@@ -16,9 +16,6 @@
 buildscript {
     repositories {
         jcenter()
-//        maven {
-//            url = "https://repository.sonatype.org/content/repositories/central/"
-//        }
     }
     dependencies {
         classpath "org.asciidoctor:asciidoctor-gradle-plugin:$asciidoc"

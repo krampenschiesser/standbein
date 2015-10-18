@@ -31,6 +31,14 @@ dependencies {
     compile "net.sourceforge.plantuml:plantuml:$plantuml"
     compile "org.apache.lucene:lucene-core:$lucene"
 
+    //Jackson
+    compile "com.fasterxml.jackson.core:jackson-databind:$jackson"
+    compile "com.fasterxml.jackson.core:jackson-annotations:$jackson"
+    compile "com.fasterxml.jackson.core:jackson-core:$jackson"
+//    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jackson_jdk8"
+//    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_jsr310"
+
+
     runtime "org.hibernate:hibernate-validator:$hibernateValidation"
     runtime "com.sun.el:el-ri:1.0"
     runtime "ch.qos.logback:logback-core:$logback"
