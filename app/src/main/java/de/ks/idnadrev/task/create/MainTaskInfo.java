@@ -194,4 +194,12 @@ public class MainTaskInfo extends BaseController<Task> {
   public AsciiDocEditor getDescription() {
     return description;
   }
+
+  public boolean isProject() {
+    return project.isSelected();
+  }
+
+  public TaskState getState() {
+    return state.getSelectionModel().getSelectedItem();
+  }
 }
