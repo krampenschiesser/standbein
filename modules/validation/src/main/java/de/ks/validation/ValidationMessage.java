@@ -1,0 +1,46 @@
+/**
+ * Copyright [2015] [Christian Loehnert]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.ks.validation;
+
+import javafx.scene.control.Control;
+
+public interface ValidationMessage extends Comparable<ValidationMessage> {
+  /**
+   * Message text
+   *
+   * @return message text
+   */
+  public String getText();
+
+  /**
+   * Message {@link Severity}
+   *
+   * @return message severity
+   */
+  public Severity getSeverity();
+
+  /**
+   * Message target - {@link javafx.scene.Control} which message is related to .
+   *
+   * @return message target
+   */
+  public Control getTarget();
+
+  @Override
+  default public int compareTo(ValidationMessage msg) {
+    return msg == null || getTarget() != msg.getTarget() ? -1 : getSeverity().compareTo(msg.getSeverity());
+  }
+}
