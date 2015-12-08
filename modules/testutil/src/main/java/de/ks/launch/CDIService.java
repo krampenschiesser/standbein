@@ -14,19 +14,16 @@
  */
 package de.ks.launch;
 
-import org.apache.deltaspike.cdise.api.CdiContainer;
-import org.apache.deltaspike.cdise.api.CdiContainerLoader;
-
 public class CDIService extends Service {
-  private final CdiContainer cdiContainer = CdiContainerLoader.getCdiContainer();
+//  private final CdiContainer cdiContainer = CdiContainerLoader.getCdiContainer();
 
   @Override
   protected void doStart() {
-    cdiContainer.boot();
+//    cdiContainer.boot();
   }
 
   @Override
   protected void doStop() {
-    cdiContainer.shutdown();
+//    cdiContainer.shutdown();
   }
 }
