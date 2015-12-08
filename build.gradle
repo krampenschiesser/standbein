@@ -84,10 +84,6 @@ allprojects {
 
     clean.doLast {
         file('log').listFiles().findAll { it.name.endsWith('.log') }.collect { println("deleting $it"); it.delete() }
-        file('data/mathjax').deleteDir();
-        file('data/asciidoctor.css').delete();
-        file('data/asciidoctor-coderay.css').delete();
-        file('data/markdown.css').delete();
         file('files').deleteDir();
         file('db').deleteDir();
         file('version.info').delete();
@@ -105,11 +101,3 @@ allprojects {
     }
 }
 
-task installLocal {
-    copy {
-        from "app/build/install/app"
-        into "/home/scar/idnadrev-dist"
-    }
-}
-
-installLocal.dependsOn(':app:installApp')

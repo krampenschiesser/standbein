@@ -12,14 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-include "doc"
 
+dependencies {
+    compile project(":modules:launch")
+    compile "org.apache.deltaspike.cdictrl:deltaspike-cdictrl-weld:$deltaspike"
+//    compile "org.apache.deltaspike.cdictrl:deltaspike-cdictrl-owb:$deltaspike"
+    compile "junit:junit:$junit"
 
-include "modules:testutil", "modules:util", "modules:reflection"
-include "modules:launch"
-//PC stuff
-include "modules:eventsystem", "modules:i18n", "modules:scheduler"
-include "modules:executor"
-//javaFX stuff
-include "modules:images", "modules:application"
-include "modules:application-test-util"
+    runtime "org.jboss.weld.se:weld-se:$weld"
+    runtime "org.jboss:jandex:$jandex"
+//    runtime "org.apache.openwebbeans:openwebbeans-impl:$openwebbeans"
+//    runtime "org.apache.openwebbeans:openwebbeans-spi:$openwebbeans"
+}

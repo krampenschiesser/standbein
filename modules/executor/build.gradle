@@ -12,14 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-include "doc"
 
 
-include "modules:testutil", "modules:util", "modules:reflection"
-include "modules:launch"
-//PC stuff
-include "modules:eventsystem", "modules:i18n", "modules:scheduler"
-include "modules:executor"
-//javaFX stuff
-include "modules:images", "modules:application"
-include "modules:application-test-util"
+
+dependencies {
+    compile project(":modules:util")
+    compile project(":modules:reflection")
+    testCompile project(":modules:testutil")
+}
