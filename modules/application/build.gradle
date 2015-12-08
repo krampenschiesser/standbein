@@ -22,6 +22,7 @@ dependencies {
     compile project(":modules:images")
     compile project(":modules:launch")
     compile project(":modules:eventsystem")
+    compile project(":modules:validation")
 
     testCompile project(":modules:testutil")
 
