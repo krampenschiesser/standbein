@@ -16,6 +16,7 @@
 package de.ks.validation;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class ValidationResult implements Cloneable {
@@ -49,6 +50,10 @@ public class ValidationResult implements Cloneable {
     ValidationResult retval = clone();
     retval.messages.addAll(other.messages);
     return retval;
+  }
+
+  public ValidationMessage getHighestMessage() {
+    return messages.stream().max(Comparator.comparing(m -> m.getSeverity().ordinal())).get();
   }
 
   @Override
