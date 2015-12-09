@@ -15,10 +15,20 @@
  */
 package de.ks.validation;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Control;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class ValidationContainer {
+  private final List<Validator> validators = new ArrayList<>();
+  private final SimpleBooleanProperty invalid = new SimpleBooleanProperty();
+  private final SimpleObjectProperty<ValidationResult> validationResult = new SimpleObjectProperty<>();
 
-  public <T> void addValidator(Validator<T> validator) {
-
+  public <C extends Control, T> void addValidator(Validator<C, T> validator) {
+    this.validators.add(validator);
   }
 
 }

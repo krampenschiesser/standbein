@@ -20,6 +20,6 @@ import javafx.scene.control.Control;
 import java.util.function.BiFunction;
 
 @FunctionalInterface
-public interface Validator<V> extends BiFunction<Control, V, ValidationResult> {
+public interface Validator<C extends Control, V> extends BiFunction<C, V, ValidationResult> {
 
 }
