@@ -117,6 +117,9 @@ public class ValidationContainer {
   @SuppressWarnings("unchecked")
   protected void handleChange(Validator validator, Control control, Object newValue) {
     ValidationResult result = (ValidationResult) validator.apply(control, newValue);
+    if (result != null && result.getMessages().isEmpty()) {
+      result = null;
+    }
     results.put(control, result);
     ControlDecorator decorator = decorators.getOrDefault(control, defaultDecorator.get());
 

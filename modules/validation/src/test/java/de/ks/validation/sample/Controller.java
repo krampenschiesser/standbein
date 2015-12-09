@@ -44,20 +44,27 @@ public class Controller implements Initializable {
     Platform.runLater(() -> new DefaultDecorator().decorate(decoratedField, result));
 
     validationContainer = new ValidationContainer();
-    validationContainer.registerValidator(validatedField, new Validator<TextField, String>() {
-      @Override
-      public ValidationResult apply(TextField textField, String s) {
-        try {
-          int number = Integer.parseInt(s);
-          if (number < 0 || number > 42) {
-            return ValidationResult.createError("Number '" + number + "' out of range. Has to be between 0 and 42");
-          }
-        } catch (NumberFormatException e) {
-          return ValidationResult.createError("No valid number '" + s + "'");
-        }
+
+
+    Validator<TextField, String> emptyValidator = (textField, s) -> {
+      if (s == null || s.isEmpty()) {
+        return ValidationResult.createError("Must not be empty!.");
+      } else {
         return null;
       }
-    });
+    };
+    Validator<TextField, String> numberValidator = (textField, s) -> {
+      try {
+        int number = Integer.parseInt(s);
+        if (number < 0 || number > 42) {
+          return ValidationResult.createError("Number '" + number + "' out of range. Has to be between 0 and 42");
+        }
+      } catch (NumberFormatException e) {
+        return ValidationResult.createError("No valid number '" + s + "'");
+      }
+      return null;
+    };
+    validationContainer.registerValidator(validatedField, emptyValidator.and(numberValidator));
 
     button.disableProperty().bind(validationContainer.invalidProperty());
   }

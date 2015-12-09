@@ -65,7 +65,11 @@ public class ValidationResult implements Cloneable {
   }
 
   public ValidationMessage getHighestMessage() {
+    if (messages.isEmpty()) {
+      throw new IllegalStateException("neeee");
+    } else {
     return messages.stream().max(Comparator.comparing(m -> m.getSeverity().ordinal())).get();
+    }
   }
 
   @Override
