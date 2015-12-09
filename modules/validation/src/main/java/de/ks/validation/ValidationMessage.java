@@ -17,30 +17,10 @@ package de.ks.validation;
 
 import javafx.scene.control.Control;
 
-public interface ValidationMessage extends Comparable<ValidationMessage> {
-  /**
-   * Message text
-   *
-   * @return message text
-   */
-  public String getText();
+public interface ValidationMessage {
+  String getText();
 
-  /**
-   * Message {@link Severity}
-   *
-   * @return message severity
-   */
-  public Severity getSeverity();
+  Severity getSeverity();
 
-  /**
-   * Message target - {@link javafx.scene.Control} which message is related to .
-   *
-   * @return message target
-   */
-  public Control getTarget();
-
-  @Override
-  default public int compareTo(ValidationMessage msg) {
-    return msg == null || getTarget() != msg.getTarget() ? -1 : getSeverity().compareTo(msg.getSeverity());
-  }
+  Control getTarget();
 }
