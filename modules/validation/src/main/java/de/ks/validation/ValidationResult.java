@@ -20,6 +20,18 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ValidationResult implements Cloneable {
+  public static ValidationResult createError(String msg) {
+    ValidationResult result = new ValidationResult();
+    result.add(new ValidationMessage(msg));
+    return result;
+  }
+
+  public static ValidationResult createWarning(String msg) {
+    ValidationResult result = new ValidationResult();
+    result.add(new ValidationMessage(msg, Severity.WARNING));
+    return result;
+  }
+
   private List<ValidationMessage> messages = new ArrayList<>();
   protected Object value;
 

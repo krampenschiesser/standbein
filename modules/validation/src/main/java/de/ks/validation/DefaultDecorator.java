@@ -15,9 +15,19 @@
  */
 package de.ks.validation;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
+import javafx.scene.Parent;
 import javafx.scene.control.Control;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.Label;
+import javafx.scene.control.PopupControl;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.stage.PopupWindow;
+import javafx.stage.Window;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,13 +35,37 @@ import java.util.Map;
 public class DefaultDecorator implements ControlDecorator {
   public static final String ERROR_STYLE = "ValidationFailedError";
   public static final String WARNING_STYLE = "ValidationFailedWarning";
+  public static final String VALIDATION_DECORATOR_CSS = "validationDecorator.css";
+  public static final String VALIDATION_POPUP_STYLE = "ValidationPopup";
 
-  protected final Map<Control, Tooltip> toolTips = new HashMap<>();
+  protected final Map<Control, ValidationPopup> toolTips = new HashMap<>();
+  protected String styleSheet = VALIDATION_DECORATOR_CSS;
+
+  public void setStyleSheet(String styleSheet) {
+    this.styleSheet = styleSheet;
+  }
 
   @Override
   public void decorate(Control c, ValidationResult result) {
+    if (c.getParent() == null) {
+      ChangeListener<Parent> listener = new ChangeListener<Parent>() {
+        @Override
+        public void changed(ObservableValue<? extends Parent> observable, Parent oldValue, Parent newValue) {
+          if (newValue != null) {
+            Platform.runLater(() -> decorate(c, result));
+            c.parentProperty().removeListener(this);
+          }
+        }
+      };
+      c.parentProperty().addListener(listener);
+    } else {
+      decorateInternal(c, result);
+    }
+  }
+
+  private void decorateInternal(Control c, ValidationResult result) {
     ValidationMessage highestMessage = result.getHighestMessage();
-    Tooltip existing = toolTips.get(c);
+    ValidationPopup existing = toolTips.get(c);
 
     if (existing == null) {
       if (highestMessage.getSeverity() == Severity.ERROR) {
@@ -39,23 +73,52 @@ public class DefaultDecorator implements ControlDecorator {
       } else {
         c.getStyleClass().add(WARNING_STYLE);
       }
-      Tooltip tooltip = new Tooltip(highestMessage.getText());
-      c.setTooltip(tooltip);
+      ValidationPopup tooltip = new ValidationPopup(c.getScene().getWindow());
       tooltip.setAnchorLocation(PopupWindow.AnchorLocation.CONTENT_BOTTOM_LEFT);
       existing = tooltip;
       toolTips.put(c, tooltip);
-    } else {
-      existing.setText(highestMessage.getText());
     }
-    existing.show(c, 0, c.getHeight());
+    existing.setText(highestMessage.getText());
+    Bounds bounds = c.localToScreen(c.getLayoutBounds());
+    double minY = bounds.getMinY();
+    existing.show(c, bounds.getMinX(), minY);
   }
 
   @Override
   public void removeDecoration(Control c) {
-    Tooltip existing = toolTips.remove(c);
+    ValidationPopup existing = toolTips.remove(c);
     if (existing != null) {
       c.getStyleClass().remove(ERROR_STYLE);
       c.getStyleClass().remove(WARNING_STYLE);
+      existing.hide();
+      existing.window.showingProperty().removeListener(existing.listener);
+    }
+  }
+
+  class ValidationPopup extends PopupControl {
+    private final Window window;
+    private Label label = new Label();
+    private final ChangeListener<Boolean> listener;
+
+    public ValidationPopup(Window window) {
+      this.window = window;
+      StackPane pane = new StackPane(label);
+      getScene().setRoot(pane);
+      getScene().getStylesheets().add(styleSheet);
+      label.getStyleClass().add(VALIDATION_POPUP_STYLE);
+
+      listener = (observable, oldValue, newValue) -> {
+        if (!newValue) {
+          hide();
+        }
+      };
+      window.showingProperty().addListener(listener);
+      DropShadow dropShadow = new DropShadow(10, Color.BLACK);
+      pane.setEffect(dropShadow);
+    }
+
+    public void setText(String text) {
+      label.setText(text);
     }
   }
 }

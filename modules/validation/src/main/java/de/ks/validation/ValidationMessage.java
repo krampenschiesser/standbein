@@ -15,12 +15,25 @@
  */
 package de.ks.validation;
 
-import javafx.scene.control.Control;
+public class ValidationMessage {
+  protected String text;
+  protected Severity severity;
 
-public interface ValidationMessage {
-  String getText();
+  public ValidationMessage(String text) {
+    this(text, Severity.ERROR);
+  }
 
-  Severity getSeverity();
+  public ValidationMessage(String text, Severity severity) {
+    this.text = text;
+    this.severity = severity;
+  }
 
-  Control getTarget();
+  public String getText() {
+    return text;
+  }
+
+  public Severity getSeverity() {
+    return severity;
+  }
+
 }

@@ -48,7 +48,7 @@ public class ValidationContainer {
   protected final Map<ObservableValue, ChangeListener> registeredObservers = new HashMap<>();
   protected final Map<Control, ControlDecorator> decorators = new HashMap<>();
 
-  protected final SimpleObjectProperty<ControlDecorator> defaultDecorator = new SimpleObjectProperty<>();
+  protected final SimpleObjectProperty<ControlDecorator> defaultDecorator = new SimpleObjectProperty<>(new DefaultDecorator());
   protected final SimpleBooleanProperty invalid = new SimpleBooleanProperty();
   protected final SimpleObjectProperty<ValidationResult> validationResult = new SimpleObjectProperty<>();
 
