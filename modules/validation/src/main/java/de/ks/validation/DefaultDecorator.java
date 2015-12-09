@@ -23,9 +23,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.stage.PopupWindow;
 import javafx.stage.Window;
 
@@ -37,6 +35,7 @@ public class DefaultDecorator implements ControlDecorator {
   public static final String WARNING_STYLE = "ValidationFailedWarning";
   public static final String VALIDATION_DECORATOR_CSS = "validationDecorator.css";
   public static final String VALIDATION_POPUP_STYLE = "ValidationPopup";
+  public static final String VALIDATION_POPUP_CONTAINER_STYLE = "ValidationPopupContainer";
 
   protected final Map<Control, ValidationPopup> toolTips = new HashMap<>();
   protected String styleSheet = VALIDATION_DECORATOR_CSS;
@@ -113,8 +112,10 @@ public class DefaultDecorator implements ControlDecorator {
         }
       };
       window.showingProperty().addListener(listener);
-      DropShadow dropShadow = new DropShadow(10, Color.BLACK);
-      pane.setEffect(dropShadow);
+
+//      DropShadow dropShadow = new DropShadow(10, Color.BLACK);
+//      pane.setEffect(dropShadow);
+      pane.getStyleClass().add(VALIDATION_POPUP_CONTAINER_STYLE);
     }
 
     public void setText(String text) {
