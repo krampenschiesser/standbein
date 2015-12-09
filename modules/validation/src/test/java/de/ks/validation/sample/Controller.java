@@ -48,7 +48,7 @@ public class Controller implements Initializable {
 
     Validator<TextField, String> emptyValidator = (textField, s) -> {
       if (s == null || s.isEmpty()) {
-        return ValidationResult.createError("Must not be empty!.");
+        return ValidationResult.createError("Must not be empty!");
       } else {
         return null;
       }
