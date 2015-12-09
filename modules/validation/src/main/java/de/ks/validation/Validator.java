@@ -17,9 +17,35 @@ package de.ks.validation;
 
 import javafx.scene.control.Control;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 
 @FunctionalInterface
 public interface Validator<C extends Control, V> extends BiFunction<C, V, ValidationResult> {
 
+  default Validator<C, V> and(Validator<C, V> other) {
+    if (this instanceof CombinedValidator) {
+      return ((CombinedValidator<C, V>) this).addValidator(other);
+    } else {
+      CombinedValidator<C, V> combined = new CombinedValidator<>();
+      combined.addValidator(this);
+      combined.addValidator(other);
+      return combined;
+    }
+  }
+
+  class CombinedValidator<C extends Control, V> implements Validator<C, V> {
+    private final List<Validator<C, V>> validators = new ArrayList<>();
+
+    public CombinedValidator<C, V> addValidator(Validator<C, V> validator) {
+      validators.add(validator);
+      return this;
+    }
+
+    @Override
+    public ValidationResult apply(C control, V value) {
+      return validators.stream().map(v -> v.apply(control, value)).reduce(new ValidationResult(), ValidationResult::combine);
+    }
+  }
 }
