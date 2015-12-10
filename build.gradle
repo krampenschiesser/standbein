@@ -65,6 +65,7 @@ allprojects {
         compile "org.apache.commons:commons-lang3:$lang3"
         compile "javax.validation:validation-api:$javaxValidation"
         compile "javax.enterprise:cdi-api:$cdiapi"
+        compile "org.objenesis:objenesis:$objenesis"
 
         testCompile "junit:junit:$junit"
         testCompile("org.mockito:mockito-core:$mockito") {
