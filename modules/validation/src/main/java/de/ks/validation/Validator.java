@@ -35,8 +35,8 @@ public interface Validator<C extends Control, V> extends BiFunction<C, V, Valida
     }
   }
 
-  class CombinedValidator<C extends Control, V> implements Validator<C, V> {
-    private final List<Validator<C, V>> validators = new ArrayList<>();
+  static class CombinedValidator<C extends Control, V> implements Validator<C, V> {
+    final List<Validator<C, V>> validators = new ArrayList<>();
 
     public CombinedValidator<C, V> addValidator(Validator<C, V> validator) {
       validators.add(validator);

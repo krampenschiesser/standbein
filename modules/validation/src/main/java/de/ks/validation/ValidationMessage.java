@@ -16,8 +16,8 @@
 package de.ks.validation;
 
 public class ValidationMessage {
-  protected String text;
-  protected Severity severity;
+  protected final String text;
+  protected final Severity severity;
 
   public ValidationMessage(String text) {
     this(text, Severity.ERROR);

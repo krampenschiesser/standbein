@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -52,7 +51,6 @@ public class ValidationContainer {
   protected final SimpleBooleanProperty invalid = new SimpleBooleanProperty();
   protected final SimpleObjectProperty<ValidationResult> validationResult = new SimpleObjectProperty<>();
 
-  private final WeakHashMap<ChangeListener, Throwable> debugTraces = new WeakHashMap<>();
   private final ExecutorService javaFXExecutor;
 
   public ValidationContainer() {
@@ -63,8 +61,13 @@ public class ValidationContainer {
     this.javaFXExecutor = javaFXExecutor;
     results.addListener((MapChangeListener<Control, ValidationResult>) change -> {
       ValidationResult reduce = results.values().stream().reduce(new ValidationResult(), ValidationResult::combine);
-      validationResult.set(reduce);
-      invalid.set(reduce.getMessages().size() > 0);
+      if (reduce.getMessages().size() > 0) {
+        validationResult.set(reduce);
+        invalid.set(true);
+      } else {
+        validationResult.set(null);
+        invalid.set(false);
+      }
     });
   }
 
@@ -89,11 +92,7 @@ public class ValidationContainer {
   protected <C extends Control, T> void configure(Validator<C, T> validator, C control, ObservableValue<T> observableValue) {
     ChangeListener removed = registeredObservers.remove(observableValue);//remove existing
     if (removed != null) {
-      if (log.isDebugEnabled()) {
-        log.warn("Removed existing validation listener {}", removed, debugTraces.get(removed));
-      } else {
-        log.warn("Removed existing validation listener {}", removed);
-      }
+      observableValue.removeListener(removed);
     }
 
     ChangeListener<T> changeListener = (observable, oldValue, newValue) -> {
@@ -101,9 +100,6 @@ public class ValidationContainer {
     };
     observableValue.addListener(changeListener);
     registeredObservers.put(observableValue, changeListener);
-    if (log.isDebugEnabled()) {
-      debugTraces.put(changeListener, new Exception().fillInStackTrace());
-    }
   }
 
   protected void runInFX(Runnable r) {
@@ -120,7 +116,11 @@ public class ValidationContainer {
     if (result != null && result.getMessages().isEmpty()) {
       result = null;
     }
-    results.put(control, result);
+    if (result != null) {
+      results.put(control, result);
+    } else {
+      results.remove(control);
+    }
     ControlDecorator decorator = decorators.getOrDefault(control, defaultDecorator.get());
 
     if (decorator != null) {
@@ -142,7 +142,8 @@ public class ValidationContainer {
   }
 
   public ValidationResult getValidationResult() {
-    return validationResult.get().clone();
+    ValidationResult current = this.validationResult.get();
+    return current == null ? null : current.clone();
   }
 
   public ReadOnlyObjectProperty<ValidationResult> validationResultProperty() {
