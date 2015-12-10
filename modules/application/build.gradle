@@ -24,6 +24,10 @@ dependencies {
     compile project(":modules:eventsystem")
     compile project(":modules:validation")
 
+    compile "com.fasterxml.jackson.core:jackson-databind:$jackson"
+    compile "com.fasterxml.jackson.core:jackson-annotations:$jackson"
+    compile "com.fasterxml.jackson.core:jackson-core:$jackson"
+
     testCompile project(":modules:testutil")
 
 }
