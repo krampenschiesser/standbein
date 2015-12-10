@@ -17,35 +17,33 @@ package de.ks.eventsystem;
 
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import de.ks.eventsystem.bus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.inject.Produces;
 import javax.inject.Singleton;
 
-public class EventSystem {
-  private static final Logger log = LoggerFactory.getLogger(EventSystem.class);
+public class EventBusModule extends AbstractModule {
 
-  private static final EventBus bus;
-
-  public static void setWaitForEvents(boolean wait) {
-    EventBus.alwaysWait = wait;
+  @Override
+  protected void configure() {
+    //nope just provider
   }
 
-  static {
-    bus = new EventBus();
-    bus.register(new EventSystem());
-  }
-
-  @Subscribe
-  public void onDeadEvent(DeadEvent dead) {
-    log.warn("No handler for event \"{}\" found. Contents: {}", dead.getEvent().getClass().getSimpleName(), dead.getEvent());
-  }
-
-  @Produces
+  @Provides
   @Singleton
   public EventBus getEventBus() {
-    return bus;
+    return new EventBus().register(new LoggingDeadEventHandler());
+  }
+
+  static class LoggingDeadEventHandler {
+    private static final Logger log = LoggerFactory.getLogger(LoggingDeadEventHandler.class);
+
+    @Subscribe
+    public void onDeadEvent(DeadEvent dead) {
+      log.warn("No handler for event \"{}\" found. Contents: {}", dead.getEvent().getClass().getSimpleName(), dead.getEvent());
+    }
   }
 }

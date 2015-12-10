@@ -18,15 +18,12 @@ import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.inject.Vetoed;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
-@Vetoed
 public class JavaFXExecutorService extends AbstractExecutorService {
   private static final Logger log = LoggerFactory.getLogger(JavaFXExecutorService.class);
   final ExecutorService mock;

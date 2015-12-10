@@ -24,8 +24,6 @@ import de.ks.reflection.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.inject.Vetoed;
-import javax.enterprise.inject.spi.CDI;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -33,10 +31,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-/**
- *
- */
-@Vetoed
 public class EventBus {
   /**
    * Used to synchronous execute all events, mainly in tests
@@ -50,9 +44,10 @@ public class EventBus {
   protected JavaFXExecutorService javaFXExecutorService = null;
 
   public EventBus register(Object handler) {
-    @SuppressWarnings("unchecked") List<Method> methods = ReflectionUtil.getAllMethods(handler.getClass(),//
-            (Method m) -> m.isAnnotationPresent(Subscribe.class),          //
-            (Method m) -> m.getParameters().length == 1                    //
+    @SuppressWarnings("unchecked")
+    List<Method> methods = ReflectionUtil.getAllMethods(handler.getClass(),//
+      (Method m) -> m.isAnnotationPresent(Subscribe.class),          //
+      (Method m) -> m.getParameters().length == 1                    //
     );
 
     lock.writeLock().lock();
@@ -70,9 +65,10 @@ public class EventBus {
   }
 
   public EventBus unregister(Object handler) {
-    @SuppressWarnings("unchecked") List<Method> methods = ReflectionUtil.getAllMethods(handler.getClass(),//
-            (Method m) -> m.isAnnotationPresent(Subscribe.class),          //
-            (Method m) -> m.getParameters().length == 1                    //
+    @SuppressWarnings("unchecked")
+    List<Method> methods = ReflectionUtil.getAllMethods(handler.getClass(),//
+      (Method m) -> m.isAnnotationPresent(Subscribe.class),          //
+      (Method m) -> m.getParameters().length == 1                    //
     );
 
     Set<Class<?>> classes = methods.stream().map(this::getEventType).collect(Collectors.toSet());
@@ -105,32 +101,17 @@ public class EventBus {
   }
 
   public EventBus post(Object event) {
-    post(event, EventTarget.Default, alwaysWait);
-    return this;
-  }
-
-  public EventBus post(Object event, EventTarget target) {
-    post(event, target, alwaysWait);
+    post(event, alwaysWait);
     return this;
   }
 
   public EventBus postAndWait(Object event) {
-    post(event, EventTarget.Default, true);
+    post(event, true);
     return this;
   }
 
-  public EventBus postAndWait(Object event, EventTarget target) {
-    post(event, target, true);
-    return this;
-  }
-
-  protected void post(Object event, EventTarget target, boolean wait) {
-
-    if (target == EventTarget.Default) {
-      postToEventHandlers(event, wait);
-    } else {
-      CDI.current().getBeanManager().fireEvent(event);
-    }
+  protected void post(Object event, boolean wait) {
+    postToEventHandlers(event, wait);
   }
 
   private void postToEventHandlers(Object event, boolean wait) {

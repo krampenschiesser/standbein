@@ -64,7 +64,8 @@ allprojects {
         compile "com.google.guava:guava:$guava"
         compile "org.apache.commons:commons-lang3:$lang3"
         compile "javax.validation:validation-api:$javaxValidation"
-        compile "javax.enterprise:cdi-api:$cdiapi"
+        compile "com.google.inject:guice:$guice"
+        compile 'javax.inject:javax.inject:1'
         compile "org.objenesis:objenesis:$objenesis"
 
         testCompile "junit:junit:$junit"

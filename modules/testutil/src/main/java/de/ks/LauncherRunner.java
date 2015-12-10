@@ -24,8 +24,6 @@ import org.junit.runners.model.InitializationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.CDI;
 import java.io.File;
 
 public class LauncherRunner extends BlockJUnit4ClassRunner {
@@ -59,11 +57,11 @@ public class LauncherRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Object createTest() throws Exception {
-    Instance<?> select = CDI.current().select(getTestClass().getJavaClass());
-    if (select.isUnsatisfied()) {
-      return getTestClass().getJavaClass().newInstance();
-    } else {
-      return select.get();
-    }
+//    Instance<?> select = CDI.current().select(getTestClass().getJavaClass());
+//    if (select.isUnsatisfied()) {
+    return getTestClass().getJavaClass().newInstance();
+//    } else {
+//      return select.get();
+//    }
   }
 }
