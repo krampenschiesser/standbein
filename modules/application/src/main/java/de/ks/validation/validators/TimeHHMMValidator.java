@@ -15,17 +15,17 @@
 
 package de.ks.validation.validators;
 
-import de.ks.validation.ValidationMessage;
+import de.ks.validation.LocalizedValidationMessage;
+import de.ks.validation.ValidationResult;
+import de.ks.validation.Validator;
 import javafx.scene.control.Control;
-import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalTime;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class TimeHHMMValidator implements Validator<String> {
+public class TimeHHMMValidator implements Validator<Control, String> {
   private static final Logger log = LoggerFactory.getLogger(TimeHHMMValidator.class);
   private final AtomicReference<LocalTime> time = new AtomicReference<>();
 
@@ -37,11 +37,11 @@ public class TimeHHMMValidator implements Validator<String> {
     if (timeString.contains(":")) {
       return parseFormat(control, timeString);
     }
-    return ValidationResult.fromMessages(new ValidationMessage("validation.timeHHMM", control));
+    return new ValidationResult().add(new LocalizedValidationMessage("validation.timeHHMM"));
   }
 
   private ValidationResult parseFormat(Control control, String timeString) {
-    ValidationResult result = ValidationResult.fromMessages(new ValidationMessage("validation.timeHHMM", control));
+    ValidationResult result = new ValidationResult().add(new LocalizedValidationMessage("validation.timeHHMM"));
 
     String[] split = timeString.split(":");
     if (split.length != 2) {

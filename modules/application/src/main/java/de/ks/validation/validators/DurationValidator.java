@@ -15,10 +15,10 @@
 package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
-import de.ks.validation.ValidationMessage;
+import de.ks.validation.LocalizedValidationMessage;
+import de.ks.validation.ValidationResult;
+import de.ks.validation.Validator;
 import javafx.scene.control.Control;
-import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class DurationValidator implements Validator<String> {
+public class DurationValidator implements Validator<Control, String> {
   private static final Logger log = LoggerFactory.getLogger(DurationValidator.class);
   private final String minutesSuffixShort;
   private final String minutesSuffifx;
@@ -53,18 +53,18 @@ public class DurationValidator implements Validator<String> {
       return null;
     } else {
       if (timeString.contains(":")) {
-        return parseFormat(control, timeString);
+        return parseFormat(timeString);
       } else if (hasSuffix(timeString, minutesSuffixShort, minutesSuffifx, TimeUnit.MINUTES)) {
         return null;
       } else if (hasSuffix(timeString, hoursSuffixShort, hoursSuffix, TimeUnit.HOURS)) {
         return null;
       }
-      return ValidationResult.fromMessages(new ValidationMessage("validation.duration", control, minutesSuffifx, minutesSuffixShort, hoursSuffix, hoursSuffixShort, durationFormat));
+      return new ValidationResult().add(new LocalizedValidationMessage("validation.duration", minutesSuffifx, minutesSuffixShort, hoursSuffix, hoursSuffixShort, durationFormat));
     }
   }
 
-  private ValidationResult parseFormat(Control control, String timeString) {
-    ValidationResult result = ValidationResult.fromMessages(new ValidationMessage("validation.duration.invalidFormat", control, durationFormat));
+  private ValidationResult parseFormat(String timeString) {
+    ValidationResult result = new ValidationResult().add(new LocalizedValidationMessage("validation.duration.invalidFormat", durationFormat));
 
     String[] split = timeString.split(":");
     if (split.length != 2) {

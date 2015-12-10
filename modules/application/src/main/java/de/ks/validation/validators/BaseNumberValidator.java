@@ -16,13 +16,13 @@
 package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
+import de.ks.validation.ValidationResult;
+import de.ks.validation.Validator;
 import javafx.scene.control.Control;
-import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.Validator;
 
 import java.util.function.Function;
 
-class BaseNumberValidator<T extends Number> implements Validator<String> {
+class BaseNumberValidator<T extends Number> implements Validator<Control, String> {
   protected final Function<String, T> parser;
   protected final String msg;
 
@@ -41,7 +41,7 @@ class BaseNumberValidator<T extends Number> implements Validator<String> {
       return furtherProcessing(control, value);
     } catch (NumberFormatException e) {
       String validationMsg = Localized.get(msg);
-      return ValidationResult.fromError(control, validationMsg);
+      return ValidationResult.createError(validationMsg);
     }
   }
 

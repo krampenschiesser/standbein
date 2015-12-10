@@ -15,25 +15,19 @@
 package de.ks.validation;
 
 import de.ks.i18n.Localized;
-import javafx.scene.control.Control;
-import org.controlsfx.validation.Severity;
 
-public class ValidationMessage implements org.controlsfx.validation.ValidationMessage {
-
+public class LocalizedValidationMessage extends ValidationMessage {
   private final String messageTemplate;
-  private final Severity severity;
-  private final Control target;
   private final Object[] parameters;
 
-  public ValidationMessage(String messageTemplate, Control target, Object... parameters) {
-    this(messageTemplate, Severity.ERROR, target, parameters);
+  public LocalizedValidationMessage(String messageTemplate, Object... parameters) {
+    this(messageTemplate, Severity.ERROR, parameters);
   }
 
-  public ValidationMessage(String messageTemplate, Severity severity, Control target, Object... parameters) {
+  public LocalizedValidationMessage(String messageTemplate, Severity severity, Object... parameters) {
+    super(messageTemplate, severity);
     assert messageTemplate != null;
     this.messageTemplate = messageTemplate.replaceAll("\\{", "").replaceAll("\\}", "");
-    this.severity = severity;
-    this.target = target;
     this.parameters = parameters == null ? new Object[0] : parameters;
   }
 
@@ -46,13 +40,4 @@ public class ValidationMessage implements org.controlsfx.validation.ValidationMe
     }
   }
 
-  @Override
-  public Severity getSeverity() {
-    return severity;
-  }
-
-  @Override
-  public Control getTarget() {
-    return target;
-  }
 }

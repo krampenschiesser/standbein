@@ -35,6 +35,10 @@ public interface Validator<C extends Control, V> extends BiFunction<C, V, Valida
     }
   }
 
+  static <C extends Control, V> Validator<C, V> and(Validator<C, V> first, Validator<C, V> second) {
+    return first.and(second);
+  }
+
   static class CombinedValidator<C extends Control, V> implements Validator<C, V> {
     final List<Validator<C, V>> validators = new ArrayList<>();
 

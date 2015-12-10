@@ -16,11 +16,11 @@
 package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
+import de.ks.validation.ValidationResult;
+import de.ks.validation.Validator;
 import javafx.scene.control.Control;
-import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.Validator;
 
-public class StringLengthValidator implements Validator<String> {
+public class StringLengthValidator implements Validator<Control, String> {
   protected final int expectedLength;
 
   public StringLengthValidator(int expectedLength) {
@@ -30,7 +30,7 @@ public class StringLengthValidator implements Validator<String> {
   @Override
   public ValidationResult apply(Control control, String s) {
     if (s == null || s.length() != expectedLength) {
-      return ValidationResult.fromError(control, Localized.get("validation.stringLength", s.length(), expectedLength));
+      return ValidationResult.createError(Localized.get("validation.stringLength", s.length(), expectedLength));
     }
     return null;
   }

@@ -63,14 +63,14 @@ public class ValidationContainerTest {
       }
     });
     FXPlatform.invokeLater(this::noop);
-    assertTrue(container.getInvalid());
+    assertTrue(container.isInvalid());
     assertEquals(1, container.results.size());
     assertEquals(1, container.getValidationResult().getMessages().size());
     assertEquals("NO", container.getValidationResult().getMessages().get(0).getText());
 
     FXPlatform.invokeLater(() -> textField.setText("Sauerland!"));
     FXPlatform.invokeLater(this::noop);
-    assertFalse(container.getInvalid());
+    assertFalse(container.isInvalid());
     assertEquals(0, container.results.size());
     assertNull(container.getValidationResult());
   }

@@ -16,19 +16,19 @@
 package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
+import de.ks.validation.ValidationResult;
+import de.ks.validation.Validator;
 import javafx.scene.control.Control;
-import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.Validator;
 
 import java.io.File;
 
-public class FileExistsValidator implements Validator<String> {
+public class FileExistsValidator implements Validator<Control, String> {
   @Override
   public ValidationResult apply(Control control, String s) {
     String filePath = s == null || s.isEmpty() ? "" : getFilePathFromString(s);
 
     String validationMsg = Localized.get("validation.fileDoesNotExist", filePath);
-    ValidationResult validationResult = ValidationResult.fromError(control, validationMsg);
+    ValidationResult validationResult = ValidationResult.createError(validationMsg);
 
     if (s == null || s.isEmpty()) {
       return validationResult;

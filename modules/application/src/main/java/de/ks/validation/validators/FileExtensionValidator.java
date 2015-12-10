@@ -16,15 +16,15 @@
 package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
+import de.ks.validation.ValidationResult;
+import de.ks.validation.Validator;
 import javafx.scene.control.Control;
-import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.Validator;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FileExtensionValidator implements Validator<String> {
+public class FileExtensionValidator implements Validator<Control, String> {
 
   private final List<String> fileExtensions;
 
@@ -35,7 +35,7 @@ public class FileExtensionValidator implements Validator<String> {
   @Override
   public ValidationResult apply(Control control, String s) {
     String validationMsg = Localized.get("validation.file.extension", fileExtensions);
-    ValidationResult validationResult = ValidationResult.fromError(control, validationMsg);
+    ValidationResult validationResult = ValidationResult.createError(validationMsg);
 
     if (s == null || s.isEmpty()) {
       return validationResult;

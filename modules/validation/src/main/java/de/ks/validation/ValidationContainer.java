@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -133,7 +134,7 @@ public class ValidationContainer {
     }
   }
 
-  public boolean getInvalid() {
+  public boolean isInvalid() {
     return invalid.get();
   }
 
@@ -172,5 +173,18 @@ public class ValidationContainer {
     Validator validator = validators.get(control);
     Object newValue = observableValues.get(control).getValue();
     runInFX(() -> handleChange(validator, control, newValue));
+  }
+
+  public Optional<ValidationMessage> getHighestMessage(Control target) {
+    ValidationResult result = results.get(target);
+    if (result == null) {
+      return Optional.empty();
+    } else {
+      return Optional.of(result.getHighestMessage());
+    }
+  }
+
+  public ValidationResult getValidationResult(Control target) {
+    return results.get(target);
   }
 }

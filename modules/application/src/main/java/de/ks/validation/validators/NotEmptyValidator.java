@@ -15,16 +15,16 @@
 package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
+import de.ks.validation.ValidationResult;
+import de.ks.validation.Validator;
 import javafx.scene.control.Control;
-import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.Validator;
 
-public class NotEmptyValidator implements Validator<String> {
+public class NotEmptyValidator implements Validator<Control, String> {
   @Override
   public ValidationResult apply(Control control, String s) {
     if (s == null || s.trim().isEmpty()) {
       String validationMsg = Localized.get("validation.notEmpty");
-      return ValidationResult.fromError(control, validationMsg);
+      return ValidationResult.createError(validationMsg);
     }
     return null;
   }

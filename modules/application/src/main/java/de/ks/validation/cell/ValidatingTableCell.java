@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,27 +16,28 @@
 package de.ks.validation.cell;
 
 import de.ks.validation.ValidationRegistry;
-import de.ks.validation.validators.ValidatorChain;
+import de.ks.validation.ValidationResult;
+import de.ks.validation.Validator;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Cell;
+import javafx.scene.control.Control;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
-import org.controlsfx.validation.Validator;
 
 import javax.enterprise.inject.spi.CDI;
 import java.util.Arrays;
 import java.util.List;
 
 public class ValidatingTableCell<S, T> extends TableCell<S, T> {
-  protected final List<Validator<String>> validators;
+  protected final List<Validator<Control, String>> validators;
   protected TextField textField;
 
-  public ValidatingTableCell(StringConverter<T> converter, Validator<String>... validators) {
+  public ValidatingTableCell(StringConverter<T> converter, Validator<Control, String>... validators) {
     this.getStyleClass().add("text-field-table-cell");
     setConverter(converter);
     this.validators = Arrays.asList(validators);
@@ -114,7 +115,8 @@ public class ValidatingTableCell<S, T> extends TableCell<S, T> {
   public void commitEdit(T newValue) {
     ValidationRegistry validationRegistry = CDI.current().select(ValidationRegistry.class).get();
 
-    if (!validationRegistry.getValidationResult().getErrors().stream().filter(m -> m.getTarget().equals(textField)).findAny().isPresent()) {
+    ValidationResult validationResult = validationRegistry.getValidationResult(textField);
+    if (validationResult == null || validationResult.getMessages().isEmpty()) {
       super.commitEdit(newValue);
     }
   }
@@ -158,10 +160,10 @@ public class ValidatingTableCell<S, T> extends TableCell<S, T> {
     cell.setGraphic(graphic);
   }
 
-  static <T> TextField createTextField(final Cell<T> cell, final StringConverter<T> converter, List<Validator<String>> validators) {
+  static <T> TextField createTextField(final Cell<T> cell, final StringConverter<T> converter, List<Validator<Control, String>> validators) {
     final TextField textField = new TextField(getItemText(cell, converter));
     ValidationRegistry validationRegistry = CDI.current().select(ValidationRegistry.class).get();
-    validationRegistry.registerValidator(textField, new ValidatorChain<>(validators));
+    validationRegistry.registerValidator(textField, validators.stream().reduce((first, second) -> first.and(second)).get());
 
     // Use onAction here rather than onKeyReleased (with check for Enter),
     // as otherwise we encounter RT-34685
@@ -169,7 +171,8 @@ public class ValidatingTableCell<S, T> extends TableCell<S, T> {
       if (converter == null) {
         throw new IllegalStateException("Attempting to convert text input into Object, but provided " + "StringConverter is null. Be sure to set a StringConverter " + "in your cell factory.");
       }
-      if (!validationRegistry.getValidationResult().getErrors().stream().filter(m -> m.getTarget().equals(textField)).findAny().isPresent()) {
+      ValidationResult validationResult = validationRegistry.getValidationResult(textField);
+      if (validationResult == null || validationResult.getMessages().isEmpty()) {
         cell.commitEdit(converter.fromString(textField.getText()));
       }
       event.consume();

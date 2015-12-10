@@ -16,14 +16,14 @@
 package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
+import de.ks.validation.ValidationResult;
+import de.ks.validation.Validator;
 import javafx.scene.control.Control;
-import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.Validator;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public class RegexPatternValidator implements Validator<String> {
+public class RegexPatternValidator implements Validator<Control, String> {
   @Override
   public ValidationResult apply(Control control, String s) {
     if (s == null || s.isEmpty()) {
@@ -33,7 +33,7 @@ public class RegexPatternValidator implements Validator<String> {
         Pattern.compile(s);
         return null;
       } catch (PatternSyntaxException e) {
-        return ValidationResult.fromError(control, Localized.get("invalid.pattern", s));
+        return ValidationResult.createError(Localized.get("invalid.pattern", s));
       }
     }
   }

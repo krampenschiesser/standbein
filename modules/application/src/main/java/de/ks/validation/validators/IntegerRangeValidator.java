@@ -16,8 +16,8 @@
 package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
+import de.ks.validation.ValidationResult;
 import javafx.scene.control.Control;
-import org.controlsfx.validation.ValidationResult;
 
 public class IntegerRangeValidator extends IntegerValidator {
   protected final int minInclusive;
@@ -32,10 +32,10 @@ public class IntegerRangeValidator extends IntegerValidator {
   protected ValidationResult furtherProcessing(Control control, Integer value) {
     if (value < minInclusive) {
       String validationMsg = Localized.get("validation.number.greaterEquals", minInclusive);
-      return ValidationResult.fromError(control, validationMsg);
+      return ValidationResult.createError(validationMsg);
     } else if (value >= maxExclusive) {
       String validationMsg = Localized.get("validation.number.lessThan", maxExclusive);
-      return ValidationResult.fromError(control, validationMsg);
+      return ValidationResult.createError(validationMsg);
     }
     return super.furtherProcessing(control, value);
   }
