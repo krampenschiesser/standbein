@@ -50,14 +50,16 @@ public class DefaultLoader<V extends Node, C> {
 
   private final ControllerFactory controllerFactory;
   private final ResourceBundle resourceBundle;
+  private final Localized localized;
 
   private C loadedInstance;
   private FXMLLoader loader;
 
   @Inject
-  public DefaultLoader(ControllerFactory controllerFactory, ResourceBundle resourceBundle) {
+  public DefaultLoader(ControllerFactory controllerFactory, ResourceBundle resourceBundle, Localized localized) {
     this.controllerFactory = controllerFactory;
     this.resourceBundle = resourceBundle;
+    this.localized = localized;
   }
 
   protected void initialize(Class<?> controller, URL fxmlFile) {
@@ -68,6 +70,10 @@ public class DefaultLoader<V extends Node, C> {
       throw new FXMLFileNotFoundException("FXML file not found, is null!");
     }
 
+    ResourceBundle bundleToUse = resourceBundle;
+    if (controller != null) {
+      bundleToUse = localized.getBundle(controller);
+    }
     loader = new FXMLLoader(fxmlFile, resourceBundle, new JavaFXBuilderFactory(), controllerFactory);
   }
 
@@ -133,7 +139,7 @@ public class DefaultLoader<V extends Node, C> {
 
         label.setOnMouseClicked(e -> {
           if (e.getButton() == MouseButton.SECONDARY) {
-            MenuItem item = new MenuItem(Localized.get("copy"));
+            MenuItem item = new MenuItem(localized.get("copy"));
             ContextMenu contextMenu = new ContextMenu(item);
             item.setOnAction(actionEvent -> {
               HashMap<DataFormat, Object> content = new HashMap<>();
@@ -149,6 +155,7 @@ public class DefaultLoader<V extends Node, C> {
   }
 
   public V getView() {
+    checkInitialized();
     if (fxmlFile == null) {
       return null;
     } else {
@@ -156,18 +163,23 @@ public class DefaultLoader<V extends Node, C> {
     }
   }
 
-  private FXMLLoader getLoader() {
-    load();
-    return loader;
-  }
-
   public C getController() {
+    checkInitialized();
     if (fxmlFile == null) {
-      load();
       return loadedInstance;
     } else {
       return getLoader().getController();
     }
+  }
+
+  private void checkInitialized() {
+    if (controller == null && fxmlFile == null) {
+      throw new IllegalStateException(this.getClass().getSimpleName() + " not yet initialized");
+    }
+  }
+
+  private FXMLLoader getLoader() {
+    return loader;
   }
 
   public URL getFxmlFile() {
