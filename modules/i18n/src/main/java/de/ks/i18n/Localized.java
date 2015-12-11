@@ -17,10 +17,10 @@ package de.ks.i18n;
 
 import de.ks.eventsystem.bus.EventBus;
 import de.ks.i18n.event.LanguageChangedEvent;
+import de.ks.standbein.GuiceSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.inject.spi.CDI;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Locale;
@@ -46,7 +46,7 @@ public class Localized {
     Locale oldLocale = Locale.getDefault();
     Locale.setDefault(locale);
     initialize();
-    CDI.current().select(EventBus.class).get().post(new LanguageChangedEvent(oldLocale, locale));
+    GuiceSupport.get(EventBus.class).post(new LanguageChangedEvent(oldLocale, locale));
   }
 
   protected synchronized static void initialize() {

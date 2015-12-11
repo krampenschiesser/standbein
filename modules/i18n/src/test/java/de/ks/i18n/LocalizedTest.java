@@ -23,19 +23,18 @@ import de.ks.eventsystem.bus.EventBus;
 import de.ks.i18n.event.LanguageChangedEvent;
 import de.ks.i18n.nobundle.NoBundleClass;
 import de.ks.i18n.other.OtherClass;
+import de.ks.standbein.GuiceSupport;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.enterprise.inject.spi.CDI;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Created by Christian Loehnert
@@ -79,7 +78,7 @@ public class LocalizedTest {
 
   @Test
   public void testLanguageChangeEvent() throws Exception {
-    EventBus eventBus = CDI.current().select(EventBus.class).get();
+    EventBus eventBus = GuiceSupport.get(EventBus.class);
     eventBus.register(this);
     try {
       Localized.changeLocale(Locale.GERMAN);
