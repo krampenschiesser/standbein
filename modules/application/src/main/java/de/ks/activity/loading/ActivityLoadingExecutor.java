@@ -14,12 +14,10 @@
  */
 package de.ks.activity.loading;
 
-import javax.enterprise.inject.Vetoed;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-@Vetoed
 public class ActivityLoadingExecutor extends ThreadPoolExecutor {
 
   public ActivityLoadingExecutor() {

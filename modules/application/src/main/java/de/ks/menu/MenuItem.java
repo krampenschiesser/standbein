@@ -15,7 +15,6 @@
 
 package de.ks.menu;
 
-import javax.enterprise.util.Nonbinding;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -29,12 +28,12 @@ public @interface MenuItem {
   /**
    * The name of the menu
    */
-  @Nonbinding String value();
+  String value();
 
   /**
    * An optional path to an item image.
    */
-  @Nonbinding String image() default "";
+  String image() default "";
 
-  @Nonbinding int order() default 100;
+  int order() default 100;
 }

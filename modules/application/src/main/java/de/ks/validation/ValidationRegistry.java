@@ -29,12 +29,17 @@ import java.util.Optional;
 @ActivityScoped
 public class ValidationRegistry {
   private static final Logger log = LoggerFactory.getLogger(ValidationRegistry.class);
-  protected final ValidationContainer validationSupport = new ValidationContainer();
 
   protected final SimpleBooleanProperty invalid = new SimpleBooleanProperty(false);
 
+  protected final ActivityStore store;
+  protected final ValidationContainer validationSupport;
+
   @Inject
-  ActivityStore store;
+  public ValidationRegistry(ValidationContainer validationSupport, ActivityStore store) {
+    this.validationSupport = validationSupport;
+    this.store = store;
+  }
 
   @PostConstruct
   public void init() {

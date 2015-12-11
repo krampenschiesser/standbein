@@ -28,6 +28,7 @@ import javafx.scene.input.MouseButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -42,63 +43,46 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class DefaultLoader<V extends Node, C> {
   private static final Logger log = LoggerFactory.getLogger(DefaultLoader.class);
-  private final Class<?> controller;
-  private final URL fxmlFile;
-  private FXMLLoader loader;
+
+  private Class<?> controller;
+  private URL fxmlFile;
   protected final AtomicBoolean loaded = new AtomicBoolean(false);
-  private ControllerFactory controllerFactory;
-  private ResourceBundle resourceBundle;
+
+  private final ControllerFactory controllerFactory;
+  private final ResourceBundle resourceBundle;
+
   private C loadedInstance;
+  private FXMLLoader loader;
 
-  public DefaultLoader(Class<?> modelController) {
-    this(modelController, guessFxmlFile(modelController));
+  @Inject
+  public DefaultLoader(ControllerFactory controllerFactory, ResourceBundle resourceBundle) {
+    this.controllerFactory = controllerFactory;
+    this.resourceBundle = resourceBundle;
   }
 
-  private static URL guessFxmlFile(Class<?> modelController) {
-    String controllerName = modelController.getSimpleName();
-    URL resource = modelController.getResource(controllerName + ".fxml");
-    if (resource == null) {
-      log.trace("Trying {}", controllerName + "View.fxml");
-      resource = modelController.getResource(controllerName + "View.fxml");
-    }
-    if (resource == null) {
-      if (controllerName.toLowerCase(Locale.ROOT).endsWith("controller")) {
-        String substring = controllerName.substring(0, controllerName.length() - "controller".length());
-
-        log.trace("Trying {}", substring + ".fxml");
-        resource = modelController.getResource(substring + ".fxml");
-        if (resource == null) {
-          log.trace("Trying {}", substring + "View.fxml");
-          resource = modelController.getResource(substring + "View.fxml");
-        }
-      }
-    }
-    return resource;
-  }
-
-  public DefaultLoader(URL fxmlFile) {
-    this(null, fxmlFile);
-  }
-
-  protected DefaultLoader(Class<?> controller, URL fxmlFile) {
+  protected void initialize(Class<?> controller, URL fxmlFile) {
     this.controller = controller;
     this.fxmlFile = fxmlFile;
     if (fxmlFile == null && controller == null) {
       log.error("FXML file not found, is null!");
       throw new FXMLFileNotFoundException("FXML file not found, is null!");
     }
-    controllerFactory = new ControllerFactory();
 
-    if (controller != null) {
-      resourceBundle = Localized.getBundle(controller);
-    } else {
-      resourceBundle = Localized.getBundle();
-    }
     loader = new FXMLLoader(fxmlFile, resourceBundle, new JavaFXBuilderFactory(), controllerFactory);
   }
 
+  public DefaultLoader<V, C> load(URL fxmlFile) {
+    return load(null, fxmlFile);
+  }
+
+  public DefaultLoader<V, C> load(Class<C> controller) {
+    return load(controller, guessFxmlFile(controller));
+  }
+
   @SuppressWarnings("unchecked")
-  public DefaultLoader<V, C> load() {
+  public DefaultLoader<V, C> load(Class<C> controller, URL fxmlFile) {
+    initialize(controller, fxmlFile);
+
     try {
       if (loaded.compareAndSet(false, true)) {
         if (fxmlFile == null) {
@@ -195,5 +179,27 @@ public class DefaultLoader<V extends Node, C> {
     return "DefaultLoader{" +
       "fxmlFile=" + fxmlFile +
       '}';
+  }
+
+  private static URL guessFxmlFile(Class<?> modelController) {
+    String controllerName = modelController.getSimpleName();
+    URL resource = modelController.getResource(controllerName + ".fxml");
+    if (resource == null) {
+      log.trace("Trying {}", controllerName + "View.fxml");
+      resource = modelController.getResource(controllerName + "View.fxml");
+    }
+    if (resource == null) {
+      if (controllerName.toLowerCase(Locale.ROOT).endsWith("controller")) {
+        String substring = controllerName.substring(0, controllerName.length() - "controller".length());
+
+        log.trace("Trying {}", substring + ".fxml");
+        resource = modelController.getResource(substring + ".fxml");
+        if (resource == null) {
+          log.trace("Trying {}", substring + "View.fxml");
+          resource = modelController.getResource(substring + "View.fxml");
+        }
+      }
+    }
+    return resource;
   }
 }

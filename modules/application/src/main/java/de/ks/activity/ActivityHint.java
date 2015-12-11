@@ -15,8 +15,8 @@
 package de.ks.activity;
 
 import de.ks.activity.context.ActivityStore;
+import de.ks.standbein.GuiceSupport;
 
-import javax.enterprise.inject.spi.CDI;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -58,7 +58,7 @@ public class ActivityHint {
   }
 
   public ActivityHint returnToCurrent() {
-    return setReturnToActivity(CDI.current().select(ActivityController.class).get().getCurrentActivityId());
+    return setReturnToActivity(GuiceSupport.get(ActivityController.class).getCurrentActivityId());
   }
 
   public Supplier getReturnToDatasourceHint() {
@@ -72,7 +72,7 @@ public class ActivityHint {
 
   @SuppressWarnings("unchecked")
   public <M> ActivityHint setReturnToModelHint(Function<M, Object> modelFunction) {
-    Object model = CDI.current().select(ActivityStore.class).get().getModel();
+    Object model = GuiceSupport.get(ActivityStore.class).getModel();
     this.returnToDatasourceHint = () -> modelFunction.apply((M) model);
     return this;
   }
@@ -88,7 +88,7 @@ public class ActivityHint {
 
   @SuppressWarnings("unchecked")
   public <M> ActivityHint setModelHint(Function<M, Object> modelFunction) {
-    Object model = CDI.current().select(ActivityStore.class).get().getModel();
+    Object model = GuiceSupport.get(ActivityStore.class).getModel();
     this.dataSourceHint = () -> modelFunction.apply((M) model);
     return this;
   }

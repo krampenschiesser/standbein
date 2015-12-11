@@ -21,13 +21,11 @@ import de.ks.executor.LoggingUncaughtExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.inject.Vetoed;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 
 @ActivityScoped
-@Vetoed
 public class ActivityExecutor implements ScheduledExecutorService {
   private static final Logger log = LoggerFactory.getLogger(ActivityExecutor.class);
   private final String name;

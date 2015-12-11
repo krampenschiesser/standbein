@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.inject.Alternative;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-@Alternative
 public class PropertiesOptionSource implements OptionSource {
   private static final Logger log = LoggerFactory.getLogger(PropertiesOptionSource.class);
   public static final String PROPERTIES_FILENAME = "properties";

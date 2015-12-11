@@ -15,6 +15,7 @@
  */
 package de.ks.validation.cell;
 
+import de.ks.standbein.GuiceSupport;
 import de.ks.validation.ValidationRegistry;
 import de.ks.validation.ValidationResult;
 import de.ks.validation.Validator;
@@ -29,7 +30,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 
-import javax.enterprise.inject.spi.CDI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -113,7 +113,7 @@ public class ValidatingTableCell<S, T> extends TableCell<S, T> {
 
   @Override
   public void commitEdit(T newValue) {
-    ValidationRegistry validationRegistry = CDI.current().select(ValidationRegistry.class).get();
+    ValidationRegistry validationRegistry = GuiceSupport.get(ValidationRegistry.class);
 
     ValidationResult validationResult = validationRegistry.getValidationResult(textField);
     if (validationResult == null || validationResult.getMessages().isEmpty()) {
@@ -162,7 +162,7 @@ public class ValidatingTableCell<S, T> extends TableCell<S, T> {
 
   static <T> TextField createTextField(final Cell<T> cell, final StringConverter<T> converter, List<Validator<Control, String>> validators) {
     final TextField textField = new TextField(getItemText(cell, converter));
-    ValidationRegistry validationRegistry = CDI.current().select(ValidationRegistry.class).get();
+    ValidationRegistry validationRegistry = GuiceSupport.get(ValidationRegistry.class);
     validationRegistry.registerValidator(textField, validators.stream().reduce((first, second) -> first.and(second)).get());
 
     // Use onAction here rather than onKeyReleased (with check for Enter),

@@ -17,7 +17,6 @@ package de.ks.application;
 
 import de.ks.i18n.Localized;
 import de.ks.imagecache.Images;
-import de.ks.javafx.FxCss;
 import de.ks.launch.ApplicationService;
 import de.ks.launch.Launcher;
 import javafx.application.Application;
@@ -28,9 +27,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.CDI;
 
 /**
  *
@@ -64,14 +60,5 @@ public class LaunchingApp extends Application {
       log.error("Could not start JavaFXApp", e);
       throw e;
     }
-  }
-
-  private Scene createScene(MainWindow mainWindow) {
-    Scene scene = new Scene(mainWindow.getNode());
-    Instance<String> styleSheets = CDI.current().select(String.class, FxCss.LITERAL);
-    styleSheets.forEach((sheet) -> {
-      scene.getStylesheets().add(sheet);
-    });
-    return scene;
   }
 }

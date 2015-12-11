@@ -15,6 +15,7 @@
 
 package de.ks.activity;
 
+import com.google.inject.Injector;
 import de.ks.activity.context.ActivityContext;
 import de.ks.activity.context.ActivityStore;
 import de.ks.activity.executor.ActivityExecutor;
@@ -37,8 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PreDestroy;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,7 +62,7 @@ public class ActivityController {
   @Inject
   protected ActivityStore store;
   @Inject
-  protected Instance<Navigator> navigator;
+  protected Provider<Navigator> navigator;
   @Inject
   protected ActivityInitialization initialization;
   @Inject
@@ -71,9 +72,8 @@ public class ActivityController {
   protected ActivityExecutor executor;
   @Inject
   protected ActivityJavaFXExecutor javaFXExecutor;
-
   @Inject
-  protected Instance<Object> factory;
+  protected Injector injector;
 
   protected final Map<String, ActivityCfg> registeredActivities = new HashMap<>();
   protected final ReentrantLock lock = new ReentrantLock(true);
@@ -112,14 +112,14 @@ public class ActivityController {
           resume(id, activityHint.isRefreshOnReturn(), dataSourceHint, null, activityHint);
         } else {
           context.startActivity(id);
-          ActivityCfg activityCfg = factory.select(activityHint.getNextActivity()).get();
+          ActivityCfg activityCfg = injector.getInstance(activityHint.getNextActivity());
 
           registeredActivities.put(id, activityCfg);
 
           activityCfg.setActivityHint(activityHint);
 
           log.info("Starting activity {}", id);
-          DataSource dataSource = factory.select(activityCfg.getDataSource()).get();
+          DataSource dataSource = injector.getInstance(activityCfg.getDataSource());
           dataSource.setLoadingHint(dataSourceHint);
           store.setDatasource(dataSource);
 

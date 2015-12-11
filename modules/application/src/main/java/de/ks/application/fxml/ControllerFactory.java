@@ -15,6 +15,8 @@
 
 package de.ks.application.fxml;
 
+import com.google.inject.ConfigurationException;
+import com.google.inject.Injector;
 import de.ks.activity.context.ActivityContext;
 import de.ks.activity.initialization.ActivityInitialization;
 import de.ks.reflection.ReflectionUtil;
@@ -22,65 +24,65 @@ import javafx.util.Callback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
  */
 public class ControllerFactory implements Callback<Class<?>, Object> {
   private static final Logger log = LoggerFactory.getLogger(ControllerFactory.class);
-  private static volatile CDI cdi;
 
-  static <T> CDI<T> getCdi() {
-    if (cdi == null) {
-      synchronized (ControllerFactory.class) {
-        if (cdi == null) {
-          cdi = CDI.current();
-        }
-      }
-    }
-    return cdi;
+  private final Injector injector;
+  private final ActivityContext context;
+  private final ActivityInitialization initialization;
+
+  @Inject
+  public ControllerFactory(Injector injector, ActivityContext context, ActivityInitialization initialization) {
+    this.injector = injector;
+    this.context = context;
+    this.initialization = initialization;
   }
 
   @Override
   public Object call(Class<?> clazz) {
-    BeanManager beanManager = getCdi().getBeanManager();
+    checkNoScopeBinding(clazz);
+
+    try {
+      Object instance = injector.getInstance(clazz);
+      registerLoadedController(instance);
+      return instance;
+    } catch (ConfigurationException e) {
+      return constructUnjectable(clazz);
+    }
+  }
+
+  private void checkNoScopeBinding(Class<?> clazz) {
+    Set<Class<? extends Annotation>> scopes = injector.getScopeBindings().keySet();
     for (Annotation annotation : clazz.getAnnotations()) {
-      if (beanManager.isScope(annotation.annotationType())) {
+      if (scopes.contains(annotation.annotationType())) {
         throw new IllegalStateException("Class " + clazz.getName() + " is not allowed to be in scope " + annotation + " because JavaFX can't inject fields in proxy types");
       }
     }
+  }
 
-    Object object;
-    Instance<?> instance = getCdi().select(clazz);
-    if (instance.isUnsatisfied()) {
-      List<Field> injectedFields = ReflectionUtil.getAllFields(clazz, (f) -> f.isAnnotationPresent(Inject.class));
-      if (!injectedFields.isEmpty()) {
-        throw new IllegalArgumentException("Unable to instanitate class " + clazz.getName() + " that defines injected fields but is no bean.");
-      } else {
-        Object newInstance = ReflectionUtil.newInstance(clazz, false);
-        registerLoadedController(newInstance);
-        return newInstance;
-      }
+  private Object constructUnjectable(Class<?> clazz) {
+    List<Field> injectedFields = ReflectionUtil.getAllFields(clazz, (f) -> f.isAnnotationPresent(Inject.class));
+    if (!injectedFields.isEmpty()) {
+      throw new IllegalArgumentException("Unable to instanitate class " + clazz.getName() + " that defines injected fields but is no bean.");
     } else {
-      object = instance.get();
+      Object newInstance = ReflectionUtil.newInstance(clazz, false);
+      registerLoadedController(newInstance);
+      return newInstance;
     }
-
-    registerLoadedController(object);
-    return object;
   }
 
   protected void registerLoadedController(Object object) {
-    ActivityContext context = getCdi().select(ActivityContext.class).get();
     if (context.hasCurrentActivity()) {
-      Instance<ActivityInitialization> initializationInstance = getCdi().select(ActivityInitialization.class);
-      initializationInstance.get().addControllerToInitialize(object);
+      initialization.addControllerToInitialize(object);
     }
   }
 }

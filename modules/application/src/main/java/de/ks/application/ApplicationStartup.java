@@ -14,11 +14,15 @@
  */
 package de.ks.application;
 
+import com.google.inject.ConfigurationException;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import de.ks.i18n.Localized;
 import de.ks.imagecache.Images;
 import de.ks.javafx.FxCss;
 import de.ks.launch.ApplicationService;
 import de.ks.launch.Launcher;
+import de.ks.standbein.GuiceSupport;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -30,30 +34,18 @@ import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.CDI;
+import java.util.Set;
 
 public class ApplicationStartup {
   private static final Logger log = LoggerFactory.getLogger(ApplicationStartup.class);
   private MainWindow mainWindow;
 
   public void start(Stage stage) {
-    CDI<Object> cdi = CDI.current();
-    Thread.currentThread().setUncaughtExceptionHandler(cdi.select(FXApplicationExceptionHandler.class).get());
+    Thread.currentThread().setUncaughtExceptionHandler(GuiceSupport.get(FXApplicationExceptionHandler.class));
     try {
       log.info("Starting application " + getClass().getName());
-      Instance<MainWindow> select = cdi.select(MainWindow.class);
-      if (select.isUnsatisfied()) {
-        stage.setTitle(Localized.get("warning.general"));
-        StackPane container = new StackPane();
-        Label label = new Label(Localized.get("warning.unsatisfiedApplication"));
-        container.getChildren().add(label);
-        Scene scene = new Scene(container, 640, 480);
-        stage.setScene(scene);
-
-        Navigator.register(stage, container);
-      } else {
-        mainWindow = select.get();
+      try {
+        mainWindow = GuiceSupport.get(MainWindow.class);
         stage.setTitle(mainWindow.getApplicationTitle());
         stage.setScene(createScene(mainWindow));
 
@@ -67,6 +59,15 @@ public class ApplicationStartup {
         } else {
           Navigator.register(stage, pane);
         }
+      } catch (ConfigurationException e) {
+        stage.setTitle(Localized.get("warning.general"));
+        StackPane container = new StackPane();
+        Label label = new Label(Localized.get("warning.unsatisfiedApplication"));
+        container.getChildren().add(label);
+        Scene scene = new Scene(container, 640, 480);
+        stage.setScene(scene);
+
+        Navigator.register(stage, container);
       }
       stage.setOnCloseRequest((WindowEvent e) -> {
         Launcher.instance.stopAll();
@@ -82,7 +83,11 @@ public class ApplicationStartup {
 
   private Scene createScene(MainWindow mainWindow) {
     Scene scene = new Scene(mainWindow.getNode());
-    Instance<String> styleSheets = CDI.current().select(String.class, FxCss.LITERAL);
+
+    Key<Set<String>> key = Key.get(new TypeLiteral<Set<String>>() {
+    }, FxCss.class);
+
+    Set<String> styleSheets = GuiceSupport.instance.getInjector().getBinding(key).getProvider().get();
     styleSheets.forEach((sheet) -> {
       scene.getStylesheets().add(sheet);
     });
