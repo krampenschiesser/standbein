@@ -48,8 +48,8 @@ class EventHandler {
     } else {
       priority = Integer.MAX_VALUE;
     }
-    if (method.isAnnotationPresent(Threading.class)) {
-      handlingThread = method.getAnnotation(Threading.class).value();
+    if (method.isAnnotationPresent(HandleInThread.class)) {
+      handlingThread = method.getAnnotation(HandleInThread.class).value();
     } else {
       handlingThread = HandlingThread.Sync;
     }

@@ -43,7 +43,7 @@ public class ReceivingHandler {
     this.child = child;
   }
 
-  @Threading(HandlingThread.Async)
+  @HandleInThread(HandlingThread.Async)
   @Subscribe
   public void onInt(int i) {
     try {
