@@ -36,4 +36,18 @@ public class GuiceSupportTest {
     assertNotNull(select);
     assertEquals("Sauerland", select.getName());
   }
+
+  @Test
+  public void testGenericInjection() throws Exception {
+    Injectioned injectioned = GuiceSupport.get(Injectioned.class);
+    TestPojo instance = injectioned.injector.getInstance(TestPojo.class);
+    assertNotNull(instance);
+  }
+
+  @Test
+  public void testPrivateSetterInjection() throws Exception {
+    Injectioned injectioned = GuiceSupport.get(Injectioned.class);
+    TestPojo instance = injectioned.pojo;
+    assertNotNull(instance);
+  }
 }
