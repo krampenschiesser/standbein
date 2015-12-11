@@ -1,10 +1,11 @@
-/*
- * Copyright [2014] [Christian Loehnert, krampenschiesser@gmail.com]
+/**
+ * Copyright [2015] [Christian Loehnert]
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-include "doc"
+package de.ks.standbein;
 
-include "modules:guicesupport"
-include "modules:testutil", "modules:util", "modules:reflection"
-include "modules:launch"
-//PC stuff
-include "modules:eventsystem", "modules:i18n", "modules:validation"
-include "modules:executor"
-//javaFX stuff
-include "modules:images", "modules:application"
-include "modules:application-test-util"
+public class TestPojo {
+  protected String name;
+
+  public String getName() {
+    return name;
+  }
+
+  public TestPojo setName(String name) {
+    this.name = name;
+    return this;
+  }
+}

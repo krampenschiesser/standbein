@@ -57,6 +57,7 @@ allprojects {
     dependencies {
         asciidoclet "org.asciidoctor:asciidoclet:$asciidocJavaIntegration"
 
+        compile "com.google.code.findbugs:jsr305:$jsr305"
         compile "org.slf4j:slf4j-api:$slf4j"
         compile("org.slf4j:slf4j-ext:$slf4j") {
             exclude module: "cal10n-api"
