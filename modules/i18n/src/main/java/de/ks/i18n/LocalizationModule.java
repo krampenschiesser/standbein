@@ -16,9 +16,13 @@
 package de.ks.i18n;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.google.inject.name.Names;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class LocalizationModule extends AbstractModule {
   public static final String FILENAME = "ResourceBundle.filename";
@@ -29,5 +33,12 @@ public class LocalizationModule extends AbstractModule {
     bind(String.class).annotatedWith(Names.named(FILENAME)).toInstance("Translation");
     bind(String.class).annotatedWith(Names.named(BASENAME)).toInstance("de.ks.i18n.Translation");
     bind(Locale.class).toInstance(Locale.getDefault());
+  }
+
+  @Provides
+  @Singleton
+  @Inject
+  public ResourceBundle getResourceBundle(Localized localized) {
+    return localized.bundle;
   }
 }

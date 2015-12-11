@@ -33,6 +33,7 @@ import org.junit.runner.RunWith;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -48,13 +49,21 @@ public class LocalizedTest {
   private LanguageChangedEvent event;
   private Localized localized;
   private EventBus eventBus;
+  private Injector injector;
 
   @Before
   public void setUp() throws Exception {
-    Injector injector = Guice.createInjector(new LocalizationModule(), new EventBusModule());
+    injector = Guice.createInjector(new LocalizationModule(), new EventBusModule());
     localized = injector.getInstance(Localized.class);
     localized.changeLocale(Locale.ENGLISH);
     eventBus = injector.getInstance(EventBus.class);
+  }
+
+  @Test
+  public void testBundleInjection() throws Exception {
+    ResourceBundle bundle = injector.getInstance(ResourceBundle.class);
+    assertNotNull(bundle);
+    assertSame(bundle, localized.bundle);
   }
 
   @Test
