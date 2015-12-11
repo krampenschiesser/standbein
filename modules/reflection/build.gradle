@@ -16,6 +16,7 @@
 dependencies {
     compile project(":modules:util")
 
+    compile "com.google.guava:guava:$guava"
     compile "org.javassist:javassist:$javassist"
     compile "org.objenesis:objenesis:$objenesis"
 }

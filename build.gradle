@@ -14,7 +14,7 @@
  */
 
 task wrapper(type: Wrapper) {
-    gradleVersion = "2.1"
+    gradleVersion = "2.9"
 }
 
 allprojects {
@@ -44,12 +44,6 @@ allprojects {
         }
     }
 
-    jar {
-        manifest {
-            attributes("Implementation-Version": "$version")
-        }
-    }
-
     configurations {
         asciidoclet
     }
@@ -59,15 +53,12 @@ allprojects {
 
         compile "com.google.code.findbugs:jsr305:$jsr305"
         compile "org.slf4j:slf4j-api:$slf4j"
-        compile("org.slf4j:slf4j-ext:$slf4j") {
-            exclude module: "cal10n-api"
-        }
-        compile "com.google.guava:guava:$guava"
-        compile "org.apache.commons:commons-lang3:$lang3"
-        compile "javax.validation:validation-api:$javaxValidation"
-        compile "com.google.inject:guice:$guice"
-        compile 'javax.inject:javax.inject:1'
-        compile "org.objenesis:objenesis:$objenesis"
+
+//        compile "com.google.inject:guice:$guice"
+//        compile 'javax.inject:javax.inject:1'
+//        compile "com.google.guava:guava:$guava"
+//        compile "org.apache.commons:commons-lang3:$lang3"
+
 
         testCompile "junit:junit:$junit"
         testCompile("org.mockito:mockito-core:$mockito") {
@@ -75,22 +66,9 @@ allprojects {
         }
         testCompile "org.hamcrest:hamcrest-all:$hamcrest"
 
+        testRuntime "org.objenesis:objenesis:$objenesis"
         testRuntime "ch.qos.logback:logback-core:$logback"
         testRuntime "ch.qos.logback:logback-classic:$logback"
-    }
-
-    test {
-//        systemProperty 'glass.platform', 'Monocle'
-//        systemProperty 'monocle.platform', 'Headless'
-//        systemProperty 'prism.order', 'sw'
-    }
-
-    clean.doLast {
-        file('log').listFiles().findAll { it.name.endsWith('.log') }.collect { println("deleting $it"); it.delete() }
-        file('files').deleteDir();
-        file('db').deleteDir();
-        file('version.info').delete();
-        file('options.properties').delete();
     }
 
     task cleanlog {

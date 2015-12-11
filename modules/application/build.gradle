@@ -18,6 +18,7 @@ apply plugin: "maven-publish"
 version = "$applicationLibVersion"
 
 dependencies {
+    compile project(":modules:guicesupport")
     compile project(":modules:i18n")
     compile project(":modules:images")
     compile project(":modules:launch")

@@ -17,5 +17,8 @@ dependencies {
     compile project(":modules:reflection")
     compile project(":modules:executor")
 
+    compile "com.google.inject:guice:$guice"
+    compile 'javax.inject:javax.inject:1'
+
     testCompile project(":modules:testutil")
 }

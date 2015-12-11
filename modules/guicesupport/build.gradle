@@ -1,0 +1,4 @@
+dependencies {
+    compile "com.google.inject:guice:$guice"
+    compile 'javax.inject:javax.inject:1'
+}
