@@ -17,76 +17,100 @@ package de.ks.i18n;
 
 import de.ks.eventsystem.bus.EventBus;
 import de.ks.i18n.event.LanguageChangedEvent;
-import de.ks.standbein.GuiceSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicBoolean;
+
+import static de.ks.i18n.LocalizationModule.*;
 
 /**
  * Main interface to the i18n facilities.
  */
+@Singleton
 public class Localized {
   private static final Logger log = LoggerFactory.getLogger(Localized.class);
-  protected static final AtomicBoolean initialized = new AtomicBoolean(false);
-  protected static volatile ResourceBundleWrapper bundle;
-  public static final String FILENAME = "Translation";
-  public static final String BASENAME = "de.ks.i18n." + FILENAME;
+
+  protected UTF8Control control = new UTF8Control();
+  protected ResourceBundleWrapper bundle;
+
+  protected final String fileName;
+  protected final String baseName;
+
+  EventBus eventBus;
+  protected Locale locale;
+
+  @Inject
+  public Localized(Locale locale, @Named(FILENAME) String fileName, @Named(BASENAME) String baseName) {
+    this.locale = locale;
+    this.fileName = fileName;
+    this.baseName = baseName;
+  }
+
+  @Inject
+  protected void setEventBus(EventBus eventBus) {
+    this.eventBus = eventBus;
+  }
+
+  protected void initialize() {
+    String path = baseName + "_" + locale.getLanguage() + ".properties";
+    bundle = new ResourceBundleWrapper(fileName, ResourceBundle.getBundle(baseName, locale, control), null, path, locale);
+  }
+
+  private boolean isInitialized() {
+    return bundle != null;
+  }
 
   /**
    * Use this method in order to notify possible listeners and replace the resource bundle.
    *
-   * @param locale
+   * @param newLocale
    */
-  public static void changeLocale(Locale locale) {
-    Locale oldLocale = Locale.getDefault();
-    Locale.setDefault(locale);
+  public void changeLocale(Locale newLocale) {
+    Locale oldLocale = locale;
+    locale = newLocale;
     initialize();
-    GuiceSupport.get(EventBus.class).post(new LanguageChangedEvent(oldLocale, locale));
-  }
-
-  protected synchronized static void initialize() {
-    Locale locale = Locale.getDefault();
-    String path = BASENAME + "_" + locale.getLanguage() + ".properties";
-    bundle = new ResourceBundleWrapper(ResourceBundle.getBundle(BASENAME, locale, new UTF8Control()), null, path);
-    initialized.set(true);
+    if (eventBus != null) {
+      eventBus.post(new LanguageChangedEvent(oldLocale, newLocale));
+    }
   }
 
   /**
    * @return the currently used bundle to use for eg. JavaFX loaders etc.
    */
-  public static ResourceBundleWrapper getBundle() {
-    if (!initialized.get()) {
+  public ResourceBundleWrapper getBundle() {
+    if (!isInitialized()) {
       initialize();
     }
     return bundle;
   }
 
-  public static ResourceBundleWrapper getBundle(Class callerClass) {
-    if (!initialized.get()) {
+  public ResourceBundleWrapper getBundle(Class callerClass) {
+    if (!isInitialized()) {
       initialize();
     }
-    Locale locale = Locale.getDefault();
     String substring = callerClass.getName().substring(0, callerClass.getName().lastIndexOf('.') + 1);
 
 
-    UTF8Control control = new UTF8Control();
-    String baseName = substring + Localized.FILENAME;
-    URL resource = callerClass.getResource("/" + control.getResourceName(baseName, locale));
+    String classRelativeBaseName = substring + fileName;
+    URL resource = callerClass.getResource("/" + control.getResourceName(classRelativeBaseName, locale));
     if (resource == null) {
-      resource = callerClass.getResource("/" + control.getResourceName(baseName, control.getFallbackLocale(baseName, locale)));
+      resource = callerClass.getResource("/" + control.getResourceName(classRelativeBaseName, control.getFallbackLocale(classRelativeBaseName, locale)));
     }
 
     if (resource != null) {
-      log.debug("Found local bundle {}", baseName);
-      ResourceBundle localBundle = ResourceBundle.getBundle(baseName, locale, control);
-      return new ResourceBundleWrapper(localBundle, bundle.getBundle(), baseName + "_" + locale.getLanguage() + ".properties");
+      log.debug("Found local bundle {}", classRelativeBaseName);
+      ResourceBundle localBundle = ResourceBundle.getBundle(classRelativeBaseName, locale, control);
+      return new ResourceBundleWrapper(fileName, localBundle, bundle.getBundle(), classRelativeBaseName + "_" + locale.getLanguage() + ".properties", locale);
+    } else {
+      return bundle;
     }
-    return bundle;
   }
 
   /**
@@ -104,7 +128,7 @@ public class Localized {
    * @param args
    * @return
    */
-  public static String get(String key, Object... args) {
+  public String get(String key, Object... args) {
     String string = getBundle().getString(key);
     if (args == null) {
       return string;
@@ -121,7 +145,7 @@ public class Localized {
     }
   }
 
-  public static String get(Field field) {
+  public String get(Field field) {
     String key = field.getDeclaringClass().getName();
     key += field.getName();
     return get(key);

@@ -20,11 +20,19 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 public class OtherClass {
+  private final Localized localized;
+
+  @Inject
+  public OtherClass(Localized localized) {
+    this.localized = localized;
+  }
+
   public String getString() {
-    return Localized.get("subPackageString");
+    return localized.get("subPackageString");
   }
 
   public String getStringFromFXML() throws IOException {

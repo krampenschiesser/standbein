@@ -21,8 +21,8 @@ import java.util.Locale;
  * Indicates a language change to possible listeners.
  */
 public class LanguageChangedEvent {
-  Locale oldLocale;
-  Locale newLocale;
+  final Locale oldLocale;
+  final Locale newLocale;
 
   public LanguageChangedEvent(Locale oldLocale, Locale newLocale) {
     this.oldLocale = oldLocale;
@@ -33,16 +33,8 @@ public class LanguageChangedEvent {
     return newLocale;
   }
 
-  public void setNewLocale(Locale newLocale) {
-    this.newLocale = newLocale;
-  }
-
   public Locale getOldLocale() {
     return oldLocale;
-  }
-
-  public void setOldLocale(Locale oldLocale) {
-    this.oldLocale = oldLocale;
   }
 
   @Override

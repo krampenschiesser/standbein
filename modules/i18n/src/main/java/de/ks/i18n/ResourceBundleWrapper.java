@@ -36,8 +36,12 @@ class ResourceBundleWrapper extends ResourceBundle {
   private final String path;
   private final File missingKeyFile;
   private final ResourceBundle fallback;
+  private final String bundleFileName;
+  private final Locale locale;
 
-  public ResourceBundleWrapper(ResourceBundle bundle, ResourceBundle fallback, String path) {
+  public ResourceBundleWrapper(String bundleFileName, ResourceBundle bundle, ResourceBundle fallback, String path, Locale locale) {
+    this.bundleFileName = bundleFileName;
+    this.locale = locale;
     this.fallback = fallback == null ? bundle : fallback;
     String tempDir = System.getProperty("java.io.tmpdir");
     String pathname = tempDir + File.separator + "idnadrev_missing_keys.properties";
@@ -213,13 +217,12 @@ class ResourceBundleWrapper extends ResourceBundle {
       }
     }
     log.trace("Found caller class {}, basename={}", callerClassName, baseBundleName);
-    Locale locale = Locale.getDefault();
 
     String substring = callerClassName.substring(0, callerClassName.lastIndexOf('.') + 1);
 
 
     UTF8Control control = new UTF8Control();
-    String baseName = substring + Localized.FILENAME;
+    String baseName = substring + bundleFileName;
     URL resource = getClass().getClassLoader().getResource(control.getResourceName(baseName, locale));
     if (resource == null) {
       resource = getClass().getClassLoader().getResource(control.getResourceName(baseName, control.getFallbackLocale(baseName, locale)));

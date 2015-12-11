@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ks.i18n.nobundle;
+package de.ks.i18n;
 
-import de.ks.i18n.Localized;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
-import javax.inject.Inject;
+import java.util.Locale;
 
-public class NoBundleClass {
-  private final Localized localized;
+public class LocalizationModule extends AbstractModule {
+  public static final String FILENAME = "ResourceBundle.filename";
+  public static final String BASENAME = "ResourceBundle.baseName";
 
-  @Inject
-  public NoBundleClass(Localized localized) {
-    this.localized = localized;
+  @Override
+  protected void configure() {
+    bind(String.class).annotatedWith(Names.named(FILENAME)).toInstance("Translation");
+    bind(String.class).annotatedWith(Names.named(BASENAME)).toInstance("de.ks.i18n.Translation");
+    bind(Locale.class).toInstance(Locale.getDefault());
   }
-
-  public String getString() {
-    return localized.get("subPackageString");
-  }
-
 }

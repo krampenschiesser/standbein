@@ -18,12 +18,14 @@ package de.ks.i18n;
 import com.google.common.base.Charsets;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import de.ks.LauncherRunner;
+import de.ks.eventsystem.EventBusModule;
 import de.ks.eventsystem.bus.EventBus;
 import de.ks.i18n.event.LanguageChangedEvent;
 import de.ks.i18n.nobundle.NoBundleClass;
 import de.ks.i18n.other.OtherClass;
-import de.ks.standbein.GuiceSupport;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,44 +46,48 @@ import static org.junit.Assert.*;
 @RunWith(LauncherRunner.class)
 public class LocalizedTest {
   private LanguageChangedEvent event;
+  private Localized localized;
+  private EventBus eventBus;
 
   @Before
   public void setUp() throws Exception {
-    Localized.changeLocale(Locale.ENGLISH);
+    Injector injector = Guice.createInjector(new LocalizationModule(), new EventBusModule());
+    localized = injector.getInstance(Localized.class);
+    localized.changeLocale(Locale.ENGLISH);
+    eventBus = injector.getInstance(EventBus.class);
   }
 
   @Test
   public void testLanguageChange() throws Exception {
-    String helloWorld = Localized.get("hello");
+    String helloWorld = localized.get("hello");
     assertEquals("Hello world!", helloWorld);
 
-    Localized.changeLocale(Locale.GERMAN);
-    helloWorld = Localized.get("hello");
+    localized.changeLocale(Locale.GERMAN);
+    helloWorld = localized.get("hello");
     assertEquals("Hallo Welt!", helloWorld);
 
-    Localized.changeLocale(Locale.ENGLISH);
-    helloWorld = Localized.get("hello");
+    localized.changeLocale(Locale.ENGLISH);
+    helloWorld = localized.get("hello");
     assertEquals("Hello world!", helloWorld);
   }
 
   @Test
   public void testParameters() throws Exception {
-    String helloSauerland = Localized.get("hello.parametererized", "Sauerland", "!!!");
+    String helloSauerland = localized.get("hello.parametererized", "Sauerland", "!!!");
     assertEquals("Hello Sauerland!!!", helloSauerland);
   }
 
   @Test
   public void testParametersPositioned() throws Exception {
-    String helloSauerland = Localized.get("hello.positioned", "!!!", "Sauerland");
+    String helloSauerland = localized.get("hello.positioned", "!!!", "Sauerland");
     assertEquals("Hello Sauerland!!!", helloSauerland);
   }
 
   @Test
   public void testLanguageChangeEvent() throws Exception {
-    EventBus eventBus = GuiceSupport.get(EventBus.class);
     eventBus.register(this);
     try {
-      Localized.changeLocale(Locale.GERMAN);
+      localized.changeLocale(Locale.GERMAN);
       assertNotNull(event);
       assertEquals(Locale.ENGLISH, event.getOldLocale());
       assertEquals(Locale.GERMAN, event.getNewLocale());
@@ -92,10 +98,10 @@ public class LocalizedTest {
 
   @Test
   public void testMissingKeys() throws Exception {
-    Localized.get("doesNot.Exist.Dots");
-    Localized.get("doesNotExistNoDots");
+    localized.get("doesNot.Exist.Dots");
+    localized.get("doesNotExistNoDots");
 
-    File missingKeyFile = Localized.getBundle().getMissingKeyFile();
+    File missingKeyFile = localized.getBundle().getMissingKeyFile();
     assertNotNull(missingKeyFile);
     List<String> missing = Files.readLines(missingKeyFile, Charsets.UTF_8);
     List<String> extracted = missing.stream().filter((s) -> s.startsWith("doesNot")).collect(Collectors.toList());
@@ -110,12 +116,12 @@ public class LocalizedTest {
 
   @Test
   public void testNullParameter() throws Exception {
-    Localized.get("doesNot.Exist.Dots", (Object[]) null);
+    localized.get("doesNot.Exist.Dots", (Object[]) null);
   }
 
   @Test
   public void testNullParameterArray() throws Exception {
-    Localized.get("doesNot.Exist.Dots", null, null);
+    localized.get("doesNot.Exist.Dots", null, null);
   }
 
   @Subscribe
@@ -125,24 +131,18 @@ public class LocalizedTest {
 
   @Test
   public void testSubPackageKey() throws Exception {
-    Supplier<String> supplier = () -> new OtherClass().getString();
+    Supplier<String> supplier = () -> new OtherClass(localized).getString();
     assertEquals("Hello SubPackage", supplier.get());
-    assertEquals("Hello SubPackage", new OtherClass().getString());
+    assertEquals("Hello SubPackage", new OtherClass(localized).getString());
   }
 
   @Test
   public void testNoSubPackageKey() throws Exception {
-    assertEquals("?subPackageString?", new NoBundleClass().getString());
+    assertEquals("?subPackageString?", new NoBundleClass(localized).getString());
   }
 
   @Test
   public void testRootSubPackageKey() throws Exception {
-    assertEquals("?subPackageString?", Localized.get("subPackageString"));
-  }
-
-  @Test
-  public void testGetBundleForClass() throws Exception {
-
-
+    assertEquals("?subPackageString?", localized.get("subPackageString"));
   }
 }
