@@ -15,10 +15,14 @@
 package de.ks.version;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.assertEquals;
@@ -28,46 +32,17 @@ public class VersionTest {
   public static AtomicLong upgradeCounter = new AtomicLong();
 
   @Test
-  public void testReadFromMetaInf() throws Exception {
-    VersionInfo versionInfo = new VersionInfo(getClass());
-    log.info(versionInfo.getDescription());
-    int versionNumber = versionInfo.getVersion();
-    assertEquals(23, versionNumber);
-  }
-
-  @Test
-  public void testWriteVersion() throws Exception {
-    File testversion = getVersionFile();
-    Versioning versioning = new Versioning(testversion, VersionTest.class);
-    assertEquals(-1, versioning.getLastVersion());
-    versioning.writeLastVersion(230);
-    assertEquals(230, versioning.getLastVersion());
-  }
-
-  protected File getVersionFile() {
-    File tempDir = new File(System.getProperty("java.io.tmpdir"));
-    File testversion = new File(tempDir, "testversion");
-    if (testversion.exists()) {
-      testversion.delete();
-    }
-    return testversion;
-  }
-
-  @Test
   public void testUpgrade() throws Exception {
     upgradeCounter.set(0);
-    Versioning versioning = new Versioning(getVersionFile(), VersionTest.class) {
-      @Override
-      public int getLastVersion() {
-        return 1;
-      }
 
-      @Override
-      public int getCurrentVersion() {
-        return 3;
-      }
-    };
+    VersionProvider versionProvider = Mockito.mock(VersionProvider.class);
+    Mockito.when(versionProvider.getLastVersion()).thenReturn(Optional.of(1));
+    Mockito.when(versionProvider.getCurrentVersion()).thenReturn(3);
 
+    Collection<InitialImport> imports = Collections.emptyList();
+    Collection<VersionUpgrade> upgrades = Arrays.asList(new UpgraderVersion1(), new UpgraderVersion2(), new UpgraderVersion3());
+
+    Versioning versioning = new Versioning(imports, upgrades, versionProvider);
     versioning.upgradeToCurrentVersion();
     assertEquals(2, upgradeCounter.get());
   }

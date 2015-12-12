@@ -19,13 +19,23 @@ import java.util.Set;
 
 public interface LaunchListener {
 
-  void totalWaves(int count);
+  default void totalWaves(int count) {
 
-  void waveStarted(int prio);
+  }
 
-  void waveFinished(int prio);
+  default void waveStarted(int prio) {
 
-  void failure(String msg);
+  }
 
-  void wavePriorities(Set<Integer> integers);
+  default void waveFinished(int prio) {
+
+  }
+
+  default void failure(String msg, Throwable t) {
+
+  }
+
+  default void wavePriorities(Set<Integer> integers) {
+
+  }
 }

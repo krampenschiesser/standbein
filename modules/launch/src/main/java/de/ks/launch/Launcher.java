@@ -14,8 +14,7 @@
  */
 package de.ks.launch;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import de.ks.SubclassInstantiator;
+import com.google.inject.Inject;
 import de.ks.preload.LaunchListener;
 import de.ks.preload.LaunchListenerAdapter;
 import de.ks.preload.PreloaderApplication;
@@ -23,46 +22,33 @@ import javafx.application.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+@Singleton
 public class Launcher {
-  public static final Launcher instance = new Launcher(true);
-
   private static final Logger log = LoggerFactory.getLogger(Launcher.class);
-  public static final String SERVICE_PACKAGES = "service.packages";
-  public static final String SERVICE_PROPERTIES_FILENAME = "service.properties";
-  public static final String PACKAGE_SEPARATOR = ",";
 
-  private final List<Service> services = new ArrayList<>();
-  private final ExecutorService executorService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("launcher-%d").build());
+  private final List<Service> services;
+  private final ExecutorService executorService;
+
   private final List<Throwable> startupExceptions = Collections.synchronizedList(new ArrayList<>());
-  private final SubclassInstantiator instantiator;
 
   private volatile CountDownLatch latch;
   private volatile LaunchListener launchListener = new LaunchListenerAdapter();
   private Class<? extends PreloaderApplication> preloader;
   private Future<?> preloaderFuture;
-  private PreloaderApplication preloaderInstance;
-  private final CountDownLatch preloaderLatch = new CountDownLatch(1);
 
-  protected Launcher(boolean excludeTestResources) {
-    instantiator = new SubclassInstantiator(executorService, getClass().getPackage(), SERVICE_PROPERTIES_FILENAME, SERVICE_PACKAGES, PACKAGE_SEPARATOR);
-    instantiator.setExcludeTestResources(excludeTestResources);
-  }
+  private volatile PreloaderApplication preloaderInstance;
+  private CountDownLatch preloaderLatch = new CountDownLatch(1);
 
-  public List<Service> discoverServices() {
-    List<Service> services = instantiator.instantiateSubclasses(Service.class);
-    services.sort((o1, o2) -> Integer.compare(o1.getPriority(), o2.getPriority()));
-    return services;
-  }
-
-  public List<Service> getServices() {
-    if (services.isEmpty()) {
-      services.addAll(discoverServices());
-    }
-    return services;
+  @Inject
+  public Launcher(Set<Service> services, ExecutorService executorService) {
+    this.services = new ArrayList<>(services);
+    this.executorService = executorService;
+    this.services.sort((o1, o2) -> Integer.compare(o1.getPriority(), o2.getPriority()));
   }
 
   public <S extends Service> void removeService(Class<S> clazz) {
@@ -72,7 +58,7 @@ public class Launcher {
 
   @SuppressWarnings("unchecked")
   public <S extends Service> S getService(Class<S> clazz) {
-    List<Service> collect = getServices().stream().filter((s) -> s.getClass().equals(clazz)).collect(Collectors.toList());
+    List<Service> collect = services.stream().filter((s) -> s.getClass().equals(clazz)).collect(Collectors.toList());
     if (collect.isEmpty()) {
       return null;
     } else {
@@ -82,7 +68,7 @@ public class Launcher {
 
   @SuppressWarnings("unchecked")
   public <S extends Service> S getService(String name) {
-    List<Service> collect = getServices().stream().filter((s) -> s.getName().equals(name)).collect(Collectors.toList());
+    List<Service> collect = services.stream().filter((s) -> s.getName().equals(name)).collect(Collectors.toList());
     if (collect.isEmpty()) {
       return null;
     } else {
@@ -92,7 +78,7 @@ public class Launcher {
 
   public TreeMap<Integer, List<Service>> getServiceWaves() {
     TreeMap<Integer, List<Service>> retval = new TreeMap<>();
-    getServices().forEach((service) -> {
+    services.forEach((service) -> {
       int priority = service.getPriority();
       retval.putIfAbsent(priority, new ArrayList<>());
       retval.get(priority).add(service);
@@ -121,28 +107,28 @@ public class Launcher {
     launchListener.waveStarted(prio);
     log.info("Starting services with prio {}", prio);
     List<CompletableFuture<Void>> waveFutures = waves.get(prio).stream()//
-            .map((s) -> {
-              return CompletableFuture.supplyAsync(() -> {
-                s.initialize(this, executorService, args);
-                return s.start();
-              }, executorService)//
-                      .thenAccept((service) -> log.info("Successfully started service {}", service.getName()));
-            }).collect(Collectors.toList());
+      .map((s) -> {
+        return CompletableFuture.supplyAsync(() -> {
+          s.initialize(this, executorService, args);
+          return s.start();
+        }, executorService)//
+          .thenAccept((service) -> log.info("Successfully started service {}", service.getName()));
+      }).collect(Collectors.toList());
 
     CompletableFuture<Void> allOf = CompletableFuture.allOf(waveFutures.toArray(new CompletableFuture[waveFutures.size()]));
     allOf.thenRun(() -> log.info("Started services with prio {}", prio))//
-            .thenRun(() -> latch.countDown())//
-            .thenRun(() -> launchListener.waveFinished(prio))//
-            .thenRun(() -> startWave(iter, waves, args))//
-            .exceptionally((t) -> {
-              while (latch.getCount() > 0) {
-                latch.countDown();
-              }
-              startupExceptions.add(t);
-              launchListener.failure(t.toString());
-              //throw new RuntimeException(t);
-              return null;
-            });
+      .thenRun(() -> latch.countDown())//
+      .thenRun(() -> launchListener.waveFinished(prio))//
+      .thenRun(() -> startWave(iter, waves, args))//
+      .exceptionally((t) -> {
+        while (latch.getCount() > 0) {
+          latch.countDown();
+        }
+        startupExceptions.add(t);
+        launchListener.failure(t.toString(), t);
+        //throw new RuntimeException(t);
+        return null;
+      });
   }
 
   public void awaitStart() {
@@ -162,7 +148,7 @@ public class Launcher {
   }
 
   public boolean isStarted() {
-    for (Service service : getServices()) {
+    for (Service service : services) {
       if (!service.isRunning()) {
         return false;
       }
@@ -189,23 +175,23 @@ public class Launcher {
     Integer prio = iter.next();
     log.info("Stopping services with prio {}", prio);
     List<CompletableFuture<Void>> waveFutures = waves.get(prio).stream()//
-            .map((s) -> {
-              if (s.isStopped()) {
-                return CompletableFuture.<Void>completedFuture(null);
-              } else {
-                return CompletableFuture.supplyAsync(() -> s.stop(), executorService)//
-                        .thenAccept((service) -> log.info("Successfully stopped service {}", service.getName()));
-              }
-            }).collect(Collectors.toList());
+      .map((s) -> {
+        if (s.isStopped()) {
+          return CompletableFuture.<Void>completedFuture(null);
+        } else {
+          return CompletableFuture.supplyAsync(() -> s.stop(), executorService)//
+            .thenAccept((service) -> log.info("Successfully stopped service {}", service.getName()));
+        }
+      }).collect(Collectors.toList());
 
     CompletableFuture<Void> allOf = CompletableFuture.allOf(waveFutures.toArray(new CompletableFuture[waveFutures.size()]));
     allOf.thenRun(() -> log.info("Stopped services with prio {}", prio))//
-            .thenRun(() -> latch.countDown())//
-            .thenRun(() -> stopWave(iter, waves))//
-            .exceptionally((t) -> {
-              log.info("Failed to stop services", t);
-              return null;
-            });
+      .thenRun(() -> latch.countDown())//
+      .thenRun(() -> stopWave(iter, waves))//
+      .exceptionally((t) -> {
+        log.info("Failed to stop services", t);
+        return null;
+      });
   }
 
   public void awaitStop() {
@@ -267,5 +253,9 @@ public class Launcher {
 
   public PreloaderApplication getPreloaderInstance() {
     return preloaderInstance;
+  }
+
+  public List<Service> getServices() {
+    return services;
   }
 }

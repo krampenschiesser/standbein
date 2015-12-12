@@ -15,6 +15,7 @@
 package de.ks.preload;
 
 import de.ks.launch.Launcher;
+import de.ks.standbein.GuiceSupport;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -26,12 +27,14 @@ public abstract class PreloaderApplication extends Application {
 
   @Override
   public void start(Stage primaryStage) throws Exception {
+    Launcher launcher = GuiceSupport.get(Launcher.class);
+
     stage = primaryStage;
     try {
       startPreloader(stage);
-      Launcher.instance.setPreloaderInstance(this);
+      launcher.setPreloaderInstance(this);
     } catch (Exception e) {
-      Launcher.instance.setPreloaderInstance(null);
+      launcher.setPreloaderInstance(null);
       log.error("Could not start preloader {}", getClass().getName(), e);
       throw e;
     }

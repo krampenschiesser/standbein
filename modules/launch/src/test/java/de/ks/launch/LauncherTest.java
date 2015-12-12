@@ -14,13 +14,14 @@
  */
 package de.ks.launch;
 
-import com.dummy.other.ServiceB;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import de.ks.LauncherModule;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinPool;
 
@@ -32,15 +33,11 @@ public class LauncherTest {
 
   @Before
   public void setUp() throws Exception {
-    launcher = new Launcher(false);
-  }
-
-  @Test
-  public void testDiscoverServices() throws Exception {
-    List<Service> services = launcher.discoverServices();
-    assertEquals(2, services.size());
-    assertTrue(ServiceB.class.isInstance(services.get(1)));
-    assertTrue(ServiceA.class.isInstance(services.get(0)));
+    Injector injector = Guice.createInjector(new LauncherModule());
+    Launcher instance = injector.getInstance(Launcher.class);
+    Launcher instance2 = injector.getInstance(Launcher.class);
+    assertSame(instance, instance2);
+    launcher = instance;
   }
 
   @Test

@@ -14,31 +14,6 @@
  */
 package de.ks.preload;
 
-import java.util.Set;
-
 public class LaunchListenerAdapter implements LaunchListener {
-  @Override
-  public void totalWaves(int count) {
-
-  }
-
-  @Override
-  public void waveStarted(int prio) {
-
-  }
-
-  @Override
-  public void waveFinished(int prio) {
-
-  }
-
-  @Override
-  public void failure(String msg) {
-
-  }
-
-  @Override
-  public void wavePriorities(Set<Integer> integers) {
-
-  }
+  //ok
 }
