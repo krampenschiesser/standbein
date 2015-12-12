@@ -24,6 +24,10 @@ public class LoggingGuiceTestSupportTest {
     assertNotNull(pojo);
     assertEquals("Hello Sauerland!", pojo.getText());
 
+  }
+
+  @Test
+  public void testLaunching() throws Exception {
     assertTrue(launcher.isStarted());
     assertEquals(1, launcher.getServices().size());
     assertTrue(service.didCallStart);

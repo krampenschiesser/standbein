@@ -29,26 +29,51 @@ public class GuiceTestSupport extends TestWatcher {
   private final Injector injector;
   private final Object test;
   protected boolean launch;
+  protected boolean executeStop = true;
 
   public GuiceTestSupport(Object test, Module... modules) {
     this.test = test;
     injector = Guice.createInjector(modules);
   }
 
+  @Override
   protected void starting(Description description) {
     injector.injectMembers(test);
 
     if (launch) {
+      log.info("###Starting services before {}.{}", description.getTestClass().getSimpleName(), description.getMethodName());
       Launcher launcher = injector.getInstance(Launcher.class);
       if (!launcher.isStarted()) {
         launcher.startAll();
         launcher.awaitStart();
       }
+      log.info("###Starting services -> done");
+    }
+  }
+
+  @Override
+  protected void finished(Description description) {
+    if (launch && executeStop) {
+      log.info("###Stopping services after {}.{}", description.getTestClass().getSimpleName(), description.getMethodName());
+      Launcher launcher = injector.getInstance(Launcher.class);
+      if (launcher.isStarted()) {
+        launcher.stopAll();
+        launcher.awaitStop();
+      }
+      log.info("###Stopping services -> done");
+    } else {
+      log.warn("###Prevent stop of launched services!");
     }
   }
 
   public GuiceTestSupport launchServices() {
     launch = true;
+    return this;
+  }
+
+  public GuiceTestSupport preventServiceStop() {
+    launch = true;
+    executeStop = false;
     return this;
   }
 }

@@ -31,6 +31,6 @@ public class TestService extends Service {
 
   @Override
   protected void doStop() {
-
+    didCallStart = false;
   }
 }

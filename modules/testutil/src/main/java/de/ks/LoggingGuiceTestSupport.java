@@ -36,26 +36,32 @@ public class LoggingGuiceTestSupport extends GuiceTestSupport {
   }
 
   @Override
+  public LoggingGuiceTestSupport preventServiceStop() {
+    super.preventServiceStop();
+    return this;
+  }
+
+  @Override
   protected void starting(Description description) {
-    log.info("###Starting {}.{}", description.getClassName(), description.getMethodName());
     super.starting(description);
+    log.info("###Starting {}.{}", description.getTestClass().getSimpleName(), description.getMethodName());
   }
 
   @Override
   protected void succeeded(Description description) {
     super.succeeded(description);
-    log.info("###Successfully finished {}.{}", description.getClassName(), description.getMethodName());
+    log.info("###Successfully finished {}.{}", description.getTestClass().getSimpleName(), description.getMethodName());
   }
 
   @Override
   protected void failed(Throwable e, Description description) {
     super.failed(e, description);
-    log.error("###Failed {}.{}: {}", description.getClassName(), description.getMethodName(), e, e);
+    log.error("###Failed {}.{}: {}", description.getTestClass().getSimpleName(), description.getMethodName(), e, e);
   }
 
   @Override
   protected void skipped(AssumptionViolatedException e, Description description) {
     super.skipped(e, description);
-    log.info("###Skipped {}.{}: {}", description.getClassName(), description.getMethodName());
+    log.info("###Skipped {}.{}: {}", description.getTestClass().getSimpleName(), description.getMethodName());
   }
 }
