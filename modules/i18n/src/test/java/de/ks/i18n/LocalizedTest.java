@@ -20,7 +20,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import de.ks.LauncherRunner;
 import de.ks.eventsystem.EventBusModule;
 import de.ks.eventsystem.bus.EventBus;
 import de.ks.i18n.event.LanguageChangedEvent;
@@ -28,7 +27,6 @@ import de.ks.i18n.nobundle.NoBundleClass;
 import de.ks.i18n.other.OtherClass;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.util.List;
@@ -39,12 +37,6 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by Christian Loehnert
- * Krampenschiesser@freenet.de
- * All rights reserved by now, license may come later.
- */
-@RunWith(LauncherRunner.class)
 public class LocalizedTest {
   private LanguageChangedEvent event;
   private Localized localized;
