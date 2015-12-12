@@ -18,16 +18,13 @@ package de.ks.activity.context;
 import de.ks.IntegrationTestModule;
 import de.ks.LoggingGuiceTestSupport;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Collections;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 
 import static org.junit.Assert.*;
@@ -86,34 +83,5 @@ public class ScopeTest {
     };
     service.invokeAny(Collections.singletonList(callable));
     assertEquals("Hello Sauerland!", bean1.getValue());
-  }
-
-  @Ignore
-  @Test
-  public void testScopeCleanup() throws Exception {
-    final CyclicBarrier barrier = new CyclicBarrier(2);
-    context.start("2");
-
-    bean1.setValue("Hello Sauerland!");
-
-    service.execute(() -> {
-      ActivityScopedBean1 bean = provider.get();
-      assertNotNull(bean.getValue());
-      assertEquals("Hello Sauerland!", bean.getValue());
-      try {
-        barrier.await();
-      } catch (InterruptedException | BrokenBarrierException e) {
-        //brz
-      }
-    });
-    assertEquals(1, context.activities.size());
-    assertEquals("Hello Sauerland!", bean1.getValue());
-    context.stop("2");
-
-    assertEquals("Activity got removed although one thread still holds it", 1, context.activities.size());
-    barrier.await();
-    Thread.sleep(100);
-
-    assertEquals(0, context.activities.size());
   }
 }

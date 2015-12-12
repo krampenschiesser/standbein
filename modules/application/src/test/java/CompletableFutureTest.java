@@ -14,7 +14,6 @@
  */
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,42 +37,42 @@ public class CompletableFutureTest {
 
   private static final Logger log = LoggerFactory.getLogger(CompletableFutureTest.class);
 
-  @Ignore
-  @Test
-  public void testName() throws Exception {
-    CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> 42, service);
-    CompletableFuture<Integer> other = CompletableFuture.supplyAsync(() -> 1, service);
-
-    CompletableFuture<Void> first = future.thenAcceptBothAsync(other, (integer, integer2) -> {
-      try {
-        log.info("Start sleeping {}*{}*100", integer, integer2);
-        Thread.sleep(integer * integer2 * 100);
-        log.info("Done sleeping {}*{}*100", integer, integer2);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }, service);
-    CompletableFuture<Void> second = future.thenAcceptBothAsync(other, (integer, integer2) -> {
-      try {
-        log.info("Start sleeping {}*{}*200", integer, integer2);
-        Thread.sleep(integer * integer2 * 200);
-        log.info("Done sleeping {}*{}*200", integer, integer2);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }, service);
-    CompletableFuture<Void> third = future.thenAcceptBothAsync(other, (integer, integer2) -> {
-      try {
-        log.info("Start sleeping {}*{}*300", integer, integer2);
-        Thread.sleep(integer * integer2 * 300);
-        log.info("Done sleeping {}*{}*300", integer, integer2);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }, service);
-
-    CompletableFuture.allOf(third, CompletableFuture.allOf(first, second)).join();
-  }
+//  @Ignore//manual test
+//  @Test
+//  public void testName() throws Exception {
+//    CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> 42, service);
+//    CompletableFuture<Integer> other = CompletableFuture.supplyAsync(() -> 1, service);
+//
+//    CompletableFuture<Void> first = future.thenAcceptBothAsync(other, (integer, integer2) -> {
+//      try {
+//        log.info("Start sleeping {}*{}*100", integer, integer2);
+//        Thread.sleep(integer * integer2 * 100);
+//        log.info("Done sleeping {}*{}*100", integer, integer2);
+//      } catch (InterruptedException e) {
+//        e.printStackTrace();
+//      }
+//    }, service);
+//    CompletableFuture<Void> second = future.thenAcceptBothAsync(other, (integer, integer2) -> {
+//      try {
+//        log.info("Start sleeping {}*{}*200", integer, integer2);
+//        Thread.sleep(integer * integer2 * 200);
+//        log.info("Done sleeping {}*{}*200", integer, integer2);
+//      } catch (InterruptedException e) {
+//        e.printStackTrace();
+//      }
+//    }, service);
+//    CompletableFuture<Void> third = future.thenAcceptBothAsync(other, (integer, integer2) -> {
+//      try {
+//        log.info("Start sleeping {}*{}*300", integer, integer2);
+//        Thread.sleep(integer * integer2 * 300);
+//        log.info("Done sleeping {}*{}*300", integer, integer2);
+//      } catch (InterruptedException e) {
+//        e.printStackTrace();
+//      }
+//    }, service);
+//
+//    CompletableFuture.allOf(third, CompletableFuture.allOf(first, second)).join();
+//  }
 
   @Test
   public void testSecondThen() throws Exception {

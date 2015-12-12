@@ -74,7 +74,7 @@ public class DefaultLoader<V extends Node, C> {
     if (controller != null) {
       bundleToUse = localized.getBundle(controller);
     }
-    loader = new FXMLLoader(fxmlFile, resourceBundle, new JavaFXBuilderFactory(), controllerFactory);
+    loader = new FXMLLoader(fxmlFile, bundleToUse, new JavaFXBuilderFactory(), controllerFactory);
   }
 
   public DefaultLoader<V, C> load(URL fxmlFile) {
