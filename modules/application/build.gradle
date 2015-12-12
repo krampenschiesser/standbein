@@ -25,6 +25,9 @@ dependencies {
     compile project(":modules:eventsystem")
     compile project(":modules:validation")
 
+    compile "org.apache.commons:commons-lang3:$lang3"
+    compile "com.google.inject.extensions:guice-multibindings:$guice"
+
     compile "com.fasterxml.jackson.core:jackson-databind:$jackson"
     compile "com.fasterxml.jackson.core:jackson-annotations:$jackson"
     compile "com.fasterxml.jackson.core:jackson-core:$jackson"
