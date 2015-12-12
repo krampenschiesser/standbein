@@ -23,10 +23,16 @@ import javax.inject.Singleton;
 
 @Singleton
 public class Navigator {
-  public void present(Node node) {
+  private Stage stage;
+  private Pane rootContainer;
 
+  public void present(Node node) {
+    rootContainer.getChildren().clear();
+    rootContainer.getChildren().add(node);
   }
 
   public void register(Stage stage, Pane container) {
+    this.stage = stage;
+    rootContainer = container;
   }
 }

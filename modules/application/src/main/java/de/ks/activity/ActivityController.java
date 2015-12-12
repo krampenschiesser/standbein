@@ -280,7 +280,7 @@ public class ActivityController {
     progress.setMaxSize(Control.USE_PREF_SIZE, Control.USE_PREF_SIZE);
     container.getChildren().add(progress);
 
-    navigator.get().present(container);
+    Platform.runLater(() -> navigator.get().present(container));
   }
 
   public void stopAll() {
@@ -305,7 +305,10 @@ public class ActivityController {
 
   public void select(ActivityCfg activityCfg, Class<?> targetController) {
     Node view = initialization.getViewForController(targetController);
-    navigator.get().present(view);
+    javaFXExecutor.invokeInJavaFXThread(() -> {
+      navigator.get().present(view);
+      return null;
+    });
     activityCfg.setCurrentController(targetController);
   }
 

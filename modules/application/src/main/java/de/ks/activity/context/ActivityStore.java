@@ -22,7 +22,6 @@ import de.ks.activity.initialization.ActivityInitialization;
 import de.ks.binding.Binding;
 import de.ks.datasource.DataSource;
 import de.ks.eventsystem.bus.EventBus;
-import de.ks.validation.ValidationRegistry;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -30,7 +29,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -49,20 +47,13 @@ public class ActivityStore {
 
   private static final Logger log = LoggerFactory.getLogger(ActivityStore.class);
 
-  @Inject
   protected Binding binding;
-  @Inject
   protected ActivityExecutor executor;
-  @Inject
   protected ActivityJavaFXExecutor javaFXExecutor;
-  @Inject
   protected ActivityContext context;
-  @Inject
   protected ActivityInitialization initialization;
-  @Inject
-  protected ValidationRegistry registry;
-  @Inject
   protected EventBus eventBus;
+
   private boolean isDebugging = false;
 
   protected final SimpleObjectProperty<Object> model = new SimpleObjectProperty<>();
@@ -75,8 +66,18 @@ public class ActivityStore {
   protected volatile CompletableFuture<Void> loadingFuture;
   protected volatile CompletableFuture<Object> savingFuture;
 
-  @PostConstruct
-  public void initialize() {
+  @Inject
+  public ActivityStore(ActivityExecutor executor, ActivityJavaFXExecutor javaFXExecutor, ActivityContext context, ActivityInitialization initialization, EventBus eventBus) {
+    this.executor = executor;
+    this.javaFXExecutor = javaFXExecutor;
+    this.context = context;
+    this.initialization = initialization;
+    this.eventBus = eventBus;
+  }
+
+  @Inject
+  public void setBinding(Binding binding) {
+    this.binding = binding;
     model.addListener(binding::bindChangedModel);
   }
 
