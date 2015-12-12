@@ -15,8 +15,10 @@
 
 package de.ks.validation.validators;
 
+import de.ks.i18n.Localized;
+
 public class IntegerValidator extends BaseNumberValidator<Integer> {
-  public IntegerValidator() {
-    super(s -> Integer.valueOf(s), "validation.mustBeInteger");
+  public IntegerValidator(Localized localized) {
+    super(localized, s -> Integer.valueOf(s), "validation.mustBeInteger");
   }
 }

@@ -17,24 +17,24 @@ package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
 import de.ks.validation.ValidationResult;
-import de.ks.validation.Validator;
 import javafx.scene.control.Control;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FileExtensionValidator implements Validator<Control, String> {
+public class FileExtensionValidator extends LocalizedValidator<Control, String> {
 
   private final List<String> fileExtensions;
 
-  public FileExtensionValidator(String... extensions) {
+  public FileExtensionValidator(Localized localized, String... extensions) {
+    super(localized);
     fileExtensions = Arrays.asList(extensions).stream().map(ext -> ext.startsWith(".") ? ext : "." + ext).collect(Collectors.toList());
   }
 
   @Override
   public ValidationResult apply(Control control, String s) {
-    String validationMsg = Localized.get("validation.file.extension", fileExtensions);
+    String validationMsg = localized.get("validation.file.extension", fileExtensions);
     ValidationResult validationResult = ValidationResult.createError(validationMsg);
 
     if (s == null || s.isEmpty()) {

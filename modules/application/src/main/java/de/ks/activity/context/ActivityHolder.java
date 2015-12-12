@@ -15,13 +15,15 @@
 
 package de.ks.activity.context;
 
+import com.google.inject.Key;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ActivityHolder {
   protected final String id;
-  protected final Map<Class<?>, StoredBean> objectStore = new ConcurrentHashMap<>();
+  protected final Map<Key<?>, StoredBean> objectStore = new ConcurrentHashMap<>();
   protected final AtomicInteger count = new AtomicInteger(0);
 
   public ActivityHolder(String id) {
@@ -29,15 +31,15 @@ public class ActivityHolder {
     count.incrementAndGet();
   }
 
-  public StoredBean getStoredBean(Class<?> key) {
+  public StoredBean getStoredBean(Key<?> key) {
     return objectStore.get(key);
   }
 
-  public void put(Class<?> key, StoredBean storedBean) {
+  public void put(Key<?> key, StoredBean storedBean) {
     objectStore.putIfAbsent(key, storedBean);
   }
 
-  public Map<Class<?>, StoredBean> getObjectStore() {
+  public Map<Key<?>, StoredBean> getObjectStore() {
     return objectStore;
   }
 
@@ -47,5 +49,9 @@ public class ActivityHolder {
 
   public String getId() {
     return id;
+  }
+
+  public void destroy() {
+    objectStore.clear();
   }
 }

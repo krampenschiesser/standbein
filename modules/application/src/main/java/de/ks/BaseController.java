@@ -21,8 +21,8 @@ import de.ks.activity.context.ActivityStore;
 import de.ks.activity.initialization.ActivityCallback;
 import de.ks.activity.initialization.ActivityInitialization;
 import de.ks.activity.initialization.DatasourceCallback;
+import de.ks.eventsystem.bus.HandleInThread;
 import de.ks.eventsystem.bus.HandlingThread;
-import de.ks.eventsystem.bus.Threading;
 import de.ks.validation.ValidationRegistry;
 import javafx.fxml.Initializable;
 
@@ -41,7 +41,7 @@ public abstract class BaseController<T> implements Initializable, DatasourceCall
   protected ActivityInitialization activityInitialization;
 
   @Subscribe
-  @Threading(HandlingThread.JavaFX)
+  @HandleInThread(HandlingThread.JavaFX)
   private void afterRefresh(ActivityLoadFinishedEvent e) {
     onRefresh(extractFromEvent(e));
   }

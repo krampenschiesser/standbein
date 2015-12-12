@@ -37,11 +37,11 @@ public class TimeHHMMValidator implements Validator<Control, String> {
     if (timeString.contains(":")) {
       return parseFormat(control, timeString);
     }
-    return new ValidationResult().add(new LocalizedValidationMessage("validation.timeHHMM"));
+    return new ValidationResult().add(new LocalizedValidationMessage(localized, "validation.timeHHMM"));
   }
 
   private ValidationResult parseFormat(Control control, String timeString) {
-    ValidationResult result = new ValidationResult().add(new LocalizedValidationMessage("validation.timeHHMM"));
+    ValidationResult result = new ValidationResult().add(new LocalizedValidationMessage(localized, "validation.timeHHMM"));
 
     String[] split = timeString.split(":");
     if (split.length != 2) {

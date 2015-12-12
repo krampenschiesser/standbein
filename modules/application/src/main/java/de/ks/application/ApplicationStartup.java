@@ -14,9 +14,6 @@
  */
 package de.ks.application;
 
-import com.google.inject.ConfigurationException;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
 import de.ks.i18n.Localized;
 import de.ks.imagecache.Images;
 import de.ks.javafx.FxCss;
@@ -26,7 +23,6 @@ import de.ks.standbein.GuiceSupport;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -34,46 +30,46 @@ import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import java.util.Collections;
 import java.util.Set;
 
 public class ApplicationStartup {
   private static final Logger log = LoggerFactory.getLogger(ApplicationStartup.class);
+
   private MainWindow mainWindow;
+  private final Navigator navigator;
+  private final Localized localized;
+  private final Launcher launcher;
+  private final Set<String> styleSheets;
+
+  @Inject
+  public ApplicationStartup(Navigator navigator, Localized localized, Launcher launcher, @FxCss Set<String> styleSheets) {
+    this.navigator = navigator;
+    this.localized = localized;
+    this.launcher = launcher;
+    this.styleSheets = styleSheets == null ? Collections.emptySet() : styleSheets;
+  }
+
+  @com.google.inject.Inject(optional = true)
+  public void setMainWindow(MainWindow mainWindow) {
+    this.mainWindow = mainWindow;
+  }
 
   public void start(Stage stage) {
-    Thread.currentThread().setUncaughtExceptionHandler(GuiceSupport.get(FXApplicationExceptionHandler.class));
     try {
+      Thread.currentThread().setUncaughtExceptionHandler(GuiceSupport.get(FXApplicationExceptionHandler.class));
       log.info("Starting application " + getClass().getName());
-      try {
-        mainWindow = GuiceSupport.get(MainWindow.class);
-        stage.setTitle(mainWindow.getApplicationTitle());
-        stage.setScene(createScene(mainWindow));
-
-        Image icon = Images.get("appicon.png");
-        if (icon != null) {
-          stage.getIcons().add(icon);
-        }
-        Pane pane = (Pane) mainWindow.getNode();
-        if (pane instanceof BorderPane) {
-          Navigator.registerWithExistingPane(stage, (BorderPane) pane);
-        } else {
-          Navigator.register(stage, pane);
-        }
-      } catch (ConfigurationException e) {
-        stage.setTitle(Localized.get("warning.general"));
-        StackPane container = new StackPane();
-        Label label = new Label(Localized.get("warning.unsatisfiedApplication"));
-        container.getChildren().add(label);
-        Scene scene = new Scene(container, 640, 480);
-        stage.setScene(scene);
-
-        Navigator.register(stage, container);
+      if (mainWindow == null) {
+        setWarning(stage);
+      } else {
+        setMainWindow(stage);
       }
+
       stage.setOnCloseRequest((WindowEvent e) -> {
-        Launcher.instance.stopAll();
-//        Launcher.instance.awaitStop();
+        launcher.stopAll();
       });
-      Launcher.instance.getService(ApplicationService.class).setStage(stage);
+      launcher.getService(ApplicationService.class).setStage(stage);
       stage.show();
     } catch (Exception e) {
       log.error("Could not start JavaFXApp", e);
@@ -81,13 +77,33 @@ public class ApplicationStartup {
     }
   }
 
+  private void setMainWindow(Stage stage) {
+    stage.setTitle(mainWindow.getApplicationTitle());
+    stage.setScene(createScene(mainWindow));
+
+    Image icon = Images.get("appicon.png");
+    if (icon != null) {
+      stage.getIcons().add(icon);
+    }
+    Pane pane = (Pane) mainWindow.getNode();
+    navigator.register(stage, pane);
+  }
+
+  private void setWarning(Stage stage) {
+    stage.setTitle(localized.get("warning.general"));
+
+    StackPane container = new StackPane();
+    Label label = new Label(localized.get("warning.unsatisfiedApplication"));
+    container.getChildren().add(label);
+    Scene scene = new Scene(container, 640, 480);
+    stage.setScene(scene);
+
+    navigator.register(stage, container);
+  }
+
   private Scene createScene(MainWindow mainWindow) {
     Scene scene = new Scene(mainWindow.getNode());
 
-    Key<Set<String>> key = Key.get(new TypeLiteral<Set<String>>() {
-    }, FxCss.class);
-
-    Set<String> styleSheets = GuiceSupport.instance.getInjector().getBinding(key).getProvider().get();
     styleSheets.forEach((sheet) -> {
       scene.getStylesheets().add(sheet);
     });

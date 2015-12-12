@@ -24,7 +24,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Qualifier
 @Retention(RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 public @interface FxCss {
   public static final FxCssLiteral LITERAL = new FxCssLiteral();
 

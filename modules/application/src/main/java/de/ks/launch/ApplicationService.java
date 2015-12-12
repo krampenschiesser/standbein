@@ -14,6 +14,7 @@
  */
 package de.ks.launch;
 
+import com.google.inject.Inject;
 import de.ks.activity.context.ActivityContext;
 import de.ks.application.App;
 import de.ks.application.ApplicationStartup;
@@ -32,8 +33,13 @@ public class ApplicationService extends Service {
   private Stage stage;
   private final CountDownLatch latch = new CountDownLatch(1);
   private Future<?> fx;
-  private Launcher launcher;
   private boolean hasPreloader;
+  private Launcher launcher;
+
+  @Inject
+  ActivityContext context;
+  @Inject
+  ApplicationStartup startup;
 
   @Override
   public void initialize(Launcher launcher, ExecutorService executorService, String[] args) {
@@ -51,7 +57,7 @@ public class ApplicationService extends Service {
     log.info("Starting {}", getClass().getSimpleName());
 
     if (hasPreloader) {
-      Platform.runLater(() -> new ApplicationStartup().start(stage));
+      Platform.runLater(() -> startup.start(stage));
     } else {
       fx = executorService.submit(() -> {
         try {
@@ -82,7 +88,7 @@ public class ApplicationService extends Service {
 
   @Override
   protected void doStop() {
-    ActivityContext.stopAll();
+    context.stopAll();
     int timeout = 10;
     Platform.exit();
     try {
@@ -108,7 +114,7 @@ public class ApplicationService extends Service {
 
   public void waitUntilFXFinished() throws ExecutionException, InterruptedException {
     if (hasPreloader) {
-      Launcher.instance.waitForPreloader();
+      launcher.waitForPreloader();
     } else {
       fx.get();
     }

@@ -19,6 +19,7 @@ import de.ks.i18n.Localized;
 import de.ks.imagecache.Images;
 import de.ks.launch.ApplicationService;
 import de.ks.launch.Launcher;
+import de.ks.standbein.GuiceSupport;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -37,19 +38,17 @@ public class LaunchingApp extends Application {
   @Override
   public void start(Stage stage) throws Exception {
     try {
+      Localized localized = GuiceSupport.get(Localized.class);
+
       log.info("Starting application " + getClass().getName());
-      stage.setTitle(Localized.get("warning.general"));
-      stage.setScene(new Scene(new Label(Localized.get("warning.unsatisfiedApplication")), 640, 480));
+      stage.setTitle(localized.get("warning.general"));
+      stage.setScene(new Scene(new Label(localized.get("warning.unsatisfiedApplication")), 640, 480));
 
       Image icon = Images.get("appicon.png");
       if (icon != null) {
         stage.getIcons().add(icon);
       }
-//      if (pane instanceof BorderPane) {
-//        Navigator.registerWithExistingPane(stage, (BorderPane) pane);
-//      } else {
-//        Navigator.register(stage, pane);
-//      }
+
       stage.setOnCloseRequest((WindowEvent e) -> {
         Launcher.instance.stopAll();
         Launcher.instance.awaitStop();

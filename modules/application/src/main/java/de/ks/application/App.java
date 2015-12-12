@@ -15,6 +15,7 @@
 
 package de.ks.application;
 
+import de.ks.standbein.GuiceSupport;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -28,6 +29,6 @@ public class App extends Application {
 
   @Override
   public void start(Stage stage) throws Exception {
-    new ApplicationStartup().start(stage);
+    GuiceSupport.get(ApplicationStartup.class).start(stage);
   }
 }

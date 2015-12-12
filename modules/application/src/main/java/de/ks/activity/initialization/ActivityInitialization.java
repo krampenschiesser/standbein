@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,6 +49,8 @@ public class ActivityInitialization {
   ActivityController controller;
   @Inject
   EventBus eventBus;
+  @Inject
+  Provider<DefaultLoader> loaderProvider;
 
   public void loadActivity(ActivityCfg activityCfg) {
     currentlyLoadedControllers.get().clear();
@@ -67,13 +70,13 @@ public class ActivityInitialization {
 
   @SuppressWarnings("unchecked")
   public <T> DefaultLoader<Node, T> loadAdditionalController(Class<T> controllerClass) {
-    DefaultLoader<Node, T> loader = new DefaultLoader<>(controllerClass);
+    DefaultLoader<Node, T> loader = loaderProvider.get();
 
     if (shouldLoadInFXThread(controllerClass)) {
-      loader = controller.getJavaFXExecutor().invokeInJavaFXThread(loader::load);
+      controller.getJavaFXExecutor().invokeInJavaFXThread(() -> loader.load(controllerClass));
       log.debug("Loaded additional controller {} in fx thread", controllerClass);
     } else {
-      loader.load();
+      loader.load(controllerClass);
       log.info("Loaded additional controller {} in current thread", controllerClass);
     }
     currentlyLoadedControllers.get().add(loader.getController());
@@ -81,7 +84,8 @@ public class ActivityInitialization {
   }
 
   public <T> CompletableFuture<DefaultLoader<Node, T>> loadAdditionalControllerWithFuture(Class<T> controllerClass) {
-    @SuppressWarnings("unchecked") DefaultLoader<Node, T> loader = loadAdditionalController(controllerClass);
+    @SuppressWarnings("unchecked")
+    DefaultLoader<Node, T> loader = loadAdditionalController(controllerClass);
     CompletableFuture completed = CompletableFuture.completedFuture(loader);
     return completed;
   }
@@ -100,7 +104,7 @@ public class ActivityInitialization {
         if (t.getCause() instanceof RuntimeException && t.getCause().getCause() instanceof LoadException) {
           currentlyLoadedControllers.get().forEach(eventBus::unregister);
           currentlyLoadedControllers.get().clear();
-          log.info("Last load of {} failed, will try again in JavaFX Thread", new DefaultLoader<>(controllerClass).getFxmlFile());
+          log.info("Last load of {} failed, will try again in JavaFX Thread", loaderProvider.get().load(controllerClass).getFxmlFile());
           return javaFXExecutor.invokeInJavaFXThread(() -> getDefaultLoaderSupplier(controllerClass).get());
         }
         throw new RuntimeException(t);
@@ -112,8 +116,7 @@ public class ActivityInitialization {
 
   private Supplier<DefaultLoader<Node, Object>> getDefaultLoaderSupplier(Class<?> controllerClass) {
     return () -> {
-      DefaultLoader<Node, Object> loader = new DefaultLoader<>(controllerClass);
-      loader.load();
+      DefaultLoader<Node, Object> loader = loaderProvider.get();
       Node view = loader.getView();
 
       currentlyLoadedControllers.get().forEach((c) -> {

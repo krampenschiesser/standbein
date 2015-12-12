@@ -1,10 +1,11 @@
-/*
- * Copyright [2014] [Christian Loehnert, krampenschiesser@gmail.com]
+/**
+ * Copyright [2015] [Christian Loehnert]
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package de.ks.validation.validators;
 
-package de.ks.application;
+import de.ks.i18n.Localized;
+import de.ks.validation.Validator;
+import javafx.scene.control.Control;
 
-import javax.enterprise.inject.Produces;
+public abstract class LocalizedValidator<C extends Control, V> implements Validator<C, V> {
+  protected Localized localized;
 
-/**
- *
- */
-public class NavigatorProducer {
-
-  @Produces
-  public Navigator createNavigator() {
-    return Navigator.getCurrentNavigator();
+  public LocalizedValidator(Localized localized) {
+    this.localized = localized;
   }
 }

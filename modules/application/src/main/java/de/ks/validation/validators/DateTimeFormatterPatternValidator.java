@@ -17,12 +17,15 @@ package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
 import de.ks.validation.ValidationResult;
-import de.ks.validation.Validator;
 import javafx.scene.control.Control;
 
 import java.time.format.DateTimeFormatter;
 
-public class DateTimeFormatterPatternValidator implements Validator<Control, String> {
+public class DateTimeFormatterPatternValidator extends LocalizedValidator<Control, String> {
+
+  public DateTimeFormatterPatternValidator(Localized localized) {
+    super(localized);
+  }
 
   @Override
   public ValidationResult apply(Control control, String s) {
@@ -38,7 +41,7 @@ public class DateTimeFormatterPatternValidator implements Validator<Control, Str
   }
 
   protected ValidationResult invalid(Control control, String s) {
-    String msg = Localized.get("validation.invalidDatePattern", s);
+    String msg = localized.get("validation.invalidDatePattern", s);
     return ValidationResult.createError(msg);
   }
 }

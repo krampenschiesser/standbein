@@ -15,38 +15,25 @@
 
 package de.ks.activity.context;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
+import com.google.inject.Key;
 
 /**
  *
  */
 public class StoredBean {
-  final Bean bean;
-  final CreationalContext creationalContext;
+  final Key<?> key;
   final Object instance;
 
-  StoredBean(Bean<?> bean, CreationalContext<?> creationalContext, Object instance) {
-    this.bean = bean;
-    this.creationalContext = creationalContext;
+  StoredBean(Key<?> key, Object instance) {
+    this.key = key;
     this.instance = instance;
   }
 
-  Bean<?> getBean() {
-    return bean;
+  public Key<?> getKey() {
+    return key;
   }
 
-  CreationalContext<?> getCreationalContext() {
-    return creationalContext;
-  }
-
-  @SuppressWarnings("unchecked")
-  <T> T getInstance() {
-    return (T) instance;
-  }
-
-  @SuppressWarnings("unchecked")
-  public void destroy() {
-    bean.destroy(instance, creationalContext);
+  public Object getInstance() {
+    return instance;
   }
 }

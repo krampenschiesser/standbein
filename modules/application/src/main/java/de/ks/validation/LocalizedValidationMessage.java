@@ -19,13 +19,15 @@ import de.ks.i18n.Localized;
 public class LocalizedValidationMessage extends ValidationMessage {
   private final String messageTemplate;
   private final Object[] parameters;
+  private final Localized localized;
 
-  public LocalizedValidationMessage(String messageTemplate, Object... parameters) {
-    this(messageTemplate, Severity.ERROR, parameters);
+  public LocalizedValidationMessage(Localized localized, String messageTemplate, Object... parameters) {
+    this(localized, messageTemplate, Severity.ERROR, parameters);
   }
 
-  public LocalizedValidationMessage(String messageTemplate, Severity severity, Object... parameters) {
+  public LocalizedValidationMessage(Localized localized, String messageTemplate, Severity severity, Object... parameters) {
     super(messageTemplate, severity);
+    this.localized = localized;
     assert messageTemplate != null;
     this.messageTemplate = messageTemplate.replaceAll("\\{", "").replaceAll("\\}", "");
     this.parameters = parameters == null ? new Object[0] : parameters;
@@ -34,7 +36,7 @@ public class LocalizedValidationMessage extends ValidationMessage {
   @Override
   public String getText() {
     if (messageTemplate != null) {
-      return Localized.get(messageTemplate, parameters);
+      return localized.get(messageTemplate, parameters);
     } else {
       return null;
     }

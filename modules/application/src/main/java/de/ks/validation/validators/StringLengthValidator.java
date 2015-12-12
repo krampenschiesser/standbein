@@ -17,20 +17,20 @@ package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
 import de.ks.validation.ValidationResult;
-import de.ks.validation.Validator;
 import javafx.scene.control.Control;
 
-public class StringLengthValidator implements Validator<Control, String> {
+public class StringLengthValidator extends LocalizedValidator<Control, String> {
   protected final int expectedLength;
 
-  public StringLengthValidator(int expectedLength) {
+  public StringLengthValidator(Localized localized, int expectedLength) {
+    super(localized);
     this.expectedLength = expectedLength;
   }
 
   @Override
   public ValidationResult apply(Control control, String s) {
     if (s == null || s.length() != expectedLength) {
-      return ValidationResult.createError(Localized.get("validation.stringLength", s.length(), expectedLength));
+      return ValidationResult.createError(localized.get("validation.stringLength", s.length(), expectedLength));
     }
     return null;
   }

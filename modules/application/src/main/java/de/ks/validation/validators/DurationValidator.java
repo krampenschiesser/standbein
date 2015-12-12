@@ -35,12 +35,12 @@ public class DurationValidator implements Validator<Control, String> {
   private final String durationFormat;
   private final AtomicReference<Duration> duration = new AtomicReference<>();
 
-  public DurationValidator() {
-    minutesSuffifx = Localized.get("duration.minutes");
-    minutesSuffixShort = Localized.get("duration.minutes.short");
-    hoursSuffix = Localized.get("duration.hours");
-    hoursSuffixShort = Localized.get("duration.hours.short");
-    durationFormat = Localized.get("duration.format");
+  public DurationValidator(Localized localized) {
+    minutesSuffifx = localized.get("duration.minutes");
+    minutesSuffixShort = localized.get("duration.minutes.short");
+    hoursSuffix = localized.get("duration.hours");
+    hoursSuffixShort = localized.get("duration.hours.short");
+    durationFormat = localized.get("duration.format");
   }
 
   @Override
@@ -59,12 +59,12 @@ public class DurationValidator implements Validator<Control, String> {
       } else if (hasSuffix(timeString, hoursSuffixShort, hoursSuffix, TimeUnit.HOURS)) {
         return null;
       }
-      return new ValidationResult().add(new LocalizedValidationMessage("validation.duration", minutesSuffifx, minutesSuffixShort, hoursSuffix, hoursSuffixShort, durationFormat));
+      return new ValidationResult().add(new LocalizedValidationMessage(localized, "validation.duration", minutesSuffifx, minutesSuffixShort, hoursSuffix, hoursSuffixShort, durationFormat));
     }
   }
 
   private ValidationResult parseFormat(String timeString) {
-    ValidationResult result = new ValidationResult().add(new LocalizedValidationMessage("validation.duration.invalidFormat", durationFormat));
+    ValidationResult result = new ValidationResult().add(new LocalizedValidationMessage(localized, "validation.duration.invalidFormat", durationFormat));
 
     String[] split = timeString.split(":");
     if (split.length != 2) {

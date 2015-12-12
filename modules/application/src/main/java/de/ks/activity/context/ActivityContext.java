@@ -15,168 +15,45 @@
 
 package de.ks.activity.context;
 
-import de.ks.activity.executor.ActivityExecutor;
-import de.ks.activity.executor.ActivityJavaFXExecutor;
-import de.ks.eventsystem.bus.EventBus;
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.Scope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.spi.Context;
-import javax.enterprise.context.spi.Contextual;
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
-import java.lang.annotation.Annotation;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  *
  */
-public class ActivityContext implements Context {
+public class ActivityContext implements Scope {
   private static final Logger log = LoggerFactory.getLogger(ActivityContext.class);
-  private static final AtomicBoolean registeredWithEventBus = new AtomicBoolean();
 
   protected final ConcurrentHashMap<String, ActivityHolder> activities = new ConcurrentHashMap<>();
   protected volatile String currentActivity = null;
 
   private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
-  private final BeanManager beanManager;
-
-  public static void start(String id) {
-    CDI<Object> cdi = CDI.current();
-    ActivityContext context = (ActivityContext) cdi.getBeanManager().getContext(ActivityScoped.class);
-    context.startActivity(id);
-
-    if (!registeredWithEventBus.get()) {
-      EventBus eventBus = cdi.select(EventBus.class).get();
-      ActivityExecutor activityExecutor = cdi.select(ActivityExecutor.class).get();
-      ActivityJavaFXExecutor fxExecutor = cdi.select(ActivityJavaFXExecutor.class).get();
-      eventBus.setExecutorService(activityExecutor);
-      eventBus.setExecutorService(fxExecutor);
-    }
-  }
-
-  public static void stop(String id) {
-    ActivityContext context = (ActivityContext) CDI.current().getBeanManager().getContext(ActivityScoped.class);
-    context.stopActivity(id);
-  }
-
-  public static void cleanup(String id) {
-    ActivityContext context = (ActivityContext) CDI.current().getBeanManager().getContext(ActivityScoped.class);
-    context.cleanupSingleActivity(id);
-  }
-
-  public static void stopAll() {
-    ActivityContext context = (ActivityContext) CDI.current().getBeanManager().getContext(ActivityScoped.class);
-    context.cleanupAllActivities();
-  }
-
-  public ActivityContext(BeanManager mgr) {
-    beanManager = mgr;
-  }
-
-  @Override
-  public Class<? extends Annotation> getScope() {
-    return ActivityScoped.class;
-  }
-
-  @Override
-  public <T> T get(Contextual<T> contextual) {
-    if (contextual instanceof Bean) {
-      Bean bean = (Bean) contextual;
-
-      Pair<String, Class<?>> key = getKey(bean);
-      lock.readLock().lock();
-      try {
-        StoredBean storedBean = activities.get(key.getLeft()).getStoredBean(key.getRight());
-        if (storedBean != null) {
-          return storedBean.getInstance();
-        }
-      } finally {
-        lock.readLock().unlock();
-      }
-    }
-    return null;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T get(Contextual<T> contextual, CreationalContext<T> creationalContext) {
-    if (contextual instanceof Bean) {
-      Bean bean = (Bean) contextual;
-      Pair<String, Class<?>> key = getKey(bean);
-
-      lock.writeLock().lock();
-      try {
-        Object o = bean.create(creationalContext);
-        StoredBean storedBean = new StoredBean(bean, creationalContext, o);
-        activities.get(key.getLeft()).put(key.getRight(), storedBean);
-        return (T) o;
-      } finally {
-        lock.writeLock().unlock();
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public boolean isActive() {
-    return true;
-  }
-
-  protected Pair<String, Class<?>> getKey(Bean<?> bean) {
-    Class<?> beanClass = bean.getBeanClass();
-    Annotation annotation = beanClass.getAnnotation(ActivityScoped.class);
-
-    if (annotation == null) {//might be a producer method, only warn
-
-      String msg = "Unable to retrieve " + ActivityScoped.class.getName() + " from " + beanClass;
-      if (bean.getClass().getName().contains("Producer")) {
-        log.trace(msg);
-      } else {
-        log.warn(msg);
-      }
-    }
-    if (currentActivity == null) {
-      throw new IllegalStateException("No activity currently active!");
-    }
-    return Pair.of(currentActivity, beanClass);
-  }
 
   public void cleanupSingleActivity(String id) {
     lock.writeLock().lock();
     try {
       ActivityHolder activityHolder = activities.remove(id);
       log.debug("Cleanup activity {}", activityHolder.getId());
-      Set<Map.Entry<Class<?>, StoredBean>> entries = activityHolder.objectStore.entrySet();
-
-      for (Iterator<Map.Entry<Class<?>, StoredBean>> iterator = entries.iterator(); iterator.hasNext(); ) {
-        Map.Entry<Class<?>, StoredBean> next = iterator.next();
-        next.getValue().destroy();
-        iterator.remove();
-      }
+      activityHolder.destroy();
     } finally {
       lock.writeLock().unlock();
     }
   }
 
-  public void cleanupSingleBean(Class<?> clazz) {
+  public void cleanupSingleBean(Key<?> key) {
     lock.writeLock().lock();
     try {
       ActivityHolder activityHolder = activities.get(getCurrentActivity());
 
-      StoredBean storedBean = activityHolder.objectStore.get(clazz);
+      StoredBean storedBean = activityHolder.objectStore.remove(key);
       if (storedBean != null) {
-        storedBean.destroy();
-        activityHolder.objectStore.remove(clazz);
-        log.debug("Cleaned up bean {} of activity {}", clazz.getName(), activityHolder.getId());
+        log.debug("Cleaned up bean {} of activity {}", key, activityHolder.getId());
       }
     } finally {
       lock.writeLock().unlock();
@@ -273,5 +150,42 @@ public class ActivityContext implements Context {
 
   public boolean hasCurrentActivity() {
     return currentActivity != null;
+  }
+
+  @Override
+  public <T> Provider<T> scope(Key<T> key, Provider<T> unscoped) {
+    return new Provider<T>() {
+      @Override
+      public T get() {
+
+        ActivityHolder holder = activities.get(currentActivity);
+        StoredBean storedBean = null;
+        lock.readLock().lock();
+        try {
+          storedBean = holder.getStoredBean(key);
+        } finally {
+          lock.readLock().unlock();
+        }
+
+        if (storedBean == null) {
+          try {
+            lock.writeLock().lock();
+            storedBean = new StoredBean(key, createProxy(unscoped.get()));
+            holder.put(key, storedBean);
+          } finally {
+            lock.readLock().unlock();
+          }
+        }
+        return null;
+      }
+    };
+  }
+
+  private <T> StoredBean createProxy(T t) {
+    return null;
+  }
+
+  public void stopAll() {
+    cleanupAllActivities();
   }
 }

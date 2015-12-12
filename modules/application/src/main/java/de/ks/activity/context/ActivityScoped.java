@@ -15,13 +15,13 @@
 
 package de.ks.activity.context;
 
-import javax.enterprise.context.NormalScope;
+import javax.inject.Scope;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
-@NormalScope
+@Scope
 public @interface ActivityScoped {
 }

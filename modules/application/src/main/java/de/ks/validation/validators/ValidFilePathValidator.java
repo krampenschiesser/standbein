@@ -17,7 +17,6 @@ package de.ks.validation.validators;
 
 import de.ks.i18n.Localized;
 import de.ks.validation.ValidationResult;
-import de.ks.validation.Validator;
 import javafx.scene.control.Control;
 
 import java.io.File;
@@ -25,10 +24,14 @@ import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 
-public class ValidFilePathValidator implements Validator<Control, String> {
+public class ValidFilePathValidator extends LocalizedValidator<Control, String> {
+  public ValidFilePathValidator(Localized localized) {
+    super(localized);
+  }
+
   @Override
   public ValidationResult apply(Control control, String s) {
-    String validationMsg = Localized.get("validation.invalidpath", s);
+    String validationMsg = localized.get("validation.invalidpath", s);
     ValidationResult validationResult = ValidationResult.createError(validationMsg);
 
     if (s == null || s.isEmpty()) {

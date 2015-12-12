@@ -16,6 +16,7 @@
 package de.ks.activity;
 
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import de.ks.activity.context.ActivityContext;
 import de.ks.activity.context.ActivityStore;
 import de.ks.activity.executor.ActivityExecutor;
@@ -126,7 +127,7 @@ public class ActivityController {
           initialization.loadActivity(activityCfg);
           initialization.getControllers().forEach(eventBus::register);
 
-          select(activityCfg, activityCfg.getInitialController(), Navigator.MAIN_AREA);
+          select(activityCfg, activityCfg.getInitialController());
 
           initialization.getActivityCallbacks().forEach(ActivityCallback::onStart);
 
@@ -172,7 +173,7 @@ public class ActivityController {
 
     initialization.getControllers().forEach(eventBus::register);
 
-    select(activityCfg, activityCfg.getInitialController(), Navigator.MAIN_AREA);
+    select(activityCfg, activityCfg.getInitialController());
 
     initialization.getActivityCallbacks().forEach(ActivityCallback::onResume);
     if (reload) {
@@ -197,8 +198,8 @@ public class ActivityController {
     shutdownExecutors();
     //I want to cleanup the executors themselves, but during registering, I sadly don't know that it is a producer
     //the cdi api doesn't provide that information :(
-    context.cleanupSingleBean(ActivityExecutorProducer.class);
-    context.cleanupSingleBean(ActivityJavaFXExecutorProducer.class);
+    context.cleanupSingleBean(Key.get(ActivityExecutorProducer.class));
+    context.cleanupSingleBean(Key.get(ActivityJavaFXExecutorProducer.class));
 
     initialization.getControllers().forEach((controller) -> eventBus.unregister(controller));
   }
@@ -281,7 +282,7 @@ public class ActivityController {
     progress.setMaxSize(Control.USE_PREF_SIZE, Control.USE_PREF_SIZE);
     container.getChildren().add(progress);
 
-    navigator.get().presentInMain(container);
+    navigator.get().present(container);
   }
 
   public void stopAll() {
@@ -304,9 +305,9 @@ public class ActivityController {
     return submit;
   }
 
-  public void select(ActivityCfg activityCfg, Class<?> targetController, String presentationArea) {
+  public void select(ActivityCfg activityCfg, Class<?> targetController) {
     Node view = initialization.getViewForController(targetController);
-    navigator.get().present(presentationArea, view);
+    navigator.get().present(view);
     activityCfg.setCurrentController(targetController);
   }
 

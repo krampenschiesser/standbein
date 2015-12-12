@@ -23,7 +23,8 @@ public class IntegerRangeValidator extends IntegerValidator {
   protected final int minInclusive;
   protected final int maxExclusive;
 
-  public IntegerRangeValidator(int minInclusive, int maxExclusive) {
+  public IntegerRangeValidator(Localized localized, int minInclusive, int maxExclusive) {
+    super(localized);
     this.minInclusive = minInclusive;
     this.maxExclusive = maxExclusive;
   }
@@ -31,10 +32,10 @@ public class IntegerRangeValidator extends IntegerValidator {
   @Override
   protected ValidationResult furtherProcessing(Control control, Integer value) {
     if (value < minInclusive) {
-      String validationMsg = Localized.get("validation.number.greaterEquals", minInclusive);
+      String validationMsg = localized.get("validation.number.greaterEquals", minInclusive);
       return ValidationResult.createError(validationMsg);
     } else if (value >= maxExclusive) {
-      String validationMsg = Localized.get("validation.number.lessThan", maxExclusive);
+      String validationMsg = localized.get("validation.number.lessThan", maxExclusive);
       return ValidationResult.createError(validationMsg);
     }
     return super.furtherProcessing(control, value);

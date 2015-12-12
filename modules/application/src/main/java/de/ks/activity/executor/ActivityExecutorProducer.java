@@ -14,26 +14,21 @@
  */
 package de.ks.activity.executor;
 
-import de.ks.activity.context.ActivityContext;
-import de.ks.activity.context.ActivityScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.enterprise.inject.Disposes;
-import javax.enterprise.inject.Produces;
 
 public class ActivityExecutorProducer {
   private static final Logger log = LoggerFactory.getLogger(ActivityExecutorProducer.class);
 
-  @Produces
-  @ActivityScoped
-  public ActivityExecutor createExecutorService(ActivityContext context) {
-    //use 2 as core pool size as sometimes the scheduled thread pool doesn't start another thread
-    //when 1 blocks and a second runnable is in the queue
-    return new ActivityExecutor(context.getCurrentActivity(), 8, Integer.MAX_VALUE);
-  }
-
-  public void shutdownActivityExecutor(@Disposes ActivityExecutor executor) {
-    new GracefulExecutorShutdown().shutdown(executor, executor.getName());
-  }
+//  @Produces
+//  @ActivityScoped
+//  public ActivityExecutor createExecutorService(ActivityContext context) {
+//    //use 2 as core pool size as sometimes the scheduled thread pool doesn't start another thread
+//    //when 1 blocks and a second runnable is in the queue
+//    return new ActivityExecutor(context.getCurrentActivity(), 8, Integer.MAX_VALUE);
+//  }
+//
+//  public void shutdownActivityExecutor(@Disposes ActivityExecutor executor) {
+//    new GracefulExecutorShutdown().shutdown(executor, executor.getName());
+//  }
 }
