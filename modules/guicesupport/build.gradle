@@ -1,4 +1,5 @@
 dependencies {
     compile "com.google.inject:guice:$guice"
+    compile "com.google.inject.extensions:guice-multibindings:$guice"
     compile 'javax.inject:javax.inject:1'
 }

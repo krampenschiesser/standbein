@@ -15,15 +15,22 @@
  */
 package de.ks.standbein;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+import java.util.Set;
 
-public class Module2 extends AbstractModule {
-  @Override
-  protected void configure() {
-    Multibinder<String> setBinder = Multibinder.newSetBinder(binder(), String.class, TestQualifier.class);
-    for (int i = 0; i < 5; i++) {
-      setBinder.addBinding().toInstance("style" + i);
-    }
+public class MultiBindPojo {
+  private Set<String> styles;
+
+  //  @Inject
+//  public MultiBindPojo(@TestQualifier Set<String> styles) {
+//    this.styles = styles;
+//  }
+//
+  @com.google.inject.Inject(optional = true)
+  public void setStyles(@TestQualifier Set<String> styles) {
+    this.styles = styles;
+  }
+
+  public Set<String> getStyles() {
+    return styles;
   }
 }

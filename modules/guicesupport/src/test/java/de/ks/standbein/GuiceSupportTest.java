@@ -15,6 +15,7 @@
  */
 package de.ks.standbein;
 
+import com.google.inject.Guice;
 import com.google.inject.Module;
 import org.junit.Test;
 
@@ -49,5 +50,17 @@ public class GuiceSupportTest {
     Injectioned injectioned = GuiceSupport.get(Injectioned.class);
     TestPojo instance = injectioned.pojo;
     assertNotNull(instance);
+  }
+
+  @Test
+  public void testMultiBindPojo() throws Exception {
+    MultiBindPojo pojo = GuiceSupport.get(MultiBindPojo.class);
+    assertEquals(5, pojo.getStyles().size());
+  }
+
+  @Test
+  public void testMultiBindPojoUnBound() throws Exception {
+    MultiBindPojo pojo = Guice.createInjector(new Module1()).getInstance(MultiBindPojo.class);
+    assertNull(pojo.getStyles());
   }
 }

@@ -15,15 +15,15 @@
  */
 package de.ks.standbein;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+import javax.inject.Qualifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-public class Module2 extends AbstractModule {
-  @Override
-  protected void configure() {
-    Multibinder<String> setBinder = Multibinder.newSetBinder(binder(), String.class, TestQualifier.class);
-    for (int i = 0; i < 5; i++) {
-      setBinder.addBinding().toInstance("style" + i);
-    }
-  }
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+@Qualifier
+@Retention(RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
+public @interface TestQualifier {
 }
