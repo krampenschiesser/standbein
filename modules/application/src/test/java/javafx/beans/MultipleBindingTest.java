@@ -14,16 +14,19 @@
  */
 package javafx.beans;
 
-import de.ks.LauncherRunner;
+import de.ks.JavaFXTestModule;
+import de.ks.LoggingGuiceTestSupport;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.TextField;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(LauncherRunner.class)
 public class MultipleBindingTest {
+  @Rule
+  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule()).launchServices();
+
   @Test
   public void testName() throws Exception {
     TextField textField = new TextField();

@@ -15,8 +15,10 @@
 
 package de.ks.validation.validators;
 
+import de.ks.i18n.Localized;
+
 public class DoubleValidator extends BaseNumberValidator<Double> {
-  public DoubleValidator() {
-    super(s -> Double.valueOf(s), "validation.mustBeDouble");
+  public DoubleValidator(Localized localized) {
+    super(localized, s -> Double.valueOf(s), "validation.mustBeDouble");
   }
 }

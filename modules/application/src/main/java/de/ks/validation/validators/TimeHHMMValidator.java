@@ -15,9 +15,9 @@
 
 package de.ks.validation.validators;
 
+import de.ks.i18n.Localized;
 import de.ks.validation.LocalizedValidationMessage;
 import de.ks.validation.ValidationResult;
-import de.ks.validation.Validator;
 import javafx.scene.control.Control;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +25,13 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalTime;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class TimeHHMMValidator implements Validator<Control, String> {
+public class TimeHHMMValidator extends LocalizedValidator<Control, String> {
   private static final Logger log = LoggerFactory.getLogger(TimeHHMMValidator.class);
   private final AtomicReference<LocalTime> time = new AtomicReference<>();
+
+  public TimeHHMMValidator(Localized localized) {
+    super(localized);
+  }
 
   @Override
   public ValidationResult apply(Control control, String timeString) {

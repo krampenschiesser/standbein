@@ -18,9 +18,15 @@ package de.ks.activity.context;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
+import javassist.util.proxy.MethodHandler;
+import javassist.util.proxy.Proxy;
+import javassist.util.proxy.ProxyFactory;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -30,10 +36,25 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class ActivityContext implements Scope {
   private static final Logger log = LoggerFactory.getLogger(ActivityContext.class);
 
+  protected final Objenesis objenesis = new ObjenesisStd(true);
   protected final ConcurrentHashMap<String, ActivityHolder> activities = new ConcurrentHashMap<>();
+  protected final ConcurrentHashMap<Key<?>, Object> proxies = new ConcurrentHashMap<>();
   protected volatile String currentActivity = null;
 
   private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
+
+  public void start(String id) {
+    startActivity(id);
+  }
+
+  public void stop(String id) {
+    stopActivity(id);
+  }
+
+  public void cleanup(String id) {
+    cleanupSingleActivity(id);
+  }
+
 
   public void cleanupSingleActivity(String id) {
     lock.writeLock().lock();
@@ -168,21 +189,52 @@ public class ActivityContext implements Scope {
         }
 
         if (storedBean == null) {
+          lock.writeLock().lock();
           try {
-            lock.writeLock().lock();
-            storedBean = new StoredBean(key, createProxy(unscoped.get()));
+            storedBean = new StoredBean(key, unscoped.get());
             holder.put(key, storedBean);
           } finally {
-            lock.readLock().unlock();
+            lock.writeLock().unlock();
           }
         }
-        return null;
+        @SuppressWarnings("unchecked")
+        Class<T> clazz = (Class<T>) storedBean.getInstance().getClass();
+        return getProxy(clazz, key);
       }
+
     };
   }
 
-  private <T> StoredBean createProxy(T t) {
-    return null;
+  private Object getCurrentInstance(Key<?> key) {
+    ActivityHolder holder = activities.get(currentActivity);
+    StoredBean storedBean = holder.getStoredBean(key);
+    return storedBean.getInstance();
+
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> T getProxy(Class<T> clazz, Key<T> key) {
+    if (proxies.containsKey(key)) {
+      return (T) proxies.get(key);
+    } else {
+      ProxyFactory factory = new ProxyFactory();
+      factory.setSuperclass(clazz);
+      Class proxy = factory.createClass();
+
+      Object retval = objenesis.newInstance(proxy);
+      ((Proxy) retval).setHandler(new MethodHandler() {
+        @Override
+        public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) throws Throwable {
+          Object currentInstance = getCurrentInstance(key);
+          if (thisMethod.getName().equals("toString")) {
+            return "Proxy for " + clazz.getName() + " current activity: '" + currentActivity + "'" + String.valueOf(thisMethod.invoke(currentInstance, args));
+          }
+          return thisMethod.invoke(currentInstance, args);
+        }
+      });
+      proxies.putIfAbsent(key, retval);
+      return (T) retval;
+    }
   }
 
   public void stopAll() {

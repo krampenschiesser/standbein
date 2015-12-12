@@ -1,13 +1,10 @@
 package de.ks.option.properties;
 
-import de.ks.LauncherRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(LauncherRunner.class)
 public class PropertiesOptionSourceTest {
   @Before
   public void setUp() throws Exception {

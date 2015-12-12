@@ -14,39 +14,40 @@
  */
 package de.ks.activity.controllerbinding;
 
-import de.ks.LauncherRunner;
+import de.ks.JavaFXTestModule;
+import de.ks.LoggingGuiceTestSupport;
 import de.ks.activity.ActivityController;
 import de.ks.activity.ActivityHint;
 import de.ks.activity.context.ActivityStore;
-import de.ks.application.Navigator;
 import de.ks.launch.ApplicationService;
-import de.ks.launch.Launcher;
+import de.ks.module.ApplicationModule;
 import de.ks.util.FXPlatform;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
-@RunWith(LauncherRunner.class)
 public class ControllerBindingTest {
+  @Rule
+  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule(), new ApplicationModule()).launchServices();
+
   @Inject
   ActivityController controller;
   @Inject
   ActivityStore store;
+  @Inject
+  ApplicationService service;
+
   private TestBindingDS datasource;
 
   @Before
   public void setUp() throws Exception {
-    ApplicationService service = Launcher.instance.getService(ApplicationService.class);
-    Navigator.registerWithBorderPane(service.getStage());
-
     controller.startOrResume(new ActivityHint(BindingActivity.class));
     controller.waitForTasks();
     datasource = (TestBindingDS) store.getDatasource();

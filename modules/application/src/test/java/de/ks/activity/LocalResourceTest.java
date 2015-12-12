@@ -15,31 +15,26 @@
  */
 package de.ks.activity;
 
-import de.ks.LauncherRunner;
+import de.ks.JavaFXTestModule;
+import de.ks.LoggingGuiceTestSupport;
 import de.ks.activity.resource.ResourceActivity;
 import de.ks.activity.resource.ResourceTestController;
-import de.ks.application.Navigator;
 import de.ks.launch.ApplicationService;
-import de.ks.launch.Launcher;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(LauncherRunner.class)
 public class LocalResourceTest {
+  @Rule
+  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule()).launchServices();
   @Inject
   ActivityController controller;
-
-  @Before
-  public void setUp() throws Exception {
-    ApplicationService service = Launcher.instance.getService(ApplicationService.class);
-    Navigator.registerWithBorderPane(service.getStage());
-  }
+  @Inject
+  ApplicationService service;
 
   @After
   public void tearDown() throws Exception {

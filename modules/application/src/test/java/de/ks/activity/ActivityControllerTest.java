@@ -15,41 +15,41 @@
 
 package de.ks.activity;
 
-import de.ks.LauncherRunner;
+import de.ks.JavaFXTestModule;
+import de.ks.LoggingGuiceTestSupport;
 import de.ks.activity.context.ActivityContext;
-import de.ks.application.Navigator;
 import de.ks.launch.ApplicationService;
-import de.ks.launch.Launcher;
+import de.ks.module.ApplicationModule;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 
-@RunWith(LauncherRunner.class)
 public class ActivityControllerTest {
+  @Rule
+  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule(), new ApplicationModule()).launchServices();
 
-  private ExecutorService executorService;
   @Inject
   protected ActivityController controller;
   @Inject
   protected ActivityContext context;
+  @Inject
+  ApplicationService service;
+  @Inject
+  ExecutorService executorService;
 
   @Before
   public void setUp() throws Exception {
     Dummy.fail = false;
-    ApplicationService service = Launcher.instance.getService(ApplicationService.class);
-    Navigator.registerWithBorderPane(service.getStage());
-    executorService = Executors.newCachedThreadPool();
     warmup();
   }
 

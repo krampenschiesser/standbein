@@ -17,7 +17,6 @@ package de.ks.validation.validators;
 import de.ks.i18n.Localized;
 import de.ks.validation.LocalizedValidationMessage;
 import de.ks.validation.ValidationResult;
-import de.ks.validation.Validator;
 import javafx.scene.control.Control;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class DurationValidator implements Validator<Control, String> {
+public class DurationValidator extends LocalizedValidator<Control, String> {
   private static final Logger log = LoggerFactory.getLogger(DurationValidator.class);
   private final String minutesSuffixShort;
   private final String minutesSuffifx;
@@ -36,6 +35,7 @@ public class DurationValidator implements Validator<Control, String> {
   private final AtomicReference<Duration> duration = new AtomicReference<>();
 
   public DurationValidator(Localized localized) {
+    super(localized);
     minutesSuffifx = localized.get("duration.minutes");
     minutesSuffixShort = localized.get("duration.minutes.short");
     hoursSuffix = localized.get("duration.hours");

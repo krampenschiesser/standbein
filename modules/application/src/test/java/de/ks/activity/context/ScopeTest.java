@@ -15,46 +15,44 @@
 
 package de.ks.activity.context;
 
-import de.ks.LauncherRunner;
+import de.ks.JavaFXTestModule;
+import de.ks.LoggingGuiceTestSupport;
+import de.ks.module.ApplicationModule;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.Collections;
-import java.util.concurrent.*;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
 
 import static org.junit.Assert.*;
 
-@RunWith(LauncherRunner.class)
 public class ScopeTest {
+  @Rule
+  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule(), new ApplicationModule()).launchServices();
+
   @Inject
   ActivityScopedBean1 bean1;
   @Inject
   ActivityScopedBean1 bean2;
   @Inject
   ActivityContext context;
+  @Inject
   ExecutorService service;
-
-  @Before
-  public void setUp() throws Exception {
-    service = Executors.newCachedThreadPool();
-  }
-
   @After
   public void tearDown() throws Exception {
-    ActivityContext.stopAll();
+    context.stopAll();
     service.shutdown();
   }
 
   @Test
   public void testActivityContextActive() throws Exception {
-    ActivityContext context = (ActivityContext) CDI.current().getBeanManager().getContext(ActivityScoped.class);
-    assertTrue(context.isActive());
-
     context.startActivity("1").getCount();
 
     bean1.getName();
@@ -73,14 +71,17 @@ public class ScopeTest {
     assertEquals(0, context.activities.size());
   }
 
+  @Inject
+  Provider<ActivityScopedBean1> provider;
+
   @Test
   public void testScopePropagation() throws Exception {
-    ActivityContext.start("2");
+    context.start("2");
 
     bean1.setValue("Hello Sauerland!");
 
     Callable<Object> callable = () -> {
-      ActivityScopedBean1 bean = CDI.current().select(ActivityScopedBean1.class).get();
+      ActivityScopedBean1 bean = provider.get();
       assertNotNull(bean.getValue());
       assertEquals("Hello Sauerland!", bean.getValue());
       return null;
@@ -93,12 +94,12 @@ public class ScopeTest {
   @Test
   public void testScopeCleanup() throws Exception {
     final CyclicBarrier barrier = new CyclicBarrier(2);
-    ActivityContext.start("2");
+    context.start("2");
 
     bean1.setValue("Hello Sauerland!");
 
     service.execute(() -> {
-      ActivityScopedBean1 bean = CDI.current().select(ActivityScopedBean1.class).get();
+      ActivityScopedBean1 bean = provider.get();
       assertNotNull(bean.getValue());
       assertEquals("Hello Sauerland!", bean.getValue());
       try {
@@ -109,7 +110,7 @@ public class ScopeTest {
     });
     assertEquals(1, context.activities.size());
     assertEquals("Hello Sauerland!", bean1.getValue());
-    ActivityContext.stop("2");
+    context.stop("2");
 
     assertEquals("Activity got removed although one thread still holds it", 1, context.activities.size());
     barrier.await();

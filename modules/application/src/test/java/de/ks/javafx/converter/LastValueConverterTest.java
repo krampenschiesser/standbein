@@ -15,20 +15,23 @@
 
 package de.ks.javafx.converter;
 
-import de.ks.LauncherRunner;
+import de.ks.JavaFXTestModule;
+import de.ks.LoggingGuiceTestSupport;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.util.converter.NumberStringConverter;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  *
  */
-@RunWith(LauncherRunner.class)
 public class LastValueConverterTest {
+  @Rule
+  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule()).launchServices();
+
   @Test
   public void testExcpetionSaveConversion() throws Exception {
     SimpleStringProperty stringProperty = new SimpleStringProperty();

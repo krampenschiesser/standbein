@@ -15,8 +15,10 @@
 
 package de.ks.validation.validators;
 
+import de.ks.i18n.Localized;
+
 public class LongValidator extends BaseNumberValidator<Long> {
-  public LongValidator() {
-    super(s -> Long.valueOf(s), "validation.mustBeInteger");
+  public LongValidator(Localized localized) {
+    super(localized, Long::valueOf, "validation.mustBeInteger");
   }
 }

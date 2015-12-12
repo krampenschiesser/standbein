@@ -14,7 +14,6 @@
  */
 package de.ks.launch;
 
-import com.google.inject.Inject;
 import de.ks.activity.context.ActivityContext;
 import de.ks.application.App;
 import de.ks.application.ApplicationStartup;
@@ -24,11 +23,19 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.concurrent.*;
 
+@Singleton
 public class ApplicationService extends Service {
   private static final Logger log = LoggerFactory.getLogger(ApplicationService.class);
-  public static final String IS_DEBUGGING = "is.debugging";
+
+  //guice configuration dealing with FX singleton shit
+  public static final String WAIT_FOR_INITIALIZATION = "waitForInitialization";
+  public static final String PREVENT_PLATFORMEXIT = "preventPlatformExit";
+
   private String[] args;
   private Stage stage;
   private final CountDownLatch latch = new CountDownLatch(1);
@@ -36,10 +43,27 @@ public class ApplicationService extends Service {
   private boolean hasPreloader;
   private Launcher launcher;
 
+  protected boolean waitForInitialization;
+  protected boolean preventPlatformExit;
+
+  final ActivityContext context;
+  final ApplicationStartup startup;
+
   @Inject
-  ActivityContext context;
-  @Inject
-  ApplicationStartup startup;
+  public ApplicationService(ActivityContext context, ApplicationStartup startup) {
+    this.context = context;
+    this.startup = startup;
+  }
+
+  @com.google.inject.Inject(optional = true)
+  public void setWaitForInitialization(@Named(WAIT_FOR_INITIALIZATION) boolean wait) {
+    this.waitForInitialization = wait;
+  }
+
+  @com.google.inject.Inject(optional = true)
+  public void setPreventPlatformExit(@Named(WAIT_FOR_INITIALIZATION) boolean preventExit) {
+    this.preventPlatformExit = preventExit;
+  }
 
   @Override
   public void initialize(Launcher launcher, ExecutorService executorService, String[] args) {
@@ -73,7 +97,7 @@ public class ApplicationService extends Service {
   private void waitForJavaFXInitialized() {
     int timeout = 10;
     try {
-      if (System.getProperties().containsKey(IS_DEBUGGING)) {
+      if (waitForInitialization) {
         latch.await();
       } else {
         boolean started = latch.await(timeout, TimeUnit.SECONDS);
@@ -90,7 +114,9 @@ public class ApplicationService extends Service {
   protected void doStop() {
     context.stopAll();
     int timeout = 10;
-    Platform.exit();
+    if (!preventPlatformExit) {
+      Platform.exit();
+    }
     try {
       latch.await(timeout, TimeUnit.SECONDS);
     } catch (InterruptedException e) {

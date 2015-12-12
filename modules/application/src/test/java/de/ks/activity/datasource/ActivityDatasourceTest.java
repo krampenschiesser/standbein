@@ -14,20 +14,17 @@
  */
 package de.ks.activity.datasource;
 
-import de.ks.LauncherRunner;
+import de.ks.JavaFXTestModule;
+import de.ks.LoggingGuiceTestSupport;
 import de.ks.activity.ActivityController;
 import de.ks.activity.ActivityHint;
 import de.ks.activity.context.ActivityStore;
-import de.ks.application.Navigator;
 import de.ks.launch.ApplicationService;
-import de.ks.launch.Launcher;
+import de.ks.module.ApplicationModule;
 import de.ks.util.FXPlatform;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.concurrent.CountDownLatch;
@@ -35,19 +32,16 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
-@RunWith(LauncherRunner.class)
 public class ActivityDatasourceTest {
-  private static final Logger log = LoggerFactory.getLogger(ActivityDatasourceTest.class);
+  @Rule
+  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule(), new ApplicationModule()).launchServices();
+
   @Inject
   ActivityController controller;
   @Inject
   ActivityStore store;
-
-  @Before
-  public void setUp() throws Exception {
-    ApplicationService service = Launcher.instance.getService(ApplicationService.class);
-    Navigator.registerWithBorderPane(service.getStage());
-  }
+  @Inject
+  ApplicationService service;
 
   @After
   public void tearDown() throws Exception {

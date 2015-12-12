@@ -14,17 +14,14 @@
  */
 package de.ks.binding;
 
-import de.ks.LauncherRunner;
 import javafx.beans.property.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.sql.Timestamp;
 
 import static org.junit.Assert.*;
 
-@RunWith(LauncherRunner.class)
 public class CustomBindingTest {
   private Binding binding;
 

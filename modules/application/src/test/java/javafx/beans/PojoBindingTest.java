@@ -15,7 +15,8 @@
 
 package javafx.beans;
 
-import de.ks.LauncherRunner;
+import de.ks.JavaFXTestModule;
+import de.ks.LoggingGuiceTestSupport;
 import de.ks.javafx.converter.LastValueConverter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.adapter.JavaBeanIntegerProperty;
@@ -27,8 +28,8 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TextField;
 import javafx.util.converter.NumberStringConverter;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +40,10 @@ import static org.junit.Assert.*;
 /**
  *
  */
-@RunWith(LauncherRunner.class)
 public class PojoBindingTest {
   private static final Logger log = LoggerFactory.getLogger(PojoBindingTest.class);
+  @Rule
+  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule()).launchServices();
 
   @Test
   public void testUIPojoCommunication() throws Exception {
@@ -110,7 +112,8 @@ public class PojoBindingTest {
     ObservableList<String> observableList = FXCollections.observableArrayList();
     observableList.add("Bla");
 
-    @SuppressWarnings("unchecked") JavaBeanObjectProperty<List<String>> collection = JavaBeanObjectPropertyBuilder.create().bean(hello).name("collection").build();
+    @SuppressWarnings("unchecked")
+    JavaBeanObjectProperty<List<String>> collection = JavaBeanObjectPropertyBuilder.create().bean(hello).name("collection").build();
     collection.addListener((observable, oldValue, newValue) -> {
       log.info("Oldvalue ={}", oldValue);
       log.info("Oldvalue ={}", newValue);

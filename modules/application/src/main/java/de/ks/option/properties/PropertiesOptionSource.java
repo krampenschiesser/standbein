@@ -20,7 +20,6 @@ import de.ks.option.OptionSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -37,8 +36,7 @@ public class PropertiesOptionSource implements OptionSource {
 
   protected final Properties properties = new Properties();
 
-  @PostConstruct
-  protected void load() {
+  public PropertiesOptionSource() {
     String path = getPropertiesFile();
     File file = new File(path);
     if (file.exists()) {

@@ -1,10 +1,11 @@
-/*
- * Copyright [2014] [Christian Loehnert, krampenschiesser@gmail.com]
+/**
+ * Copyright [2015] [Christian Loehnert]
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ks.launch;
+package de.ks.module;
 
-public class CDIService extends Service {
-//  private final CdiContainer cdiContainer = CdiContainerLoader.getCdiContainer();
+import com.google.inject.AbstractModule;
+import de.ks.activity.context.ActivityContext;
+import de.ks.activity.context.ActivityScoped;
 
+public class ApplicationModule extends AbstractModule {
   @Override
-  protected void doStart() {
-//    cdiContainer.boot();
-  }
+  protected void configure() {
+    ActivityContext context = new ActivityContext();
+    bindScope(ActivityScoped.class, context);
+    bind(ActivityContext.class).annotatedWith(ActivityScoped.class).toInstance(context);
 
-  @Override
-  protected void doStop() {
-//    cdiContainer.shutdown();
-  }
-
-  @Override
-  public int getPriority() {
-    return 2;
   }
 }

@@ -1,10 +1,11 @@
-/*
- * Copyright [2014] [Christian Loehnert, krampenschiesser@gmail.com]
+/**
+ * Copyright [2015] [Christian Loehnert]
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,18 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package de.ks;
 
-package de.ks.menu.mainmenu;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
+import de.ks.launch.ApplicationService;
 
-import de.ks.menu.MenuItem;
-
-import java.util.Locale;
-
-/**
- *
- */
-@MenuItem(Open.MENUPATH)
-public class Open {
-  public static final String MENUPATH = "/main/file";
-  public static final String ITEMPATH = MENUPATH + "/" + Open.class.getSimpleName().toLowerCase(Locale.ROOT);
+public class JavaFXTestModule extends AbstractModule {
+  @Override
+  protected void configure() {
+    bind(boolean.class).annotatedWith(Names.named(ApplicationService.PREVENT_PLATFORMEXIT)).toInstance(true);
+  }
 }

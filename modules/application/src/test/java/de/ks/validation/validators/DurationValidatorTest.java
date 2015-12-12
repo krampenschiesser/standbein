@@ -14,24 +14,34 @@
  */
 package de.ks.validation.validators;
 
-import de.ks.LauncherRunner;
+import de.ks.LoggingGuiceTestSupport;
+import de.ks.i18n.LocalizationModule;
+import de.ks.i18n.Localized;
 import javafx.scene.control.Control;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
+import javax.inject.Inject;
 import java.time.Duration;
+import java.util.Locale;
 
 import static org.junit.Assert.*;
 
-@RunWith(LauncherRunner.class)
 public class DurationValidatorTest {
+
+  @Rule
+  LoggingGuiceTestSupport guice = new LoggingGuiceTestSupport(this, new LocalizationModule());
+  @Inject
+  Localized localized;
+
   private DurationValidator validator;
   private Control control;
 
   @Before
   public void setUp() throws Exception {
-    validator = new DurationValidator();
+    localized.changeLocale(Locale.ENGLISH);
+    validator = new DurationValidator(localized);
     control = null;
   }
 
