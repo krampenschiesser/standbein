@@ -15,21 +15,17 @@
 
 package de.ks.eventsystem.bus;
 
-import de.ks.LauncherRunner;
 import de.ks.reflection.PropertyPath;
 import de.ks.reflection.ReflectionUtil;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  *
  */
-@RunWith(LauncherRunner.class)
 public class EventHandlerTest {
   @Test
   public void testEventHandling() throws Exception {
