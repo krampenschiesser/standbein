@@ -40,9 +40,9 @@ public class ImagesTest {
     String workingDirectory = System.getProperty("user.dir");
     log.info("working in {}", workingDirectory);
     if (workingDirectory.endsWith("images")) {
-      fileImage = "../../libs/images/fileimage.jpg";
+      fileImage = "../../modules/images/fileimage.jpg";
     } else {
-      fileImage = "pc/libs/images/fileimage.jpg";
+      fileImage = "pc/modules/images/fileimage.jpg";
     }
 
   }

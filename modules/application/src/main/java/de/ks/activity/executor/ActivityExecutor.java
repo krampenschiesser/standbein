@@ -14,37 +14,50 @@
  */
 package de.ks.activity.executor;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import de.ks.activity.context.ActivityContext;
 import de.ks.activity.context.ActivityScoped;
 import de.ks.executor.CancelRejection;
-import de.ks.executor.LoggingUncaughtExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @ActivityScoped
 public class ActivityExecutor implements ScheduledExecutorService {
+  public static final String EXECUTOR_COREPOOLSIZE = "ActivityExecutor.corepoolsize";
+  public static final String EXECUTOR_MAXPOOLSIZE = "ActivityExecutor.maxpoolsize";
   private static final Logger log = LoggerFactory.getLogger(ActivityExecutor.class);
-  private final String name;
   private final ScheduledThreadPoolExecutor delegate;
 
-  protected ActivityExecutor() {
-    this("NeverCalled", 2, Integer.MAX_VALUE);//but needed for cdi proxy
-  }
+  private final AtomicInteger threadCount = new AtomicInteger();
+  private final Provider<ActivityContext> context;
 
-  public ActivityExecutor(String name, int corePoolSize, int maximumPoolSize) {
-    delegate = new ScheduledThreadPoolExecutor(corePoolSize, new ThreadFactoryBuilder().setDaemon(true).setNameFormat(name + "-%d").setUncaughtExceptionHandler(new LoggingUncaughtExceptionHandler()).build());
-    this.name = name;
+  @Inject
+  public ActivityExecutor(Provider<ActivityContext> context, @Named(EXECUTOR_COREPOOLSIZE) int corePoolSize, @Named(EXECUTOR_MAXPOOLSIZE) int maximumPoolSize) {
+    this.context = context;
+    delegate = new ScheduledThreadPoolExecutor(corePoolSize, new ThreadFactory() {
+      @Override
+      public Thread newThread(Runnable r) {
+        Thread thread = new Thread(r);
+        int id = threadCount.incrementAndGet();
+        thread.setName(context.get().getCurrentActivity() + "-" + String.format("%02d", id));
+        thread.setDaemon(true);
+        return thread;
+      }
+    });
     delegate.setMaximumPoolSize(maximumPoolSize);
     delegate.setKeepAliveTime(1, TimeUnit.MINUTES);
     delegate.setRejectedExecutionHandler(new CancelRejection());
   }
 
   public String getName() {
-    return name;
+    return context.get().getCurrentActivity();
   }
 
   public void waitForAllTasksDone() {

@@ -17,7 +17,6 @@ package de.ks.application;
 import de.ks.i18n.Localized;
 import de.ks.imagecache.Images;
 import de.ks.javafx.FxCss;
-import de.ks.launch.ApplicationService;
 import de.ks.launch.Launcher;
 import de.ks.standbein.GuiceSupport;
 import javafx.scene.Scene;
@@ -31,7 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ApplicationStartup {
@@ -40,11 +41,11 @@ public class ApplicationStartup {
   private MainWindow mainWindow;
   private final Navigator navigator;
   private final Localized localized;
-  private final Launcher launcher;
-  private final Set<String> styleSheets;
+  private final Provider<Launcher> launcher;
+  private Set<String> styleSheets = new HashSet<>();
 
   @Inject
-  public ApplicationStartup(Navigator navigator, Localized localized, Launcher launcher, @FxCss Set<String> styleSheets) {
+  public ApplicationStartup(Navigator navigator, Localized localized, Provider<Launcher> launcher) {
     this.navigator = navigator;
     this.localized = localized;
     this.launcher = launcher;
@@ -54,6 +55,11 @@ public class ApplicationStartup {
   @com.google.inject.Inject(optional = true)
   public void setMainWindow(MainWindow mainWindow) {
     this.mainWindow = mainWindow;
+  }
+
+  @com.google.inject.Inject(optional = true)
+  public void setStyleSheets(@FxCss Set<String> sheets) {
+    this.styleSheets = sheets;
   }
 
   public void start(Stage stage) {
@@ -67,9 +73,9 @@ public class ApplicationStartup {
       }
 
       stage.setOnCloseRequest((WindowEvent e) -> {
-        launcher.stopAll();
+        launcher.get().stopAll();
       });
-      launcher.getService(ApplicationService.class).setStage(stage);
+      launcher.get().getService(ApplicationService.class).setStage(stage);
       stage.show();
     } catch (Exception e) {
       log.error("Could not start JavaFXApp", e);

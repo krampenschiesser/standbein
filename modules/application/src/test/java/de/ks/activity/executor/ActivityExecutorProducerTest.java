@@ -15,10 +15,9 @@
 
 package de.ks.activity.executor;
 
-import de.ks.JavaFXTestModule;
+import de.ks.IntegrationTestModule;
 import de.ks.LoggingGuiceTestSupport;
 import de.ks.activity.context.ActivityContext;
-import de.ks.module.ApplicationModule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -27,9 +26,8 @@ import javax.inject.Inject;
 import static org.junit.Assert.assertEquals;
 
 public class ActivityExecutorProducerTest {
-
   @Rule
-  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule(), new ApplicationModule()).launchServices();
+  public LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new IntegrationTestModule()).launchServices();
 
   @Inject
   ActivityContext ctx;
@@ -38,9 +36,9 @@ public class ActivityExecutorProducerTest {
 
   @Test
   public void testInjection() throws Exception {
-    ctx.startActivity("test");
+    ctx.start("test");
     assertEquals("test", executor.getName());
-    ctx.startActivity("other");
+    ctx.start("other");
     assertEquals("other", executor.getName());
 
     executor.waitForAllTasksDone();

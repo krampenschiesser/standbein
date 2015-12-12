@@ -14,13 +14,12 @@
  */
 package de.ks.activity.controllerbinding;
 
-import de.ks.JavaFXTestModule;
+import de.ks.IntegrationTestModule;
 import de.ks.LoggingGuiceTestSupport;
 import de.ks.activity.ActivityController;
 import de.ks.activity.ActivityHint;
 import de.ks.activity.context.ActivityStore;
-import de.ks.launch.ApplicationService;
-import de.ks.module.ApplicationModule;
+import de.ks.application.ApplicationService;
 import de.ks.util.FXPlatform;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -35,7 +34,7 @@ import static org.junit.Assert.*;
 
 public class ControllerBindingTest {
   @Rule
-  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule(), new ApplicationModule()).launchServices();
+  public LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new IntegrationTestModule()).launchServices();
 
   @Inject
   ActivityController controller;

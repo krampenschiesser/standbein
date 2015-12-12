@@ -14,13 +14,12 @@
  */
 package de.ks.activity.datasource;
 
-import de.ks.JavaFXTestModule;
+import de.ks.IntegrationTestModule;
 import de.ks.LoggingGuiceTestSupport;
 import de.ks.activity.ActivityController;
 import de.ks.activity.ActivityHint;
 import de.ks.activity.context.ActivityStore;
-import de.ks.launch.ApplicationService;
-import de.ks.module.ApplicationModule;
+import de.ks.application.ApplicationService;
 import de.ks.util.FXPlatform;
 import org.junit.After;
 import org.junit.Rule;
@@ -34,7 +33,7 @@ import static org.junit.Assert.*;
 
 public class ActivityDatasourceTest {
   @Rule
-  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule(), new ApplicationModule()).launchServices();
+  public LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new IntegrationTestModule()).launchServices();
 
   @Inject
   ActivityController controller;

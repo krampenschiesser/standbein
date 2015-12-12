@@ -39,6 +39,6 @@ public class LocalizationModule extends AbstractModule {
   @Singleton
   @Inject
   public ResourceBundle getResourceBundle(Localized localized) {
-    return localized.bundle;
+    return localized.getBundle();
   }
 }

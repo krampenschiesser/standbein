@@ -117,6 +117,7 @@ public class ActivityInitialization {
   private Supplier<DefaultLoader<Node, Object>> getDefaultLoaderSupplier(Class<?> controllerClass) {
     return () -> {
       DefaultLoader<Node, Object> loader = loaderProvider.get();
+      loader.load((Class<Object>) controllerClass);
       Node view = loader.getView();
 
       currentlyLoadedControllers.get().forEach((c) -> {

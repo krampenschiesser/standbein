@@ -15,7 +15,7 @@
 
 package de.ks.javafx.converter;
 
-import de.ks.JavaFXTestModule;
+import de.ks.IntegrationTestModule;
 import de.ks.LoggingGuiceTestSupport;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class LastValueConverterTest {
   @Rule
-  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule()).launchServices();
+  public LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new IntegrationTestModule()).launchServices();
 
   @Test
   public void testExcpetionSaveConversion() throws Exception {

@@ -15,11 +15,10 @@
 
 package de.ks.activity;
 
-import de.ks.JavaFXTestModule;
+import de.ks.IntegrationTestModule;
 import de.ks.LoggingGuiceTestSupport;
 import de.ks.activity.context.ActivityContext;
-import de.ks.launch.ApplicationService;
-import de.ks.module.ApplicationModule;
+import de.ks.application.ApplicationService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,14 +28,13 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 
 public class ActivityControllerTest {
   @Rule
-  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule(), new ApplicationModule()).launchServices();
+  public LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new IntegrationTestModule()).launchServices();
 
   @Inject
   protected ActivityController controller;
@@ -82,8 +80,6 @@ public class ActivityControllerTest {
   public void tearDown() throws Exception {
     Dummy.fail = false;
     controller.stopAll();
-    executorService.shutdown();
-    executorService.awaitTermination(5, TimeUnit.SECONDS);
   }
 
   @Test

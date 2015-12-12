@@ -32,17 +32,16 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.lang.management.ManagementFactory;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @ActivityScoped
 public class ActivityStore {
-  static final boolean isDebugging;
-
-  static {
-    isDebugging = ManagementFactory.getRuntimeMXBean().getInputArguments().stream().filter(s -> s.contains("jdwp")).findFirst().isPresent();
-  }
+//  static final boolean isDebugging;
+//
+//  static {
+//    isDebugging = ManagementFactory.getRuntimeMXBean().getInputArguments().stream().filter(s -> s.contains("jdwp")).findFirst().isPresent();
+//  }
 
   static enum LoadOrSave {
     LOAD, SAVE;
@@ -64,6 +63,7 @@ public class ActivityStore {
   protected ValidationRegistry registry;
   @Inject
   protected EventBus eventBus;
+  private boolean isDebugging = false;
 
   protected final SimpleObjectProperty<Object> model = new SimpleObjectProperty<>();
   protected final SimpleBooleanProperty loading = new SimpleBooleanProperty(false);

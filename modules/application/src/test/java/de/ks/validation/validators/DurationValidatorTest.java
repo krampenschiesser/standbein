@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
 public class DurationValidatorTest {
 
   @Rule
-  LoggingGuiceTestSupport guice = new LoggingGuiceTestSupport(this, new LocalizationModule());
+  public LoggingGuiceTestSupport guice = new LoggingGuiceTestSupport(this, new LocalizationModule());
   @Inject
   Localized localized;
 

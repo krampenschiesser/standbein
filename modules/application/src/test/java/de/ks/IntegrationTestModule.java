@@ -13,21 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ks.module;
+package de.ks;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.name.Names;
+import de.ks.application.ApplicationService;
 import de.ks.eventsystem.EventBusModule;
 import de.ks.i18n.LocalizationModule;
+import de.ks.module.ActivityContextModule;
+import de.ks.module.ApplicationServiceModule;
 
 import javax.inject.Singleton;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ApplicationModule extends AbstractModule {
+public class IntegrationTestModule extends AbstractModule {
   @Override
   protected void configure() {
+    bind(boolean.class).annotatedWith(Names.named(ApplicationService.PREVENT_PLATFORMEXIT)).toInstance(true);
+
     install(new ActivityContextModule());
     install(new ApplicationServiceModule());
     install(new LocalizationModule());

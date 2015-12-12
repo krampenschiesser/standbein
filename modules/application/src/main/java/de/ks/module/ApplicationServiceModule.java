@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ks;
+package de.ks.module;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
-import de.ks.launch.ApplicationService;
+import com.google.inject.multibindings.Multibinder;
+import de.ks.application.ApplicationService;
+import de.ks.launch.Service;
 
-public class JavaFXTestModule extends AbstractModule {
+public class ApplicationServiceModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(boolean.class).annotatedWith(Names.named(ApplicationService.PREVENT_PLATFORMEXIT)).toInstance(true);
+    Multibinder.newSetBinder(binder(), Service.class).addBinding().to(ApplicationService.class);
   }
+
 }

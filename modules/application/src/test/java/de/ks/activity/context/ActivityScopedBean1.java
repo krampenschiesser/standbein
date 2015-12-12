@@ -24,7 +24,7 @@ import javax.annotation.PreDestroy;
 /**
  *
  */
-@ActivityScoped()
+@ActivityScoped
 public class ActivityScopedBean1 {
   private static final Logger log = LoggerFactory.getLogger(ActivityScopedBean1.class);
   protected String value;

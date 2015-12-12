@@ -20,9 +20,7 @@ import com.google.inject.Key;
 import de.ks.activity.context.ActivityContext;
 import de.ks.activity.context.ActivityStore;
 import de.ks.activity.executor.ActivityExecutor;
-import de.ks.activity.executor.ActivityExecutorProducer;
 import de.ks.activity.executor.ActivityJavaFXExecutor;
-import de.ks.activity.executor.ActivityJavaFXExecutorProducer;
 import de.ks.activity.initialization.ActivityCallback;
 import de.ks.activity.initialization.ActivityInitialization;
 import de.ks.activity.loading.ActivityLoadingExecutor;
@@ -112,7 +110,7 @@ public class ActivityController {
         if (registeredActivities.containsKey(id)) {
           resume(id, activityHint.isRefreshOnReturn(), dataSourceHint, null, activityHint);
         } else {
-          context.startActivity(id);
+          context.start(id);
           ActivityCfg activityCfg = injector.getInstance(activityHint.getNextActivity());
 
           registeredActivities.put(id, activityCfg);
@@ -141,7 +139,7 @@ public class ActivityController {
         log.error("Failed to start {} because of ", activityHint.getDescription(), e);
         context.stopActivity(activityHint.getNextActivityId());
         if (previousActivity != null) {
-          context.startActivity(previousActivity);
+          context.start(previousActivity);
         }
         throw e;
       } finally {
@@ -160,7 +158,7 @@ public class ActivityController {
   }
 
   protected void resume(String id, boolean reload, Object returnHint, Runnable returnToRunnable, ActivityHint activityHint) {
-    context.startActivity(id);
+    context.start(id);
     log.info("Resuming activity {}", id);
 
     DataSource<?> datasource = store.getDatasource();
@@ -198,8 +196,8 @@ public class ActivityController {
     shutdownExecutors();
     //I want to cleanup the executors themselves, but during registering, I sadly don't know that it is a producer
     //the cdi api doesn't provide that information :(
-    context.cleanupSingleBean(Key.get(ActivityExecutorProducer.class));
-    context.cleanupSingleBean(Key.get(ActivityJavaFXExecutorProducer.class));
+    context.cleanupSingleBean(Key.get(ActivityExecutor.class));
+    context.cleanupSingleBean(Key.get(ActivityJavaFXExecutor.class));
 
     initialization.getControllers().forEach((controller) -> eventBus.unregister(controller));
   }
@@ -247,7 +245,7 @@ public class ActivityController {
           refresh = activityHint.isRefreshOnReturn();
         }
 
-        context.startActivity(id);
+        context.start(id);
         store.stop();
         initialization.getActivityCallbacks().forEach(ActivityCallback::onStop);
         initialization.getControllers().forEach((controller) -> eventBus.unregister(controller));

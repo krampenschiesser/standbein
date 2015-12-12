@@ -15,9 +15,8 @@
 
 package de.ks.activity.context;
 
-import de.ks.JavaFXTestModule;
+import de.ks.IntegrationTestModule;
 import de.ks.LoggingGuiceTestSupport;
-import de.ks.module.ApplicationModule;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -35,7 +34,7 @@ import static org.junit.Assert.*;
 
 public class ScopeTest {
   @Rule
-  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule(), new ApplicationModule()).launchServices();
+  public LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new IntegrationTestModule()).launchServices();
 
   @Inject
   ActivityScopedBean1 bean1;
@@ -48,7 +47,6 @@ public class ScopeTest {
   @After
   public void tearDown() throws Exception {
     context.stopAll();
-    service.shutdown();
   }
 
   @Test
@@ -59,16 +57,16 @@ public class ScopeTest {
 
     context.startActivity("2");
     bean2.getName();
-    assertEquals(2, context.activities.size());
+    assertEquals(3, context.activities.size());
 
 
     context.stopActivity("1");
-    assertEquals(1, context.activities.size());
+    assertEquals(2, context.activities.size());
     assertNull(context.activities.get("1"));
     assertFalse(context.activities.get("2").getObjectStore().isEmpty());
 
     context.cleanupAllActivities();
-    assertEquals(0, context.activities.size());
+    assertEquals(1, context.activities.size());
   }
 
   @Inject

@@ -15,11 +15,11 @@
  */
 package de.ks.activity;
 
-import de.ks.JavaFXTestModule;
+import de.ks.IntegrationTestModule;
 import de.ks.LoggingGuiceTestSupport;
 import de.ks.activity.resource.ResourceActivity;
 import de.ks.activity.resource.ResourceTestController;
-import de.ks.launch.ApplicationService;
+import de.ks.application.ApplicationService;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 
 public class LocalResourceTest {
   @Rule
-  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule()).launchServices();
+  public LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new IntegrationTestModule()).launchServices();
   @Inject
   ActivityController controller;
   @Inject

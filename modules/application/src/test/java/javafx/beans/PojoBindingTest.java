@@ -15,7 +15,7 @@
 
 package javafx.beans;
 
-import de.ks.JavaFXTestModule;
+import de.ks.IntegrationTestModule;
 import de.ks.LoggingGuiceTestSupport;
 import de.ks.javafx.converter.LastValueConverter;
 import javafx.beans.binding.Bindings;
@@ -43,7 +43,7 @@ import static org.junit.Assert.*;
 public class PojoBindingTest {
   private static final Logger log = LoggerFactory.getLogger(PojoBindingTest.class);
   @Rule
-  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule()).launchServices();
+  public LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new IntegrationTestModule()).launchServices();
 
   @Test
   public void testUIPojoCommunication() throws Exception {

@@ -15,6 +15,7 @@
 
 package de.ks.activity.context;
 
+import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -35,28 +37,44 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class ActivityContext implements Scope {
   private static final Logger log = LoggerFactory.getLogger(ActivityContext.class);
+  public static final String INITIAL_ACTIVITY = "Initial-Unbound";
 
   protected final Objenesis objenesis = new ObjenesisStd(true);
   protected final ConcurrentHashMap<String, ActivityHolder> activities = new ConcurrentHashMap<>();
   protected final ConcurrentHashMap<Key<?>, Object> proxies = new ConcurrentHashMap<>();
+
   protected volatile String currentActivity = null;
+  protected volatile Injector injector;
 
   private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
 
+  public ActivityContext() {
+    startActivity(INITIAL_ACTIVITY);
+  }
+
   public void start(String id) {
-    startActivity(id);
+    if (!INITIAL_ACTIVITY.equals(id)) {
+      startActivity(id);
+    }
   }
 
   public void stop(String id) {
-    stopActivity(id);
+    if (!INITIAL_ACTIVITY.equals(id)) {
+      stopActivity(id);
+    }
   }
 
   public void cleanup(String id) {
-    cleanupSingleActivity(id);
+    if (!INITIAL_ACTIVITY.equals(id)) {
+      cleanupSingleActivity(id);
+    }
   }
 
+  public void stopAll() {
+    cleanupAllActivities();
+  }
 
-  public void cleanupSingleActivity(String id) {
+  protected void cleanupSingleActivity(String id) {
     lock.writeLock().lock();
     try {
       ActivityHolder activityHolder = activities.remove(id);
@@ -81,7 +99,7 @@ public class ActivityContext implements Scope {
     }
   }
 
-  public ActivityHolder startActivity(String id) {
+  protected ActivityHolder startActivity(String id) {
     lock.writeLock().lock();
     try {
       currentActivity = id;
@@ -122,23 +140,29 @@ public class ActivityContext implements Scope {
     }
   }
 
-  public void cleanupAllActivities() {
+  protected void cleanupAllActivities() {
     log.debug("Cleanup all activities.");
-    for (String id : activities.keySet()) {
-      ActivityHolder activityHolder = activities.get(id);
-      if (activityHolder == null) {
-        log.error("No activity active in thread {}", Thread.currentThread().getName());
-        throw new IllegalStateException("No activity active in thread " + Thread.currentThread().getName());
-      }
-      if (multipleThreadsActive(activityHolder)) {
-        log.warn("There are still {} other threads holding a reference to this activity, cleanup not allowed", activityHolder.getCount().get() - 1);
-      }
-      waitForOtherThreads(activityHolder);
-      cleanupSingleActivity(id);
-    }
+
     lock.writeLock().lock();
     try {
-      this.activities.clear();
+      HashSet<String> removed = new HashSet<>();
+      for (String id : activities.keySet()) {
+        if (INITIAL_ACTIVITY.equals(id)) {
+          continue;
+        }
+        ActivityHolder activityHolder = activities.get(id);
+        if (activityHolder == null) {
+          log.error("No activity active in thread {}", Thread.currentThread().getName());
+          throw new IllegalStateException("No activity active in thread " + Thread.currentThread().getName());
+        }
+        if (multipleThreadsActive(activityHolder)) {
+          log.warn("There are still {} other threads holding a reference to this activity, cleanup not allowed", activityHolder.getCount().get() - 1);
+        }
+        waitForOtherThreads(activityHolder);
+        cleanupSingleActivity(id);
+        removed.add(id);
+      }
+      this.activities.keySet().removeAll(removed);
     } finally {
       lock.writeLock().unlock();
     }
@@ -175,41 +199,61 @@ public class ActivityContext implements Scope {
 
   @Override
   public <T> Provider<T> scope(Key<T> key, Provider<T> unscoped) {
+    if (injector == null) {
+      throw new IllegalStateException("Injector not yet set!");
+    }
     return new Provider<T>() {
       @Override
       public T get() {
-
-        ActivityHolder holder = activities.get(currentActivity);
-        StoredBean storedBean = null;
-        lock.readLock().lock();
-        try {
-          storedBean = holder.getStoredBean(key);
-        } finally {
-          lock.readLock().unlock();
-        }
-
-        if (storedBean == null) {
-          lock.writeLock().lock();
-          try {
-            storedBean = new StoredBean(key, unscoped.get());
-            holder.put(key, storedBean);
-          } finally {
-            lock.writeLock().unlock();
-          }
-        }
+        StoredBean storedBean = getOrCreateInstance(key, unscoped);
         @SuppressWarnings("unchecked")
         Class<T> clazz = (Class<T>) storedBean.getInstance().getClass();
         return getProxy(clazz, key);
       }
 
+      @Override
+      public String toString() {
+        return ActivityContext.class.getSimpleName() + "-Provider. Backed by: " + unscoped;
+      }
     };
+  }
+
+  private StoredBean getOrCreateInstance(Key<?> key, Provider<?> unscoped) {
+    ActivityHolder holder = activities.get(currentActivity);
+    StoredBean storedBean = null;
+    lock.readLock().lock();
+    try {
+      storedBean = holder.getStoredBean(key);
+    } finally {
+      lock.readLock().unlock();
+    }
+
+    if (storedBean == null) {
+      lock.writeLock().lock();
+      try {
+        storedBean = new StoredBean(key, unscoped.get());
+        holder.put(key, storedBean);
+        log.debug("For {} created new instance {} and put it to store", key, storedBean.getInstance());
+      } finally {
+        lock.writeLock().unlock();
+      }
+    } else {
+      log.trace("For {} found instance {}", key, storedBean.getInstance());
+    }
+
+    return storedBean;
   }
 
   private Object getCurrentInstance(Key<?> key) {
     ActivityHolder holder = activities.get(currentActivity);
     StoredBean storedBean = holder.getStoredBean(key);
-    return storedBean.getInstance();
-
+    if (storedBean == null) {
+      log.debug("Try to load {} from proxy, but found none for current activity.", key);
+      return injector.getProvider(key).get();
+    } else {
+      log.trace("For {} from proxy, loaded {}.", key, storedBean.getInstance());
+      return storedBean.getInstance();
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -237,7 +281,7 @@ public class ActivityContext implements Scope {
     }
   }
 
-  public void stopAll() {
-    cleanupAllActivities();
+  public void setInjector(Injector injector) {
+    this.injector = injector;
   }
 }

@@ -45,6 +45,12 @@ public class JavaFXExecutorService extends AbstractExecutorService {
     shutdown = true;
   }
 
+  private void checkNotShutdown() {
+    if (shutdown) {
+      throw new IllegalStateException(this + "already shut down!");
+    }
+  }
+
   @Override
   public List<Runnable> shutdownNow() {
     shutdown = true;
@@ -68,6 +74,7 @@ public class JavaFXExecutorService extends AbstractExecutorService {
 
   @Override
   public void execute(Runnable command) {
+    checkNotShutdown();
     if (isCurrentThread()) {
       command.run();
     } else {
@@ -100,6 +107,7 @@ public class JavaFXExecutorService extends AbstractExecutorService {
   }
 
   public <T> T invokeInJavaFXThread(Callable<T> callable) {
+    checkNotShutdown();
     try {
       return submit(callable).get();
     } catch (InterruptedException | ExecutionException e) {

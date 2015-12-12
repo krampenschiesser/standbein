@@ -12,13 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ks.launch;
+package de.ks.application;
 
+import com.google.inject.Injector;
 import de.ks.activity.context.ActivityContext;
-import de.ks.application.App;
-import de.ks.application.ApplicationStartup;
+import de.ks.launch.Launcher;
+import de.ks.launch.Service;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,10 @@ public class ApplicationService extends Service {
   public static final String WAIT_FOR_INITIALIZATION = "waitForInitialization";
   public static final String PREVENT_PLATFORMEXIT = "preventPlatformExit";
 
+  private static volatile Stage stage;
+  public static volatile Injector singletonForFX;
+
   private String[] args;
-  private Stage stage;
   private final CountDownLatch latch = new CountDownLatch(1);
   private Future<?> fx;
   private boolean hasPreloader;
@@ -48,11 +52,15 @@ public class ApplicationService extends Service {
 
   final ActivityContext context;
   final ApplicationStartup startup;
+  private final Injector injector;
+  private final Navigator navigator;
 
   @Inject
-  public ApplicationService(ActivityContext context, ApplicationStartup startup) {
+  public ApplicationService(ActivityContext context, ApplicationStartup startup, Injector injector, Navigator navigator) {
     this.context = context;
     this.startup = startup;
+    this.injector = injector;
+    this.navigator = navigator;
   }
 
   @com.google.inject.Inject(optional = true)
@@ -61,7 +69,7 @@ public class ApplicationService extends Service {
   }
 
   @com.google.inject.Inject(optional = true)
-  public void setPreventPlatformExit(@Named(WAIT_FOR_INITIALIZATION) boolean preventExit) {
+  public void setPreventPlatformExit(@Named(PREVENT_PLATFORMEXIT) boolean preventExit) {
     this.preventPlatformExit = preventExit;
   }
 
@@ -72,17 +80,18 @@ public class ApplicationService extends Service {
     this.launcher = launcher;
     hasPreloader = this.launcher.getPreloaderInstance() != null;
     if (hasPreloader) {
-      this.stage = this.launcher.getPreloaderInstance().getStage();
+      stage = this.launcher.getPreloaderInstance().getStage();
     }
   }
 
   @Override
   protected void doStart() {
     log.info("Starting {}", getClass().getSimpleName());
+    singletonForFX = injector;
 
     if (hasPreloader) {
       Platform.runLater(() -> startup.start(stage));
-    } else {
+    } else if (stage == null) {
       fx = executorService.submit(() -> {
         try {
           Application.launch(App.class, args);
@@ -90,6 +99,9 @@ public class ApplicationService extends Service {
           log.error("Could not start application ", e);
         }
       });
+    } else {
+      navigator.register(stage, new StackPane());
+      latch.countDown();
     }
     waitForJavaFXInitialized();
   }
@@ -131,6 +143,7 @@ public class ApplicationService extends Service {
   public void setStage(Stage stage) {
     this.stage = stage;
     latch.countDown();
+    singletonForFX = null;
   }
 
   @Override

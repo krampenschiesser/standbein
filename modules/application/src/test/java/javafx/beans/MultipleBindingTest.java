@@ -14,7 +14,7 @@
  */
 package javafx.beans;
 
-import de.ks.JavaFXTestModule;
+import de.ks.IntegrationTestModule;
 import de.ks.LoggingGuiceTestSupport;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.TextField;
@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 
 public class MultipleBindingTest {
   @Rule
-  protected LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new JavaFXTestModule()).launchServices();
+  public LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new IntegrationTestModule()).launchServices();
 
   @Test
   public void testName() throws Exception {

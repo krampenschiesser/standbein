@@ -38,8 +38,6 @@ public class GuiceTestSupport extends TestWatcher {
 
   @Override
   protected void starting(Description description) {
-    injector.injectMembers(test);
-
     if (launch) {
       log.info("###Starting services before {}.{}", description.getTestClass().getSimpleName(), description.getMethodName());
       Launcher launcher = injector.getInstance(Launcher.class);
@@ -49,6 +47,7 @@ public class GuiceTestSupport extends TestWatcher {
       }
       log.info("###Starting services -> done");
     }
+    injector.injectMembers(test);
   }
 
   @Override
