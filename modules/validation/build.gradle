@@ -1,4 +1,3 @@
 dependencies {
-
-    compile project(":modules:testutil")
+    testCompile project(":modules:testutil")
 }

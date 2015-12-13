@@ -20,7 +20,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import de.ks.eventsystem.EventBusModule;
-import de.ks.standbein.application.ApplicationService;
 import de.ks.standbein.i18n.LocalizationModule;
 import de.ks.standbein.module.ActivityContextModule;
 import de.ks.standbein.module.ApplicationServiceModule;
@@ -32,7 +31,7 @@ import java.util.concurrent.Executors;
 public class IntegrationTestModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(boolean.class).annotatedWith(Names.named(ApplicationService.PREVENT_PLATFORMEXIT)).toInstance(true);
+    bind(boolean.class).annotatedWith(Names.named(ApplicationServiceModule.PREVENT_PLATFORMEXIT)).toInstance(true);
 
     install(new ActivityContextModule());
     install(new ApplicationServiceModule());

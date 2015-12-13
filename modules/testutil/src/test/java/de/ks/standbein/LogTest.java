@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ks.util;
+package de.ks.standbein;
 
 import ch.qos.logback.classic.spi.Configurator;
 import org.junit.Test;

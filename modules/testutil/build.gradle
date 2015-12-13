@@ -15,5 +15,7 @@
 
 dependencies {
     compile project(":modules:launch")
+
+    compile "ch.qos.logback:logback-classic:$logback"
     compile "junit:junit:$junit"
 }
