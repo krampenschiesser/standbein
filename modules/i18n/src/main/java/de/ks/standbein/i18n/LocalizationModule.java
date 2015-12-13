@@ -16,7 +16,9 @@
 package de.ks.standbein.i18n;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.Provides;
+import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 
 import javax.inject.Inject;
@@ -30,9 +32,12 @@ public class LocalizationModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(String.class).annotatedWith(Names.named(FILENAME)).toInstance("Translation");
-    bind(String.class).annotatedWith(Names.named(BASENAME)).toInstance("de.ks.standbein.i18n.Translation");
-    bind(Locale.class).toInstance(Locale.getDefault());
+    OptionalBinder.newOptionalBinder(binder(), Key.get(String.class, Names.named(FILENAME)))//
+      .setDefault().toInstance("Translation");
+    OptionalBinder.newOptionalBinder(binder(), Key.get(String.class, Names.named(BASENAME)))//
+      .setDefault().toInstance("de.ks.standbein.i18n.Translation");
+
+    OptionalBinder.newOptionalBinder(binder(), Locale.class).setDefault().toInstance(Locale.getDefault());
   }
 
   @Provides

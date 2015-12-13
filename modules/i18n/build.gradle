@@ -15,6 +15,10 @@
 
 dependencies {
     compile project(":modules:eventsystem")
+
+    compile "com.google.inject:guice:$guice"
+    compile "com.google.inject.extensions:guice-multibindings:$guice"
+
     testCompile project(":modules:testutil")
 }
 

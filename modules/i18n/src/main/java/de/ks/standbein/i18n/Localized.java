@@ -53,14 +53,15 @@ public class Localized {
     this.baseName = baseName;
   }
 
-  @Inject
+  @com.google.inject.Inject(optional = true)
   protected void setEventBus(EventBus eventBus) {
     this.eventBus = eventBus;
   }
 
   protected void initialize() {
     String path = baseName + "_" + locale.getLanguage() + ".properties";
-    bundle = new ResourceBundleWrapper(fileName, ResourceBundle.getBundle(baseName, locale, control), null, path, locale);
+    ResourceBundle current = ResourceBundle.getBundle(baseName, locale, control);
+    this.bundle = new ResourceBundleWrapper(fileName, current, null, path, locale);
   }
 
   private boolean isInitialized() {
