@@ -15,8 +15,8 @@
 
 package de.ks.eventsystem.bus;
 
-import de.ks.reflection.PropertyPath;
-import de.ks.reflection.ReflectionUtil;
+import de.ks.standbein.reflection.PropertyPath;
+import de.ks.standbein.reflection.ReflectionUtil;
 import org.junit.Test;
 
 import java.lang.reflect.Method;

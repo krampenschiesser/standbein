@@ -20,7 +20,7 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Primitives;
 import de.ks.executor.JavaFXExecutorService;
-import de.ks.reflection.ReflectionUtil;
+import de.ks.standbein.reflection.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -16,8 +16,8 @@
 package javafx.beans;
 
 import de.ks.IntegrationTestModule;
-import de.ks.LoggingGuiceTestSupport;
-import de.ks.javafx.converter.LastValueConverter;
+import de.ks.standbein.LoggingGuiceTestSupport;
+import de.ks.standbein.javafx.converter.LastValueConverter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.adapter.JavaBeanIntegerProperty;
 import javafx.beans.property.adapter.JavaBeanIntegerPropertyBuilder;

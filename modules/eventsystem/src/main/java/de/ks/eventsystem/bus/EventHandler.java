@@ -18,7 +18,7 @@ package de.ks.eventsystem.bus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import de.ks.executor.JavaFXExecutorService;
 import de.ks.executor.LoggingUncaughtExceptionHandler;
-import de.ks.reflection.ReflectionUtil;
+import de.ks.standbein.reflection.ReflectionUtil;
 import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

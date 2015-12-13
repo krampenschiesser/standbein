@@ -15,7 +15,7 @@
 package javafx.beans;
 
 import de.ks.IntegrationTestModule;
-import de.ks.LoggingGuiceTestSupport;
+import de.ks.standbein.LoggingGuiceTestSupport;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.TextField;
 import org.junit.Rule;

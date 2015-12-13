@@ -14,7 +14,7 @@
  */
 package de.ks.executor;
 
-import de.ks.reflection.ReflectionUtil;
+import de.ks.standbein.reflection.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -20,8 +20,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
-import de.ks.launch.Service;
-import de.ks.launch.ServiceA;
+import de.ks.standbein.launch.Service;
+import de.ks.standbein.launch.ServiceA;
 
 import javax.inject.Singleton;
 import java.util.concurrent.ExecutorService;

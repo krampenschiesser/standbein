@@ -14,7 +14,7 @@
  */
 package com.dummy.other;
 
-import de.ks.launch.TestService;
+import de.ks.standbein.launch.TestService;
 
 public class ServiceB extends TestService {
 
