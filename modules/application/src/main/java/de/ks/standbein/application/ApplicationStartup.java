@@ -18,10 +18,11 @@ import de.ks.standbein.i18n.Localized;
 import de.ks.standbein.imagecache.Images;
 import de.ks.standbein.javafx.FxCss;
 import de.ks.standbein.launch.Launcher;
+import de.ks.standbein.module.ApplicationServiceModule;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import java.util.Collections;
 import java.util.HashSet;
@@ -43,6 +45,7 @@ public class ApplicationStartup {
   private final Provider<Launcher> launcher;
   private Set<String> styleSheets = new HashSet<>();
   private FXApplicationExceptionHandler exceptionHandler;
+  private String iconName = null;
 
   @Inject
   public ApplicationStartup(Navigator navigator, Localized localized, Provider<Launcher> launcher) {
@@ -65,6 +68,11 @@ public class ApplicationStartup {
   @com.google.inject.Inject(optional = true)
   public void setExceptionHandler(FXApplicationExceptionHandler handler) {
     this.exceptionHandler = handler;
+  }
+
+  @com.google.inject.Inject(optional = true)
+  public void setIconName(@Named(ApplicationServiceModule.APPICON) String name) {
+    this.iconName = name;
   }
 
   public void start(Stage stage) {
@@ -92,12 +100,14 @@ public class ApplicationStartup {
     stage.setTitle(mainWindow.getApplicationTitle());
     stage.setScene(createScene(mainWindow));
 
-    Image icon = Images.get("appicon.png");
-    if (icon != null) {
-      stage.getIcons().add(icon);
+    if (iconName != null) {
+      Image icon = Images.get(iconName);
+      if (icon != null) {
+        stage.getIcons().add(icon);
+      }
     }
-    Pane pane = (Pane) mainWindow.getNode();
-    navigator.register(stage, pane);
+    Parent node = mainWindow.getNode();
+    navigator.register(stage, node);
   }
 
   private void setWarning(Stage stage) {
