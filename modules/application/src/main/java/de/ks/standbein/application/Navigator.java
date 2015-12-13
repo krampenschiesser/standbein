@@ -15,8 +15,10 @@
  */
 package de.ks.standbein.application;
 
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import javax.inject.Singleton;
@@ -24,15 +26,36 @@ import javax.inject.Singleton;
 @Singleton
 public class Navigator {
   private Stage stage;
-  private Pane rootContainer;
+  private StackPane rootContainer;
+  private Node currentNode;
 
   public void present(Node node) {
     rootContainer.getChildren().clear();
     rootContainer.getChildren().add(node);
   }
 
-  public void register(Stage stage, Pane container) {
+  public void register(Stage stage, Node rootItem) {
     this.stage = stage;
-    rootContainer = container;
+    rootContainer = new StackPane();
+    currentNode = rootItem;
+    present(rootItem);
+  }
+
+  /**
+   * Sets a new root container in the navigator and returns the old one.
+   * If wanted the children of the old contaiber will be added to the new one.
+   *
+   * @param newRootContainer
+   * @param addChildren      defines if the children shall be added again to the new container
+   * @return the old root container
+   */
+  public StackPane setRootContainer(Pane newRootContainer, boolean addChildren) {
+    StackPane oldRoot = this.rootContainer;
+    ObservableList<Node> children = oldRoot.getChildren();
+    stage.getScene().setRoot(newRootContainer);
+    if (addChildren) {
+      newRootContainer.getChildren().addAll(children);
+    }
+    return oldRoot;
   }
 }
