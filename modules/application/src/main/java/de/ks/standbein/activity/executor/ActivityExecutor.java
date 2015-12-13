@@ -14,9 +14,10 @@
  */
 package de.ks.standbein.activity.executor;
 
+import de.ks.executor.CancelRejection;
 import de.ks.standbein.activity.context.ActivityContext;
 import de.ks.standbein.activity.context.ActivityScoped;
-import de.ks.executor.CancelRejection;
+import de.ks.standbein.module.ActivityContextModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +31,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @ActivityScoped
 public class ActivityExecutor implements ScheduledExecutorService {
-  public static final String EXECUTOR_COREPOOLSIZE = "ActivityExecutor.corepoolsize";
-  public static final String EXECUTOR_MAXPOOLSIZE = "ActivityExecutor.maxpoolsize";
   private static final Logger log = LoggerFactory.getLogger(ActivityExecutor.class);
   private final ScheduledThreadPoolExecutor delegate;
 
@@ -39,7 +38,7 @@ public class ActivityExecutor implements ScheduledExecutorService {
   private final Provider<ActivityContext> context;
 
   @Inject
-  public ActivityExecutor(Provider<ActivityContext> context, @Named(EXECUTOR_COREPOOLSIZE) int corePoolSize, @Named(EXECUTOR_MAXPOOLSIZE) int maximumPoolSize) {
+  public ActivityExecutor(Provider<ActivityContext> context, @Named(ActivityContextModule.EXECUTOR_COREPOOLSIZE) int corePoolSize, @Named(ActivityContextModule.EXECUTOR_MAXPOOLSIZE) int maximumPoolSize) {
     this.context = context;
     delegate = new ScheduledThreadPoolExecutor(corePoolSize, new ThreadFactory() {
       @Override

@@ -21,6 +21,10 @@ import de.ks.standbein.application.ApplicationService;
 import de.ks.standbein.launch.Service;
 
 public class ApplicationServiceModule extends AbstractModule {
+  public static final String WAIT_FOR_INITIALIZATION = "waitForInitialization";
+  public static final String PREVENT_PLATFORMEXIT = "preventPlatformExit";
+  public static final String APPICON = "iconName";
+
   @Override
   protected void configure() {
     Multibinder.newSetBinder(binder(), Service.class).addBinding().to(ApplicationService.class);

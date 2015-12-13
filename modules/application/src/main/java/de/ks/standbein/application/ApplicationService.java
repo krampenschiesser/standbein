@@ -18,6 +18,8 @@ import com.google.inject.Injector;
 import de.ks.standbein.activity.context.ActivityContext;
 import de.ks.standbein.launch.Launcher;
 import de.ks.standbein.launch.Service;
+import de.ks.standbein.launch.UIService;
+import de.ks.standbein.module.ApplicationServiceModule;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.layout.StackPane;
@@ -28,15 +30,16 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
-public class ApplicationService extends Service {
+public class ApplicationService extends Service implements UIService {
   private static final Logger log = LoggerFactory.getLogger(ApplicationService.class);
 
   //guice configuration dealing with FX singleton shit
-  public static final String WAIT_FOR_INITIALIZATION = "waitForInitialization";
-  public static final String PREVENT_PLATFORMEXIT = "preventPlatformExit";
 
   private static volatile Stage stage;
   public static volatile Injector singletonForFX;
@@ -64,12 +67,12 @@ public class ApplicationService extends Service {
   }
 
   @com.google.inject.Inject(optional = true)
-  public void setWaitForInitialization(@Named(WAIT_FOR_INITIALIZATION) boolean wait) {
+  public void setWaitForInitialization(@Named(ApplicationServiceModule.WAIT_FOR_INITIALIZATION) boolean wait) {
     this.waitForInitialization = wait;
   }
 
   @com.google.inject.Inject(optional = true)
-  public void setPreventPlatformExit(@Named(PREVENT_PLATFORMEXIT) boolean preventExit) {
+  public void setPreventPlatformExit(@Named(ApplicationServiceModule.PREVENT_PLATFORMEXIT) boolean preventExit) {
     this.preventPlatformExit = preventExit;
   }
 
@@ -151,11 +154,16 @@ public class ApplicationService extends Service {
     return 5;
   }
 
-  public void waitUntilFXFinished() throws ExecutionException, InterruptedException {
+  @Override
+  public void waitForUIThread() {
     if (hasPreloader) {
       launcher.waitForPreloader();
     } else {
-      fx.get();
+      try {
+        fx.get();
+      } catch (Exception e) {
+        log.error("Error occured wail waiting for FX exit.", e);
+      }
     }
   }
 }

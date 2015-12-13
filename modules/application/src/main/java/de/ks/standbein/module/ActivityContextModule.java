@@ -16,15 +16,19 @@
 package de.ks.standbein.module;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import de.ks.standbein.activity.context.ActivityContext;
 import de.ks.standbein.activity.context.ActivityContextService;
 import de.ks.standbein.activity.context.ActivityScoped;
-import de.ks.standbein.activity.executor.ActivityExecutor;
 import de.ks.standbein.launch.Service;
 
 public class ActivityContextModule extends AbstractModule {
+  public static final String EXECUTOR_COREPOOLSIZE = "ActivityExecutor.corepoolsize";
+  public static final String EXECUTOR_MAXPOOLSIZE = "ActivityExecutor.maxpoolsize";
+
   @Override
   protected void configure() {
     ActivityContext context = new ActivityContext();
@@ -34,7 +38,10 @@ public class ActivityContextModule extends AbstractModule {
     bindScope(ActivityScoped.class, context);
     bind(ActivityContext.class).toInstance(context);
 
-    bind(Integer.class).annotatedWith(Names.named(ActivityExecutor.EXECUTOR_COREPOOLSIZE)).toInstance(8);
-    bind(Integer.class).annotatedWith(Names.named(ActivityExecutor.EXECUTOR_MAXPOOLSIZE)).toInstance(Integer.MAX_VALUE);
+
+    OptionalBinder.newOptionalBinder(binder(), Key.get(Integer.class, Names.named(EXECUTOR_COREPOOLSIZE)))//
+      .setDefault().toInstance(8);
+    OptionalBinder.newOptionalBinder(binder(), Key.get(Integer.class, Names.named(EXECUTOR_MAXPOOLSIZE)))//
+      .setDefault().toInstance(Integer.MAX_VALUE);
   }
 }
