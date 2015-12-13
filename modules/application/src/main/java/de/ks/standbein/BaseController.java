@@ -15,14 +15,15 @@
 package de.ks.standbein;
 
 import com.google.common.eventbus.Subscribe;
+import de.ks.eventsystem.bus.HandleInThread;
+import de.ks.eventsystem.bus.HandlingThread;
 import de.ks.standbein.activity.ActivityController;
 import de.ks.standbein.activity.ActivityLoadFinishedEvent;
 import de.ks.standbein.activity.context.ActivityStore;
 import de.ks.standbein.activity.initialization.ActivityCallback;
 import de.ks.standbein.activity.initialization.ActivityInitialization;
 import de.ks.standbein.activity.initialization.DatasourceCallback;
-import de.ks.eventsystem.bus.HandleInThread;
-import de.ks.eventsystem.bus.HandlingThread;
+import de.ks.standbein.i18n.Localized;
 import de.ks.standbein.validation.ValidationRegistry;
 import javafx.fxml.Initializable;
 
@@ -39,6 +40,8 @@ public abstract class BaseController<T> implements Initializable, DatasourceCall
   protected ValidationRegistry validationRegistry;
   @Inject
   protected ActivityInitialization activityInitialization;
+  @Inject
+  protected Localized localized;
 
   @Subscribe
   @HandleInThread(HandlingThread.JavaFX)
