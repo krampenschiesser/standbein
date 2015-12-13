@@ -21,7 +21,7 @@ import javafx.scene.control.Control;
 
 import java.util.function.Function;
 
-class BaseNumberValidator<T extends Number> extends LocalizedValidator<Control, String> {
+public class BaseNumberValidator<T extends Number> extends LocalizedValidator<Control, String> {
   protected final Function<String, T> parser;
   protected final String msg;
 
