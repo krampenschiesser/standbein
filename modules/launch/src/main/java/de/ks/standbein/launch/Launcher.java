@@ -88,6 +88,11 @@ public class Launcher {
     return retval;
   }
 
+  public void startAllAndWait(String... args) {
+    startAll(args);
+    awaitStart();
+  }
+
   public void startAll(String... args) {
     if (preloader != null) {
       instanceForFx = this;
@@ -157,6 +162,11 @@ public class Launcher {
       }
     }
     return true;
+  }
+
+  public void stopAllAndWait() {
+    stopAll();
+    awaitStop();
   }
 
   public void stopAll() {
@@ -261,5 +271,18 @@ public class Launcher {
 
   public List<Service> getServices() {
     return services;
+  }
+
+  public void waitForUIThreads() {
+    services.stream().filter(s -> s instanceof UIService).map(e -> (UIService) e).forEach(UIService::waitForUIThread);
+  }
+
+  public void launchAndWaitForUIThreads(String... args) {
+    startAllAndWait(args);
+    try {
+      waitForUIThreads();
+    } finally {
+      stopAllAndWait();
+    }
   }
 }
