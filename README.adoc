@@ -1,34 +1,27 @@
-= Idnadrev documentation
+= Standbein Readme
 :Author:    Christian Löhnert
-:Email:     krampenschiesser@gmail.com
-
-== Download
-
-link:https://github.com/krampenschiesser/idnadrev/releases/download/051_rel/idnadrev-0.5.1.zip[Idnadrev Version 0.5.1] +
 
 == About
 
-Idnadrev is a task management and knowledge application
-that helps to organize your ideas, projects and any kind of information.
+Standbein is a lightweight wrapper around JavaFx to provide a starting point for small rich client applications.
+The main goals are:
 
-== User guide
+* Use dependency injection (via Guice)
+* Split the application into small parts, so called *Activities*, that are disconnected from each other
+* Control the lifecycle and threads of activities
+* Give the user as much freedom as possible to use or not use the given features (and therefore provide only the essential stuff)
 
-This is the current user guide for version 0.5.
+== Features
 
-link:doc/src/asciidoc/userguide.adoc[User guide V0.5]
+* *Service infrastructure*: to initialize your infrastructure at startup time (eg. start embedded db, hibernate, weld whatever)
+* *Version upgrade detection*: register upgrade from one version to another that are executed on the client (change ddl, extract zipfiles of data)
+* *Lifecycle control* via activities (see below)
+* slight preferation(or maybe even enforcement) of *MVC* style programming, but you are not bound to
+* *Eventbus*: send event from any class to your controllers (or who ever is listening) ...decouple...
+* *Validation*: simple validation framework
+* *Localization*: define your base localisation properties. Additionally define controller local property files (to avoid the messy 10000+ line files)
+* Designed to use dependency injection as much as possible (This is still a UI framework and it depends on JavaFX which hates testability and DI)
+* *Binding*: bind labels or textfields (or whatever your stringconverter can handle) to a model property
+* *Predefined refresh handling*: If needed you can implement your own datasource which will be loaded on entry of an activity
 
-== Building
-
-Building idnadrev is based on http://www.gradle.org/[gradle].
-If you don't have gradle installed, no worries.
-Use the provided gradle wrapper *gradlew*
-[source,shell]
-----
-$ ./gradlew help
-$ ./gradlew build
-$ ./gradlew run
-----
-
-== License
-
-Idnadrev is licensed under the http://apache.org/licenses/LICENSE-2.0[Apache 2.0 license].
+== Activity
