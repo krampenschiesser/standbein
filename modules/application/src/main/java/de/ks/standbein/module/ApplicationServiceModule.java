@@ -16,9 +16,12 @@
 package de.ks.standbein.module;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.multibindings.Multibinder;
 import de.ks.standbein.application.ApplicationService;
+import de.ks.standbein.javafx.FxCss;
 import de.ks.standbein.launch.Service;
+import de.ks.standbein.validation.DefaultDecorator;
 
 public class ApplicationServiceModule extends AbstractModule {
   public static final String WAIT_FOR_INITIALIZATION = "waitForInitialization";
@@ -28,5 +31,6 @@ public class ApplicationServiceModule extends AbstractModule {
   @Override
   protected void configure() {
     Multibinder.newSetBinder(binder(), Service.class).addBinding().to(ApplicationService.class);
+    Multibinder.newSetBinder(binder(), Key.get(String.class, FxCss.class)).addBinding().toInstance(DefaultDecorator.CSS_FILE_PATH);
   }
 }

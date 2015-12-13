@@ -19,7 +19,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
-import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DefaultDecorator implements ControlDecorator {
+  public static final String CSS_FILE_PATH = "/de/ks/standbein/validation/validationDecorator.css";
+
   public static final String ERROR_STYLE = "ValidationFailedError";
   public static final String WARNING_STYLE = "ValidationFailedWarning";
   public static final String VALIDATION_DECORATOR_CSS = "validationDecorator.css";
@@ -46,17 +48,17 @@ public class DefaultDecorator implements ControlDecorator {
 
   @Override
   public void decorate(Control c, ValidationResult result) {
-    if (c.getParent() == null) {
-      ChangeListener<Parent> listener = new ChangeListener<Parent>() {
+    if (c.getScene() == null) {
+      ChangeListener<Scene> listener = new ChangeListener<Scene>() {
         @Override
-        public void changed(ObservableValue<? extends Parent> observable, Parent oldValue, Parent newValue) {
+        public void changed(ObservableValue<? extends Scene> observable, Scene oldValue, Scene newValue) {
           if (newValue != null) {
             Platform.runLater(() -> decorate(c, result));
-            c.parentProperty().removeListener(this);
+            c.sceneProperty().removeListener(this);
           }
         }
       };
-      c.parentProperty().addListener(listener);
+      c.sceneProperty().addListener(listener);
     } else {
       decorateInternal(c, result);
     }
@@ -72,7 +74,9 @@ public class DefaultDecorator implements ControlDecorator {
       } else {
         c.getStyleClass().add(WARNING_STYLE);
       }
-      ValidationPopup tooltip = new ValidationPopup(c.getScene().getWindow());
+      Scene scene = c.getScene();
+      Window window = scene.getWindow();
+      ValidationPopup tooltip = new ValidationPopup(window);
       tooltip.setAnchorLocation(PopupWindow.AnchorLocation.CONTENT_BOTTOM_LEFT);
       existing = tooltip;
       toolTips.put(c, tooltip);

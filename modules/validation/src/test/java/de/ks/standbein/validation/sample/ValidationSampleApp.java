@@ -1,5 +1,6 @@
 package de.ks.standbein.validation.sample;
 
+import de.ks.standbein.validation.DefaultDecorator;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -22,7 +23,7 @@ public class ValidationSampleApp extends Application {
     Pane load = loader.load();
 
     Scene scene = new Scene(load);
-    scene.getStylesheets().add("/de/ks/validation/validationDecorator.css");
+    scene.getStylesheets().add(DefaultDecorator.CSS_FILE_PATH);
     primaryStage.setScene(scene);
     primaryStage.show();
     primaryStage.setOnCloseRequest(e -> primaryStage.close());
