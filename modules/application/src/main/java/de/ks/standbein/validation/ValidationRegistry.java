@@ -22,7 +22,6 @@ import javafx.scene.control.Control;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.Optional;
 
@@ -39,10 +38,6 @@ public class ValidationRegistry {
   public ValidationRegistry(ValidationContainer validationSupport, ActivityStore store) {
     this.validationSupport = validationSupport;
     this.store = store;
-  }
-
-  @PostConstruct
-  public void init() {
     validationSupport.invalidProperty().addListener((p, o, n) -> {
       invalid.set(n || store.isLoading());
       log.trace("Validation is {}", invalid.get() ? "Invalid" : "valid");
