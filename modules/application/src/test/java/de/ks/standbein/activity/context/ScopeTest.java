@@ -41,6 +41,7 @@ public class ScopeTest {
   ActivityContext context;
   @Inject
   ExecutorService service;
+
   @After
   public void tearDown() throws Exception {
     context.stopAll();
@@ -57,12 +58,12 @@ public class ScopeTest {
     assertEquals(3, context.activities.size());
 
 
-    context.stopActivity("1");
+    context.stop("1");
     assertEquals(2, context.activities.size());
     assertNull(context.activities.get("1"));
     assertFalse(context.activities.get("2").getObjectStore().isEmpty());
 
-    context.cleanupAllActivities();
+    context.stopAll();
     assertEquals(1, context.activities.size());
   }
 

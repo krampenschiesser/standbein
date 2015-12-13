@@ -17,6 +17,7 @@ package de.ks.standbein.activity;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import de.ks.eventsystem.bus.EventBus;
 import de.ks.standbein.activity.context.ActivityContext;
 import de.ks.standbein.activity.context.ActivityStore;
 import de.ks.standbein.activity.executor.ActivityExecutor;
@@ -26,7 +27,6 @@ import de.ks.standbein.activity.initialization.ActivityInitialization;
 import de.ks.standbein.activity.loading.ActivityLoadingExecutor;
 import de.ks.standbein.application.Navigator;
 import de.ks.standbein.datasource.DataSource;
-import de.ks.eventsystem.bus.EventBus;
 import de.ks.util.LockSupport;
 import javafx.application.Platform;
 import javafx.scene.Node;
@@ -137,7 +137,7 @@ public class ActivityController {
         }
       } catch (Exception e) {
         log.error("Failed to start {} because of ", activityHint.getDescription(), e);
-        context.stopActivity(activityHint.getNextActivityId());
+        context.stop(activityHint.getNextActivityId());
         if (previousActivity != null) {
           context.start(previousActivity);
         }
@@ -253,7 +253,7 @@ public class ActivityController {
         shutdownExecutors();
         registeredActivities.remove(id);
 
-        context.stopActivity(id);
+        context.stop(id);
         log.debug("Stopped activity {}", id);
 
         if (returnToActivity != null && registeredActivities.containsKey(returnToActivity)) {
