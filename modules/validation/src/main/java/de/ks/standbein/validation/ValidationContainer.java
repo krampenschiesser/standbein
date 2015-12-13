@@ -122,6 +122,10 @@ public class ValidationContainer {
     } else {
       results.remove(control);
     }
+    applyDecorator(control, newValue, result);
+  }
+
+  private void applyDecorator(Control control, Object newValue, ValidationResult result) {
     ControlDecorator decorator = decorators.getOrDefault(control, defaultDecorator.get());
 
     if (decorator != null) {
