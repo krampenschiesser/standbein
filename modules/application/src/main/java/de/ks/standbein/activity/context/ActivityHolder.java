@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ActivityHolder {
   protected final String id;
-  protected final Map<Key<?>, StoredBean> objectStore = new ConcurrentHashMap<>();
+  protected final Map<Key<?>, Object> objectStore = new ConcurrentHashMap<>();
   protected final AtomicInteger count = new AtomicInteger(0);
 
   public ActivityHolder(String id) {
@@ -31,15 +31,15 @@ public class ActivityHolder {
     count.incrementAndGet();
   }
 
-  public StoredBean getStoredBean(Key<?> key) {
+  public Object getStoredInstance(Key<?> key) {
     return objectStore.get(key);
   }
 
-  public void put(Key<?> key, StoredBean storedBean) {
-    objectStore.putIfAbsent(key, storedBean);
+  public void put(Key<?> key, Object instance) {
+    objectStore.putIfAbsent(key, instance);
   }
 
-  public Map<Key<?>, StoredBean> getObjectStore() {
+  public Map<Key<?>, Object> getObjectStore() {
     return objectStore;
   }
 

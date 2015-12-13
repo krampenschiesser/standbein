@@ -90,8 +90,8 @@ public class ActivityContext implements Scope {
     try {
       ActivityHolder activityHolder = activities.get(getCurrentActivity());
 
-      StoredBean storedBean = activityHolder.objectStore.remove(key);
-      if (storedBean != null) {
+      Object instance = activityHolder.objectStore.remove(key);
+      if (instance != null) {
         log.debug("Cleaned up bean {} of activity {}", key, activityHolder.getId());
       }
     } finally {
@@ -205,9 +205,9 @@ public class ActivityContext implements Scope {
     return new Provider<T>() {
       @Override
       public T get() {
-        StoredBean storedBean = getOrCreateInstance(key, unscoped);
+        Object instance = getOrCreateInstance(key, unscoped);
         @SuppressWarnings("unchecked")
-        Class<T> clazz = (Class<T>) storedBean.getInstance().getClass();
+        Class<T> clazz = (Class<T>) instance.getClass();
         return getProxy(clazz, key);
       }
 
@@ -218,41 +218,41 @@ public class ActivityContext implements Scope {
     };
   }
 
-  private StoredBean getOrCreateInstance(Key<?> key, Provider<?> unscoped) {
+  private Object getOrCreateInstance(Key<?> key, Provider<?> unscoped) {
     ActivityHolder holder = activities.get(currentActivity);
-    StoredBean storedBean = null;
+    Object instance = null;
     lock.readLock().lock();
     try {
-      storedBean = holder.getStoredBean(key);
+      instance = holder.getStoredInstance(key);
     } finally {
       lock.readLock().unlock();
     }
 
-    if (storedBean == null) {
+    if (instance == null) {
       lock.writeLock().lock();
       try {
-        storedBean = new StoredBean(key, unscoped.get());
-        holder.put(key, storedBean);
-        log.debug("For {} created new instance {} and put it to store", key, storedBean.getInstance());
+        instance = unscoped.get();
+        holder.put(key, instance);
+        log.debug("For {} created new instance {} and put it to store", key, instance);
       } finally {
         lock.writeLock().unlock();
       }
     } else {
-      log.trace("For {} found instance {}", key, storedBean.getInstance());
+      log.trace("For {} found instance {}", key, instance);
     }
 
-    return storedBean;
+    return instance;
   }
 
   private Object getCurrentInstance(Key<?> key) {
     ActivityHolder holder = activities.get(currentActivity);
-    StoredBean storedBean = holder.getStoredBean(key);
+    Object storedBean = holder.getStoredInstance(key);
     if (storedBean == null) {
       log.debug("Try to load {} from proxy, but found none for current activity.", key);
       return injector.getProvider(key).get();
     } else {
-      log.trace("For {} from proxy, loaded {}.", key, storedBean.getInstance());
-      return storedBean.getInstance();
+      log.trace("For {} from proxy, loaded {}.", key, storedBean);
+      return storedBean;
     }
   }
 
