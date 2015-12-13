@@ -57,12 +57,6 @@ allprojects {
         compile "com.google.code.findbugs:jsr305:$jsr305"
         compile "org.slf4j:slf4j-api:$slf4j"
 
-//        compile "com.google.inject:guice:$guice"
-//        compile 'javax.inject:javax.inject:1'
-//        compile "com.google.guava:guava:$guava"
-//        compile "org.apache.commons:commons-lang3:$lang3"
-
-
         testCompile "junit:junit:$junit"
         testCompile("org.mockito:mockito-core:$mockito") {
             exclude module: "objenesis"
@@ -105,12 +99,7 @@ task fullJar(type: Jar) {
             zipTree(it)
         }
     }
-//    from configurations.archives.allArtifacts.files.collect {
-//        println it
-//        zipTree(it)
-//    }
 }
-
 
 task fullJavaDoc(type: Javadoc) {
     title = "$project.name $version"
