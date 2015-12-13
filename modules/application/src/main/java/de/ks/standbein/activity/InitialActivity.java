@@ -13,10 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ks.standbein.application;
+package de.ks.standbein.activity;
 
-import de.ks.standbein.NodeProvider;
-import javafx.scene.Parent;
+public class InitialActivity {
+  protected final Class<? extends ActivityCfg> initialActivity;
 
-public abstract class MainWindow implements NodeProvider<Parent> {
+  public InitialActivity(Class<? extends ActivityCfg> initialActivity) {
+    this.initialActivity = initialActivity;
+  }
+
+  public Class<? extends ActivityCfg> getInitialActivity() {
+    return initialActivity;
+  }
 }

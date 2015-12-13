@@ -13,20 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ks.standbein.module;
+package de.ks.standbein.application;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
-import de.ks.standbein.application.ApplicationService;
-import de.ks.standbein.launch.Service;
+import javafx.scene.Parent;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 
-public class ApplicationServiceModule extends AbstractModule {
-  public static final String WAIT_FOR_INITIALIZATION = "waitForInitialization";
-  public static final String PREVENT_PLATFORMEXIT = "preventPlatformExit";
-  public static final String APPICON = "iconName";
+import javax.inject.Singleton;
+
+@Singleton
+public class MainTestWindow extends MainWindow {
+
+  StackPane stackPane;
 
   @Override
-  protected void configure() {
-    Multibinder.newSetBinder(binder(), Service.class).addBinding().to(ApplicationService.class);
+  public Parent getNode() {
+    stackPane = new StackPane();
+    stackPane.getChildren().add(new Label("Content"));
+    return stackPane;
   }
 }

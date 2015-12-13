@@ -20,9 +20,9 @@ import de.ks.standbein.launch.Launcher;
 import de.ks.standbein.launch.Service;
 import de.ks.standbein.launch.UIService;
 import de.ks.standbein.module.ApplicationServiceModule;
+import de.ks.util.FXPlatform;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +103,8 @@ public class ApplicationService extends Service implements UIService {
         }
       });
     } else {
-      navigator.register(stage, new StackPane());
+      FXPlatform.invokeLater(() -> startup.start(stage));
+//      FXPlatform.invokeLater(() -> navigator.register(stage));
       latch.countDown();
     }
     waitForJavaFXInitialized();
