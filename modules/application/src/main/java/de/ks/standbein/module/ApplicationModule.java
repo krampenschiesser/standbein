@@ -19,7 +19,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import de.ks.eventsystem.EventBusModule;
-import de.ks.i18n.LocalizationModule;
+import de.ks.standbein.i18n.LocalizationModule;
 
 import javax.inject.Singleton;
 import java.util.concurrent.ExecutorService;

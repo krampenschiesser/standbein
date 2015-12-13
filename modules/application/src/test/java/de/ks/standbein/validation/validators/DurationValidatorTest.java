@@ -15,8 +15,8 @@
 package de.ks.standbein.validation.validators;
 
 import de.ks.standbein.LoggingGuiceTestSupport;
-import de.ks.i18n.LocalizationModule;
-import de.ks.i18n.Localized;
+import de.ks.standbein.i18n.LocalizationModule;
+import de.ks.standbein.i18n.Localized;
 import javafx.scene.control.Control;
 import org.junit.Before;
 import org.junit.Rule;

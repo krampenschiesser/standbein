@@ -15,7 +15,7 @@
  */
 package de.ks.standbein.i18n.nobundle;
 
-import de.ks.i18n.Localized;
+import de.ks.standbein.i18n.Localized;
 
 import javax.inject.Inject;
 

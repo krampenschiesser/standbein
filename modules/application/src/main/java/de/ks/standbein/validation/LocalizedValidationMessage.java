@@ -14,7 +14,7 @@
  */
 package de.ks.standbein.validation;
 
-import de.ks.i18n.Localized;
+import de.ks.standbein.i18n.Localized;
 
 public class LocalizedValidationMessage extends ValidationMessage {
   private final String messageTemplate;

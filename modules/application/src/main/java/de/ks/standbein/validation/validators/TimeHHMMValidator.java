@@ -15,7 +15,7 @@
 
 package de.ks.standbein.validation.validators;
 
-import de.ks.i18n.Localized;
+import de.ks.standbein.i18n.Localized;
 import de.ks.standbein.validation.LocalizedValidationMessage;
 import de.ks.standbein.validation.ValidationResult;
 import javafx.scene.control.Control;

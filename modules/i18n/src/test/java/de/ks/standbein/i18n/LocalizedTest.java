@@ -22,7 +22,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import de.ks.eventsystem.EventBusModule;
 import de.ks.eventsystem.bus.EventBus;
-import de.ks.i18n.event.LanguageChangedEvent;
+import de.ks.standbein.i18n.event.LanguageChangedEvent;
 import de.ks.standbein.i18n.nobundle.NoBundleClass;
 import de.ks.standbein.i18n.other.OtherClass;
 import org.junit.Before;

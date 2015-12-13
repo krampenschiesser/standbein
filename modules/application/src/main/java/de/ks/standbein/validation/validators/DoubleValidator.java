@@ -15,7 +15,7 @@
 
 package de.ks.standbein.validation.validators;
 
-import de.ks.i18n.Localized;
+import de.ks.standbein.i18n.Localized;
 
 public class DoubleValidator extends BaseNumberValidator<Double> {
   public DoubleValidator(Localized localized) {

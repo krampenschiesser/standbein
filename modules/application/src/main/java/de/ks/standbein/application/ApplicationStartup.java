@@ -14,11 +14,11 @@
  */
 package de.ks.standbein.application;
 
-import de.ks.i18n.Localized;
+import de.ks.standbein.GuiceSupport;
+import de.ks.standbein.i18n.Localized;
 import de.ks.standbein.imagecache.Images;
 import de.ks.standbein.javafx.FxCss;
 import de.ks.standbein.launch.Launcher;
-import de.ks.standbein.GuiceSupport;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;

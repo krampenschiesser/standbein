@@ -15,7 +15,7 @@
 
 package de.ks.standbein.application.fxml;
 
-import de.ks.i18n.Localized;
+import de.ks.standbein.i18n.Localized;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;

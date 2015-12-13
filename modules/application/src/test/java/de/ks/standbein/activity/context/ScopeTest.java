@@ -48,7 +48,7 @@ public class ScopeTest {
 
   @Test
   public void testActivityContextActive() throws Exception {
-    context.startActivity("1").getCount();
+    context.start("1");
 
     bean1.getName();
 

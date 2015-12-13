@@ -28,7 +28,7 @@ import java.net.URL;
  *
  */
 public class ImageLoader extends CacheLoader<String, Image> {
-  public static final String DEFAULT_IMAGE_PACKAGE = "/de/ks/images/";
+  public static final String DEFAULT_IMAGE_PACKAGE = "/de/ks/standbein/images/";
 
   private static final Logger log = LoggerFactory.getLogger(ImageLoader.class);
 

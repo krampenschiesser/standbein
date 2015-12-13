@@ -28,7 +28,7 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static de.ks.i18n.LocalizationModule.*;
+import static de.ks.standbein.i18n.LocalizationModule.*;
 
 /**
  * Main interface to the i18n facilities.
