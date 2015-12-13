@@ -69,4 +69,9 @@ public abstract class BaseController<T> implements Initializable, DatasourceCall
   protected void onRefresh(T model) {
     //
   }
+
+  @Override
+  public int compareTo(DatasourceCallback<T> o) {
+    return Integer.compare(getPriority(), o.getPriority());
+  }
 }
