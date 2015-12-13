@@ -15,7 +15,6 @@
 package de.ks.standbein.preload;
 
 import de.ks.standbein.launch.Launcher;
-import de.ks.standbein.GuiceSupport;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -27,7 +26,7 @@ public abstract class PreloaderApplication extends Application {
 
   @Override
   public void start(Stage primaryStage) throws Exception {
-    Launcher launcher = GuiceSupport.get(Launcher.class);
+    Launcher launcher = Launcher.instanceForFx;
 
     stage = primaryStage;
     try {

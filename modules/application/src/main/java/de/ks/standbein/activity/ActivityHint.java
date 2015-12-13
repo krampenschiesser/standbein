@@ -14,10 +14,6 @@
  */
 package de.ks.standbein.activity;
 
-import de.ks.standbein.activity.context.ActivityStore;
-import de.ks.standbein.GuiceSupport;
-
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ActivityHint {
@@ -57,10 +53,6 @@ public class ActivityHint {
     return this;
   }
 
-  public ActivityHint returnToCurrent() {
-    return setReturnToActivity(GuiceSupport.get(ActivityController.class).getCurrentActivityId());
-  }
-
   public Supplier getReturnToDatasourceHint() {
     return returnToDatasourceHint;
   }
@@ -70,26 +62,12 @@ public class ActivityHint {
     return this;
   }
 
-  @SuppressWarnings("unchecked")
-  public <M> ActivityHint setReturnToModelHint(Function<M, Object> modelFunction) {
-    Object model = GuiceSupport.get(ActivityStore.class).getModel();
-    this.returnToDatasourceHint = () -> modelFunction.apply((M) model);
-    return this;
-  }
-
   public Supplier getDataSourceHint() {
     return dataSourceHint;
   }
 
   public ActivityHint setDataSourceHint(Supplier dataSourceHint) {
     this.dataSourceHint = dataSourceHint;
-    return this;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <M> ActivityHint setModelHint(Function<M, Object> modelFunction) {
-    Object model = GuiceSupport.get(ActivityStore.class).getModel();
-    this.dataSourceHint = () -> modelFunction.apply((M) model);
     return this;
   }
 

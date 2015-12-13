@@ -15,7 +15,7 @@
 package de.ks.standbein.option;
 
 import com.google.common.primitives.Primitives;
-import de.ks.standbein.GuiceSupport;
+import com.google.inject.Injector;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
 import org.objenesis.ObjenesisStd;
@@ -29,15 +29,17 @@ public class Options {
 
   private final ObjenesisStd objenesis = new ObjenesisStd();
   private final OptionSource source;
+  private final Injector injector;
 
   @Inject
-  public Options(OptionSource source) {
+  public Options(OptionSource source, Injector injector) {
     this.source = source;
+    this.injector = injector;
   }
 
   @SuppressWarnings("unchecked")
   public <T> T get(Class<T> optionClass) {
-    T options = (T) GuiceSupport.get(optionClass);
+    T options = injector.getInstance(optionClass);
 
     ProxyFactory factory = new ProxyFactory();
     factory.setSuperclass(optionClass);

@@ -15,7 +15,6 @@
 
 dependencies {
     compile project(":modules:reflection")
-    compile project(":modules:guicesupport")
 
     compile "com.google.inject:guice:$guice"
     compile "com.google.inject.extensions:guice-multibindings:$guice"

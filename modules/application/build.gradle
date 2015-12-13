@@ -15,10 +15,7 @@
 
 apply plugin: "maven-publish"
 
-version = "$applicationLibVersion"
-
 dependencies {
-    compile project(":modules:guicesupport")
     compile project(":modules:i18n")
     compile project(":modules:images")
     compile project(":modules:launch")
@@ -35,41 +32,3 @@ dependencies {
     testCompile project(":modules:testutil")
 
 }
-
-def projects = [project(":modules:i18n"), project(":modules:images"), project(":modules:launch"), project(":modules:eventsystem"),
-                project(":modules:reflection"), project(":modules:executor"), project(":modules:util")]
-
-def alldependencyprojects = new ArrayList()
-alldependencyprojects.addAll(projects)
-alldependencyprojects.add(project(":modules:application"))
-
-task sourceJar(type: Jar) {
-    from alldependencyprojects.sourceSets.main.allJava
-}
-
-task fullJar(type: Jar) {
-    dependsOn projects.build, jar
-    baseName "$applicationLibTitle"
-    alldependencyprojects.each { subproject ->
-        from subproject.configurations.archives.allArtifacts.files.collect {
-            zipTree(it)
-        }
-    }
-}
-
-
-task fullJavaDoc(type: Javadoc) {
-    title = "$applicationLibTitle $applicationLibVersion"
-
-    source = alldependencyprojects.sourceSets.main.allJava
-
-    options.docletpath = configurations.asciidoclet.files.asType(List)
-    options.doclet = 'org.asciidoctor.Asciidoclet'
-    options.overview = "src/main/java/overview.adoc"
-}
-
-task javadocJar(type: Jar, dependsOn: fullJavaDoc) {
-    classifier = 'javadoc'
-    from fullJavaDoc.destinationDir
-}
-

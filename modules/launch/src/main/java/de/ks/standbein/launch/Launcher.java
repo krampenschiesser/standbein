@@ -44,6 +44,8 @@ public class Launcher {
   private volatile PreloaderApplication preloaderInstance;
   private CountDownLatch preloaderLatch = new CountDownLatch(1);
 
+  public static volatile Launcher instanceForFx;
+
   @Inject
   public Launcher(Set<Service> services, ExecutorService executorService) {
     this.services = new ArrayList<>(services);
@@ -88,6 +90,7 @@ public class Launcher {
 
   public void startAll(String... args) {
     if (preloader != null) {
+      instanceForFx = this;
       startPreloader();
     }
     TreeMap<Integer, List<Service>> waves = getServiceWaves();
@@ -248,6 +251,7 @@ public class Launcher {
 
   public void setPreloaderInstance(PreloaderApplication preloaderInstance) {
     this.preloaderInstance = preloaderInstance;
+    instanceForFx = null;
     preloaderLatch.countDown();
   }
 

@@ -14,7 +14,6 @@
  */
 package de.ks.standbein.application;
 
-import de.ks.standbein.GuiceSupport;
 import de.ks.standbein.i18n.Localized;
 import de.ks.standbein.imagecache.Images;
 import de.ks.standbein.javafx.FxCss;
@@ -43,6 +42,7 @@ public class ApplicationStartup {
   private final Localized localized;
   private final Provider<Launcher> launcher;
   private Set<String> styleSheets = new HashSet<>();
+  private FXApplicationExceptionHandler exceptionHandler;
 
   @Inject
   public ApplicationStartup(Navigator navigator, Localized localized, Provider<Launcher> launcher) {
@@ -62,9 +62,14 @@ public class ApplicationStartup {
     this.styleSheets = sheets;
   }
 
+  @com.google.inject.Inject(optional = true)
+  public void setExceptionHandler(FXApplicationExceptionHandler handler) {
+    this.exceptionHandler = handler;
+  }
+
   public void start(Stage stage) {
     try {
-      Thread.currentThread().setUncaughtExceptionHandler(GuiceSupport.get(FXApplicationExceptionHandler.class));
+      Thread.currentThread().setUncaughtExceptionHandler(exceptionHandler);
       log.info("Starting application " + getClass().getName());
       if (mainWindow == null) {
         setWarning(stage);

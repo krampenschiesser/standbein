@@ -15,7 +15,6 @@
 
 dependencies {
     compile project(":modules:eventsystem")
-    compile project(":modules:guicesupport")
     testCompile project(":modules:testutil")
 }
 

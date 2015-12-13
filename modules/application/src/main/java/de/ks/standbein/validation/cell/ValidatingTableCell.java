@@ -15,7 +15,6 @@
  */
 package de.ks.standbein.validation.cell;
 
-import de.ks.standbein.GuiceSupport;
 import de.ks.standbein.validation.ValidationRegistry;
 import de.ks.standbein.validation.ValidationResult;
 import de.ks.standbein.validation.Validator;
@@ -35,9 +34,11 @@ import java.util.List;
 
 public class ValidatingTableCell<S, T> extends TableCell<S, T> {
   protected final List<Validator<Control, String>> validators;
+  private final ValidationRegistry validationRegistry;
   protected TextField textField;
 
-  public ValidatingTableCell(StringConverter<T> converter, Validator<Control, String>... validators) {
+  public ValidatingTableCell(ValidationRegistry validationRegistry, StringConverter<T> converter, Validator<Control, String>... validators) {
+    this.validationRegistry = validationRegistry;
     this.getStyleClass().add("text-field-table-cell");
     setConverter(converter);
     this.validators = Arrays.asList(validators);
@@ -94,7 +95,7 @@ public class ValidatingTableCell<S, T> extends TableCell<S, T> {
 
     if (isEditing()) {
       if (textField == null) {
-        textField = createTextField(this, getConverter(), validators);
+        textField = createTextField(validationRegistry, this, getConverter(), validators);
       }
 
       startEdit(this, getConverter(), null, null, textField);
@@ -113,8 +114,6 @@ public class ValidatingTableCell<S, T> extends TableCell<S, T> {
 
   @Override
   public void commitEdit(T newValue) {
-    ValidationRegistry validationRegistry = GuiceSupport.get(ValidationRegistry.class);
-
     ValidationResult validationResult = validationRegistry.getValidationResult(textField);
     if (validationResult == null || validationResult.getMessages().isEmpty()) {
       super.commitEdit(newValue);
@@ -160,9 +159,8 @@ public class ValidatingTableCell<S, T> extends TableCell<S, T> {
     cell.setGraphic(graphic);
   }
 
-  static <T> TextField createTextField(final Cell<T> cell, final StringConverter<T> converter, List<Validator<Control, String>> validators) {
+  static <T> TextField createTextField(ValidationRegistry validationRegistry, final Cell<T> cell, final StringConverter<T> converter, List<Validator<Control, String>> validators) {
     final TextField textField = new TextField(getItemText(cell, converter));
-    ValidationRegistry validationRegistry = GuiceSupport.get(ValidationRegistry.class);
     validationRegistry.registerValidator(textField, validators.stream().reduce((first, second) -> first.and(second)).get());
 
     // Use onAction here rather than onKeyReleased (with check for Enter),
