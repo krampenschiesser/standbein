@@ -81,6 +81,7 @@ public class DefaultDecorator implements ControlDecorator {
       existing = tooltip;
       toolTips.put(c, tooltip);
     }
+    //FIXME let tooltip stick to position of owner
     existing.setText(highestMessage.getText());
     Bounds bounds = c.localToScreen(c.getLayoutBounds());
     double minY = bounds.getMinY();
