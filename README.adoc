@@ -24,4 +24,10 @@ The main goals are:
 * *Binding*: bind labels or textfields (or whatever your stringconverter can handle) to a model property
 * *Predefined refresh handling*: If needed you can implement your own datasource which will be loaded on entry of an activity
 
-== Activity
+== Examples
+
+For a look at examples see https://github.com/krampenschiesser/standbein-sample.
+
+== Documentation
+
+See https://github.com/krampenschiesser/standbein/wiki[Standbein wiki]
