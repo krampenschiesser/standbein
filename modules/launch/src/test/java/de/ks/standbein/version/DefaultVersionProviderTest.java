@@ -7,18 +7,16 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
 public class DefaultVersionProviderTest {
-
+  protected boolean isWindows = StandardSystemProperty.OS_NAME.value().toLowerCase(Locale.ROOT).contains("win");
   private DefaultVersionProvider provider;
   private Path manifestPath;
   private Path versionPath;
@@ -44,9 +42,24 @@ public class DefaultVersionProviderTest {
     provider = new DefaultVersionProvider(manifestMfUrl, versionFile);
   }
 
-  private void deleteIfExists(Path path) throws IOException {
-    if (Files.exists(path)) {
-      Files.delete(path);
+  private void deleteIfExists(Path path) throws IOException, InterruptedException {
+    int maxRetry = isWindows ? 5 : 1;
+    for (int retry = 0; retry < maxRetry; retry++) {
+      try {
+
+        if (Files.exists(path) && path.toFile().exists()) {
+          Files.delete(path);
+        }
+      } catch (FileSystemException e) {
+        if (isWindows) {
+          if (retry < maxRetry - 1) {
+            Thread.sleep(1050);
+          } else {
+            throw e;
+          }
+        }
+
+      }
     }
   }
 
