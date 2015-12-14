@@ -15,21 +15,17 @@ task testUtilJar(type: Jar) {
 
 
 def projects = [project(":modules:i18n"), project(":modules:images"), project(":modules:launch"), project(":modules:validation"), project(":modules:eventsystem"),
-                project(":modules:reflection"), project(":modules:executor"), project(":modules:util")]
-
-def alldependencyprojects = new ArrayList()
-alldependencyprojects.addAll(projects)
-alldependencyprojects.add(project(":modules:application"))
+                project(":modules:reflection"), project(":modules:executor"), project(":modules:util"), project(":modules:application")]
 
 task sourceJar(type: Jar) {
-    from alldependencyprojects.sourceSets.main.allJava
+    from projects.sourceSets.main.allJava
 }
 
 
 task fullJar(type: Jar) {
     dependsOn projects.build, jar
     baseName "$project.name"
-    alldependencyprojects.each { subproject ->
+    projects.each { subproject ->
         from subproject.configurations.archives.allArtifacts.files.collect {
             zipTree(it)
         }
@@ -39,7 +35,7 @@ task fullJar(type: Jar) {
 task fullJavaDoc(type: Javadoc) {
     title = "$project.name $version"
 
-    source = alldependencyprojects.sourceSets.main.allJava
+    source = projects.sourceSets.main.allJava
 
     options.docletpath = configurations.asciidoclet.files.asType(List)
     options.doclet = 'org.asciidoctor.Asciidoclet'
@@ -79,7 +75,7 @@ publishing {
 
                 def added = new HashSet()
 
-                alldependencyprojects.each { project ->
+                projects.each { project ->
                     project.configurations.compile.allDependencies.each {
 
                         if (!it.group.equals("de.ks") && !added.contains(it)) {
