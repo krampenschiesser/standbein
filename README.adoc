@@ -11,6 +11,19 @@ The main goals are:
 * Control the lifecycle and threads of activities
 * Give the user as much freedom as possible to use or not use the given features (and therefore provide only the essential stuff)
 
+== Testing/using
+
+Currently the standbein library is still in development.
+Must of its api is in use since over a year and is considered quite stable.
+However I still want to have the possibility to simplify and refactor stuff.
+
+Therefore it is not yet in any maven repository and you have to install it into your local repository:
+
+[source,shell]
+$ ./gradlew publishToMavenLocal
+
+This command will install it in you local maven repository: ~/.m2 +
+
 == Features
 
 * *Service infrastructure*: to initialize your infrastructure at startup time (eg. start embedded db, hibernate, weld whatever)
