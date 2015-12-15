@@ -17,9 +17,10 @@ include "doc"
 include "modules:guicesupport"
 include "modules:testutil", "modules:util", "modules:reflection"
 include "modules:launch"
-//PC stuff
 include "modules:eventsystem", "modules:i18n", "modules:validation"
 include "modules:executor"
-//javaFX stuff
 include "modules:images", "modules:application"
 include "modules:application-test-util"
+
+//extensions
+include "extension:menu"

@@ -101,7 +101,6 @@ public class ActivityController {
         if (hasCurrentActivity() && context.hasCurrentActivity()) {
           if (activityHint.getDataSourceHint() != null) {
             dataSourceHint = activityHint.getDataSourceHint().get();
-
           }
           suspendCurrent();
         }
