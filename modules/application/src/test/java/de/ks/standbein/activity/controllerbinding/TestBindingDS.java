@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 public class TestBindingDS implements DataSource<Option> {
 
-  private Option saved;
+  private Option saved = new Option("test").setValue(42);
 
   public Option getSaved() {
     return saved;
@@ -28,9 +28,8 @@ public class TestBindingDS implements DataSource<Option> {
 
   @Override
   public Option loadModel(Consumer<Option> furtherProcessing) {
-    Option test = new Option("test").setValue(42);
-    furtherProcessing.accept(test);
-    return test;
+    furtherProcessing.accept(saved);
+    return saved;
   }
 
   @Override

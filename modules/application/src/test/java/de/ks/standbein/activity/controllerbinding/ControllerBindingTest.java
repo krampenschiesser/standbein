@@ -71,6 +71,12 @@ public class ControllerBindingTest {
 
     Option hello = datasource.getSaved();
     assertNotNull(hello);
+    assertEquals("Hello", hello.getName());
+
+    datasource.getSaved().setName("Test");
+    controller.reload();
+    controller.waitForTasks();
+    assertEquals("Test", name.getText());
   }
 
   @Test
