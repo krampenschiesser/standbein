@@ -151,7 +151,7 @@ public class ApplicationService extends Service implements UIService {
   }
 
   @Override
-  public int getPriority() {
+  public int getRunLevel() {
     return 5;
   }
 
