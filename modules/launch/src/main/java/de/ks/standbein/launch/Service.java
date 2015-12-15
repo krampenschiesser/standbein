@@ -88,7 +88,7 @@ public abstract class Service {
 
   //default methods
 
-  public int getPriority() {
+  public int getRunLevel() {
     return 1;
   }
 

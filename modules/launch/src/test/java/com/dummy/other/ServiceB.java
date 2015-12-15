@@ -19,7 +19,7 @@ import de.ks.standbein.launch.TestService;
 public class ServiceB extends TestService {
 
   @Override
-  public int getPriority() {
+  public int getRunLevel() {
     return 2;
   }
 }

@@ -50,7 +50,7 @@ public class Launcher {
   public Launcher(Set<Service> services, ExecutorService executorService) {
     this.services = new ArrayList<>(services);
     this.executorService = executorService;
-    this.services.sort((o1, o2) -> Integer.compare(o1.getPriority(), o2.getPriority()));
+    this.services.sort((o1, o2) -> Integer.compare(o1.getRunLevel(), o2.getRunLevel()));
   }
 
   public <S extends Service> void removeService(Class<S> clazz) {
@@ -81,9 +81,9 @@ public class Launcher {
   public TreeMap<Integer, List<Service>> getServiceWaves() {
     TreeMap<Integer, List<Service>> retval = new TreeMap<>();
     services.forEach((service) -> {
-      int priority = service.getPriority();
-      retval.putIfAbsent(priority, new ArrayList<>());
-      retval.get(priority).add(service);
+      int runlevel = service.getRunLevel();
+      retval.putIfAbsent(runlevel, new ArrayList<>());
+      retval.get(runlevel).add(service);
     });
     return retval;
   }
@@ -111,10 +111,10 @@ public class Launcher {
     if (!iter.hasNext()) {
       return;
     }
-    Integer prio = iter.next();
-    launchListener.waveStarted(prio);
-    log.info("Starting services with prio {}", prio);
-    List<CompletableFuture<Void>> waveFutures = waves.get(prio).stream()//
+    Integer runlevel = iter.next();
+    launchListener.waveStarted(runlevel);
+    log.info("Starting services with runlevel {}", runlevel);
+    List<CompletableFuture<Void>> waveFutures = waves.get(runlevel).stream()//
       .map((s) -> {
         return CompletableFuture.supplyAsync(() -> {
           s.initialize(this, executorService, args);
@@ -124,9 +124,9 @@ public class Launcher {
       }).collect(Collectors.toList());
 
     CompletableFuture<Void> allOf = CompletableFuture.allOf(waveFutures.toArray(new CompletableFuture[waveFutures.size()]));
-    allOf.thenRun(() -> log.info("Started services with prio {}", prio))//
+    allOf.thenRun(() -> log.info("Started services with runlevel {}", runlevel))//
       .thenRun(() -> latch.countDown())//
-      .thenRun(() -> launchListener.waveFinished(prio))//
+      .thenRun(() -> launchListener.waveFinished(runlevel))//
       .thenRun(() -> startWave(iter, waves, args))//
       .exceptionally((t) -> {
         while (latch.getCount() > 0) {
@@ -185,9 +185,9 @@ public class Launcher {
     if (!iter.hasNext()) {
       return;
     }
-    Integer prio = iter.next();
-    log.info("Stopping services with prio {}", prio);
-    List<CompletableFuture<Void>> waveFutures = waves.get(prio).stream()//
+    Integer runlevel = iter.next();
+    log.info("Stopping services with runlevel {}", runlevel);
+    List<CompletableFuture<Void>> waveFutures = waves.get(runlevel).stream()//
       .map((s) -> {
         if (s.isStopped()) {
           return CompletableFuture.<Void>completedFuture(null);
@@ -198,7 +198,7 @@ public class Launcher {
       }).collect(Collectors.toList());
 
     CompletableFuture<Void> allOf = CompletableFuture.allOf(waveFutures.toArray(new CompletableFuture[waveFutures.size()]));
-    allOf.thenRun(() -> log.info("Stopped services with prio {}", prio))//
+    allOf.thenRun(() -> log.info("Stopped services with runlevel {}", runlevel))//
       .thenRun(() -> latch.countDown())//
       .thenRun(() -> stopWave(iter, waves))//
       .exceptionally((t) -> {
