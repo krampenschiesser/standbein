@@ -50,7 +50,8 @@ public class Binding {
 
   protected void resetProperties() {
     properties.entrySet().forEach(entry -> {
-      @SuppressWarnings("unchecked") Property<Object> property = (Property<Object>) entry.getValue();
+      @SuppressWarnings("unchecked")
+      Property<Object> property = (Property<Object>) entry.getValue();
       if (!property.isBound()) {
         Object defaultValue = getDefaultValue(property);
         property.setValue(defaultValue);
@@ -84,7 +85,8 @@ public class Binding {
   protected void applyModelToProperties(Object model) {
     properties.entrySet().forEach(entry -> {
       Object value = entry.getKey().getValue(model);
-      @SuppressWarnings("unchecked") Property<Object> property = (Property<Object>) entry.getValue();
+      @SuppressWarnings("unchecked")
+      Property<Object> property = (Property<Object>) entry.getValue();
       Pair<Function, Function> converter = converters.get(property);
       if (converter != null && value != null) {
         value = converter.getKey().apply(value);
@@ -97,16 +99,19 @@ public class Binding {
 
   public void applyControllerContent(Object model) {
     properties.entrySet().forEach(entry -> {
-      @SuppressWarnings("unchecked") Property<Object> property = (Property<Object>) entry.getValue();
+      @SuppressWarnings("unchecked")
+      Property<Object> property = (Property<Object>) entry.getValue();
       Object value = property.getValue();
-      String valueString = "";
-      if (value != null) {
-        valueString = String.valueOf(value);
-        if (valueString.length() > 100) {
-          valueString = valueString.substring(0, 100);
+      if (log.isDebugEnabled()) {
+        String valueString = "";
+        if (value != null) {
+          valueString = String.valueOf(value);
+          if (valueString.length() > 100) {
+            valueString = valueString.substring(0, 100);
+          }
         }
+        log.debug("For key '{}' setting property {} to {}", entry.getKey().getPropertyPath(), property, valueString);
       }
-      log.debug("For key '{}' setting property {} to {}", entry.getKey().getPropertyPath(), property, valueString);
       entry.getKey().setValue(model, value);
     });
   }
