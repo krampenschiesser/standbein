@@ -17,7 +17,6 @@ package de.ks.standbein.application;
 
 import de.ks.standbein.NodeProvider;
 import javafx.scene.Parent;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
 public abstract class MainWindow implements NodeProvider<Parent> {
@@ -30,20 +29,10 @@ public abstract class MainWindow implements NodeProvider<Parent> {
   public abstract Parent getNode();
 
   /**
-   * @return the root window.
+   * @return the application root
    */
-  public Pane getRoot() {
-    return getContentPresenter();
-  }
-
-  /**
-   * @return a stackpane the navigator will use to show new content in. its children will be cleared when something new is added
-   * This stackpane has to be incldued in the rootWindow
-   */
-  public StackPane getContentPresenter() {
-    if (root == null) {
-      root = new StackPane();
-    }
-    return root;
+  public ApplicationRoot getRoot() {
+    root = new StackPane();
+    return new ApplicationRoot(root, root);
   }
 }

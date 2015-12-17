@@ -16,10 +16,10 @@
 package de.ks.standbein.menu;
 
 import com.google.inject.Injector;
+import de.ks.standbein.DummyActivity;
 import de.ks.standbein.IntegrationTestModule;
 import de.ks.standbein.LoggingGuiceTestSupport;
 import de.ks.standbein.activity.ActivityController;
-import de.ks.standbein.activity.DummyActivity;
 import de.ks.standbein.application.Navigator;
 import de.ks.util.FXPlatform;
 import javafx.collections.ObservableList;

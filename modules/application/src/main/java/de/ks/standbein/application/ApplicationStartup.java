@@ -22,7 +22,6 @@ import de.ks.standbein.i18n.Localized;
 import de.ks.standbein.launch.Launcher;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -73,9 +72,8 @@ public class ApplicationStartup {
       navigator.register(stage);
 
       if (mainWindow != null) {
-        Pane root = mainWindow.getRoot();
-        StackPane contentPresenter = mainWindow.getContentPresenter();
-        navigator.changeRootContainer(root, contentPresenter);
+        ApplicationRoot root = mainWindow.getRoot();
+        navigator.changeRootContainer(root.getRoot(), root.getPresentationArea());
         navigator.present(mainWindow.getNode());
       }
       if (mainWindow == null && initalActivity == null) {

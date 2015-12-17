@@ -15,33 +15,23 @@
  */
 package de.ks.standbein.application;
 
-import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
-import javax.inject.Singleton;
+public class ApplicationRoot {
+  protected final StackPane presentationArea;
+  protected final Pane root;
 
-@Singleton
-public class MainTestWindow extends MainWindow {
-
-  StackPane node;
-  BorderPane borderPane;
-  StackPane contentPresenter;
-
-  @Override
-  public Parent getNode() {
-    node = new StackPane();
-    node.getChildren().add(new Label("Content"));
-    return node;
+  public ApplicationRoot(Pane root, StackPane presentationArea) {
+    this.presentationArea = presentationArea;
+    this.root = root;
   }
 
-  @Override
-  public ApplicationRoot getRoot() {
-    borderPane = new BorderPane();
-    contentPresenter = new StackPane();
-    borderPane.setCenter(contentPresenter);
-    return new ApplicationRoot(borderPane, contentPresenter);
+  public StackPane getPresentationArea() {
+    return presentationArea;
   }
 
+  public Pane getRoot() {
+    return root;
+  }
 }
