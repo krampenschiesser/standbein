@@ -67,7 +67,7 @@ public class Navigator {
   }
 
   public void present(Node node) {
-    if (!node.equals(currentNode)) {
+    if (node != null && !node.equals(currentNode)) {
       contentContainer.getChildren().clear();
       contentContainer.getChildren().add(node);
       currentNode = node;
