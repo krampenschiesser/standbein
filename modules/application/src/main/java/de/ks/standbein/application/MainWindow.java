@@ -23,10 +23,23 @@ import javafx.scene.layout.StackPane;
 public abstract class MainWindow implements NodeProvider<Parent> {
   private StackPane root;
 
+  /**
+   * @return the initial node to present in the content area
+   */
+  @Override
+  public abstract Parent getNode();
+
+  /**
+   * @return the root window.
+   */
   public Pane getRoot() {
     return getContentPresenter();
   }
 
+  /**
+   * @return a stackpane the navigator will use to show new content in. its children will be cleared when something new is added
+   * This stackpane has to be incldued in the rootWindow
+   */
   public StackPane getContentPresenter() {
     if (root == null) {
       root = new StackPane();
