@@ -17,7 +17,7 @@ package de.ks.standbein.menu;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import de.ks.standbein.activity.DummyActivity;
+import de.ks.standbein.DummyActivity;
 
 public class TestMenuModule extends AbstractModule {
 

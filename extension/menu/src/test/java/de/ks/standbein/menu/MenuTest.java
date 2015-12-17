@@ -15,7 +15,7 @@
  */
 package de.ks.standbein.menu;
 
-import de.ks.IntegrationTestModule;
+import de.ks.standbein.IntegrationTestModule;
 import de.ks.standbein.LoggingGuiceTestSupport;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
