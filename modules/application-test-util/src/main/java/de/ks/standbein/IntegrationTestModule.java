@@ -25,6 +25,7 @@ import de.ks.standbein.module.ActivityContextModule;
 import de.ks.standbein.module.ApplicationServiceModule;
 
 import javax.inject.Singleton;
+import java.lang.management.ManagementFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,6 +33,9 @@ public class IntegrationTestModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(boolean.class).annotatedWith(Names.named(ApplicationServiceModule.PREVENT_PLATFORMEXIT)).toInstance(true);
+
+    boolean debugging = ManagementFactory.getRuntimeMXBean().getInputArguments().toString().contains("-agentlib:jdwp");
+    bind(boolean.class).annotatedWith(Names.named(ApplicationServiceModule.WAIT_FOR_INITIALIZATION)).toInstance(debugging);
 
     install(new ActivityContextModule());
     install(new ApplicationServiceModule());
