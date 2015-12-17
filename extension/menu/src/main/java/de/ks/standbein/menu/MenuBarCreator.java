@@ -28,13 +28,13 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
-public class BarMenuCreatorCreator extends AbstractMenuCreator<MenuBar, BarMenuCreatorCreator> {
+public class MenuBarCreator extends AbstractMenuCreator<MenuBar, MenuBarCreator> {
   private final Localized localized;
   private final ExecutorService executorService;
   private final Injector injector;
 
   @Inject
-  public BarMenuCreatorCreator(Set<MenuEntry> items, Localized localized, ExecutorService executorService, Injector injector) {
+  public MenuBarCreator(Set<MenuEntry> items, Localized localized, ExecutorService executorService, Injector injector) {
     super(items);
     this.localized = localized;
     this.executorService = executorService;

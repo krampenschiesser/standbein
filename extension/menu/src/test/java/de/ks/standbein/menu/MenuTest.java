@@ -37,7 +37,7 @@ public class MenuTest {
   public LoggingGuiceTestSupport support = new LoggingGuiceTestSupport(this, new TestMenuModule(), new IntegrationTestModule()).launchServices();
 
   @Inject
-  BarMenuCreatorCreator menu;
+  MenuBarCreator menu;
   @Inject
   Injector injector;
   @Inject
