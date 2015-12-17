@@ -22,6 +22,7 @@ import de.ks.standbein.i18n.Localized;
 import de.ks.standbein.launch.Launcher;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -55,9 +56,8 @@ public class ApplicationStartup {
     this.initalActivity = initial;
   }
 
-
   @com.google.inject.Inject(optional = true)
-  public void setupMainWindow(MainWindow window) {
+  public void setMainWindow(MainWindow window) {
     this.mainWindow = window;
   }
 
@@ -70,12 +70,15 @@ public class ApplicationStartup {
     try {
       Thread.currentThread().setUncaughtExceptionHandler(exceptionHandler);
       log.info("Starting application " + getClass().getName());
-      if (initalActivity != null) {
-        navigator.register(stage);
-      } else if (mainWindow != null) {
-        navigator.register(stage);
+      navigator.register(stage);
+
+      if (mainWindow != null) {
+        Pane root = mainWindow.getRoot();
+        StackPane contentPresenter = mainWindow.getContentPresenter();
+        navigator.changeRootContainer(root, contentPresenter);
         navigator.present(mainWindow.getNode());
-      } else {
+      }
+      if (mainWindow == null && initalActivity == null) {
         setWarning(stage);
       }
 

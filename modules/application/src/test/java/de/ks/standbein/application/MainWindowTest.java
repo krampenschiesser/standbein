@@ -5,6 +5,9 @@ import de.ks.standbein.LoggingGuiceTestSupport;
 import de.ks.util.FXPlatform;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -30,9 +33,13 @@ public class MainWindowTest {
     Node currentNode = navigator.getCurrentNode();
     assertNotNull(currentNode);
 
-    assertNotNull(mainWindow.stackPane);
-    Scene scene = mainWindow.stackPane.getScene();
+    assertNotNull(mainWindow.node);
+    Scene scene = mainWindow.node.getScene();
     assertNotNull(scene);
-    assertEquals(currentNode, mainWindow.stackPane);
+    assertEquals(currentNode, mainWindow.node);
+
+    assertThat(navigator.rootContainer, Matchers.instanceOf(BorderPane.class));
+    assertThat(navigator.contentContainer, Matchers.instanceOf(StackPane.class));
+    assertSame(navigator.contentContainer, mainWindow.contentPresenter);
   }
 }

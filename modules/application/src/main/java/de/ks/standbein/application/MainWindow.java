@@ -17,6 +17,20 @@ package de.ks.standbein.application;
 
 import de.ks.standbein.NodeProvider;
 import javafx.scene.Parent;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 public abstract class MainWindow implements NodeProvider<Parent> {
+  private StackPane root;
+
+  public Pane getRoot() {
+    return getContentPresenter();
+  }
+
+  public StackPane getContentPresenter() {
+    if (root == null) {
+      root = new StackPane();
+    }
+    return root;
+  }
 }

@@ -17,6 +17,8 @@ package de.ks.standbein.application;
 
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
 import javax.inject.Singleton;
@@ -24,12 +26,27 @@ import javax.inject.Singleton;
 @Singleton
 public class MainTestWindow extends MainWindow {
 
-  StackPane stackPane;
+  StackPane node;
+  BorderPane borderPane;
+  StackPane contentPresenter;
 
   @Override
   public Parent getNode() {
-    stackPane = new StackPane();
-    stackPane.getChildren().add(new Label("Content"));
-    return stackPane;
+    node = new StackPane();
+    node.getChildren().add(new Label("Content"));
+    return node;
+  }
+
+  @Override
+  public Pane getRoot() {
+    borderPane = new BorderPane();
+    contentPresenter = new StackPane();
+    borderPane.setCenter(contentPresenter);
+    return borderPane;
+  }
+
+  @Override
+  public StackPane getContentPresenter() {
+    return contentPresenter;
   }
 }
