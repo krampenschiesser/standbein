@@ -26,6 +26,7 @@ public class TestMenuModule extends AbstractModule {
   public static final String BLUBB_ITEM_1 = "TestItem B1";
   public static final String BLUBB_ITEM_2 = "TestItem B2";
   public static final String BLUBB_ITEM_3 = "TestItem B3";
+  public static final String SHOW_NODE = "showNode";
 
   @Override
   protected void configure() {
@@ -35,5 +36,7 @@ public class TestMenuModule extends AbstractModule {
     itemBinder.addBinding().toInstance(new MenuEntry("/main/bla/blubb", BLUBB_ITEM_1, new StartActivityAction(DummyActivity.class)).setLocalized(false).setOrder(2));
     itemBinder.addBinding().toInstance(new MenuEntry("/main/bla/blubb", BLUBB_ITEM_2, new StartActivityAction(DummyActivity.class)).setLocalized(false).setOrder(1));
     itemBinder.addBinding().toInstance(new MenuEntry("/main/bla/blubb", BLUBB_ITEM_3, new StartActivityAction(DummyActivity.class)).setLocalized(false).setOrder(2));
+
+    itemBinder.addBinding().toInstance(new MenuEntry("/urks", SHOW_NODE, new ShowNodeAction(TestNodeProvider.class)));
   }
 }

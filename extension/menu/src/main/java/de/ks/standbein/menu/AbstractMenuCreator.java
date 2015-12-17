@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractMenuCreator<N extends Node, T extends AbstractMenuCreator<N, T>> {
   public static final String PATH_SEPARATOR = "/";
-  private final Set<MenuEntry> items;
+  final Set<MenuEntry> items;
 
   @Inject
   public AbstractMenuCreator(Set<MenuEntry> items) {

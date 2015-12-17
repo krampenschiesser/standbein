@@ -15,8 +15,13 @@
  */
 package de.ks.standbein.menu;
 
+import com.google.inject.Injector;
 import de.ks.standbein.IntegrationTestModule;
 import de.ks.standbein.LoggingGuiceTestSupport;
+import de.ks.standbein.activity.ActivityController;
+import de.ks.standbein.activity.DummyActivity;
+import de.ks.standbein.application.Navigator;
+import de.ks.util.FXPlatform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -33,6 +38,14 @@ public class MenuTest {
 
   @Inject
   BarMenuCreatorCreator menu;
+  @Inject
+  Injector injector;
+  @Inject
+  ActivityController controller;
+  @Inject
+  Navigator navigator;
+  @Inject
+  TestNodeProvider testNodeProvider;
 
   @Test
   public void testMenu() throws Exception {
@@ -52,5 +65,24 @@ public class MenuTest {
     assertEquals(TestMenuModule.BLUBB_ITEM_2, blubb.getItems().get(0).getText());
     assertEquals(TestMenuModule.BLUBB_ITEM_1, blubb.getItems().get(1).getText());
     assertEquals(TestMenuModule.BLUBB_ITEM_3, blubb.getItems().get(2).getText());
+  }
+
+  @Test
+  public void testStartActivity() throws Exception {
+    MenuEntry entry = this.menu.items.stream().filter(i -> i.getName().equals(TestMenuModule.BLA_ITEM_1)).findFirst().get();
+    FXPlatform.invokeLater(() -> entry.getAction().accept(injector));
+    controller.waitForTasks();
+
+    assertEquals(DummyActivity.class.getSimpleName(), controller.getCurrentActivityId());
+  }
+
+  @Test
+  public void testShowNode() throws Exception {
+    MenuEntry entry = this.menu.items.stream().filter(i -> i.getName().equals(TestMenuModule.SHOW_NODE)).findFirst().get();
+    FXPlatform.invokeLater(() -> entry.getAction().accept(injector));
+    FXPlatform.waitForFX();
+
+    assertEquals(testNodeProvider.getNode(), navigator.getCurrentNode());
+
   }
 }
