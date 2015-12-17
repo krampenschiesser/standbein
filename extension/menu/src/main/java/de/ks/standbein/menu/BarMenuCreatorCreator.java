@@ -48,7 +48,9 @@ public class BarMenuCreatorCreator extends AbstractMenuCreator<MenuBar, BarMenuC
 
     for (MenuEntry item : menuEntries) {
       String currentItemMenuPath = item.getPath();
-      menuNames.add(currentItemMenuPath);
+      if (!menuNames.contains(currentItemMenuPath)) {
+        menuNames.add(currentItemMenuPath);
+      }
       Menu menu = getOrCreateMenu(currentItemMenuPath, menus);
 
       MenuItem menuItem = createMenuItem(item);
