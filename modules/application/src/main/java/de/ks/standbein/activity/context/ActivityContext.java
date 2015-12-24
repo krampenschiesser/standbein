@@ -199,9 +199,6 @@ public class ActivityContext implements Scope {
 
   @Override
   public <T> Provider<T> scope(Key<T> key, Provider<T> unscoped) {
-    if (injector == null) {
-      throw new IllegalStateException("Injector not yet set!");
-    }
     return new Provider<T>() {
       @Override
       public T get() {
@@ -248,6 +245,9 @@ public class ActivityContext implements Scope {
     ActivityHolder holder = activities.get(currentActivity);
     Object storedBean = holder.getStoredInstance(key);
     if (storedBean == null) {
+      if (injector == null) {
+        throw new IllegalStateException("Injector not yet set! Trying to get " + key);
+      }
       log.debug("Try to load {} from proxy, but found none for current activity.", key);
       return injector.getProvider(key).get();
     } else {
