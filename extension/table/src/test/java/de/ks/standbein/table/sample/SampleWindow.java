@@ -37,13 +37,14 @@ public class SampleWindow extends MainWindow {
   @Override
   public Parent getNode() {
     TableView<MyTableItem> tableView = new TableView<>();
-    configurator.addText(MyTableItem.class, MyTableItem::getName).setWidth(75);
-    configurator.addDate(MyTableItem.class, MyTableItem::getDate).setWidth(100);
-    configurator.addDateTime(MyTableItem.class, MyTableItem::getTime).setWidth(150);
-    configurator.addNumber(MyTableItem.class, MyTableItem::getCount);
+    configurator.addText(MyTableItem.class, MyTableItem::getName).setWidth(75).setName("Name");
+    configurator.addDate(MyTableItem.class, MyTableItem::getDate).setWidth(100).setName("Date");
+    configurator.addDateTime(MyTableItem.class, MyTableItem::getTime).setWidth(150).setName("Date/Time");
+    configurator.addNumber(MyTableItem.class, MyTableItem::getCount).setName("Count");
     configurator.configureTable(tableView);
 
     selection.configure(tableView, this::getComboValue, this::getTableItems, MyTableItem::getName);
+    selection.getBrowse().setText("Browse");
     return selection.getRoot();
   }
 
