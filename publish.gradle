@@ -15,7 +15,8 @@ task testUtilJar(type: Jar) {
 
 
 def projects = [project(":modules:i18n"), project(":modules:images"), project(":modules:launch"), project(":modules:validation"), project(":modules:eventsystem"),
-                project(":modules:reflection"), project(":modules:executor"), project(":modules:util"), project(":modules:application")]
+                project(":modules:reflection"), project(":modules:executor"), project(":modules:util"), project(":modules:application"),
+                project(":extension:menu"), project(":extension:table")]
 
 task sourceJar(type: Jar) {
     from projects.sourceSets.main.allJava
