@@ -105,7 +105,7 @@ public class TableConfigurator<E> {
 
   private <V, O extends ObservableValue<V> & WritableValue<V>> TableColumnBuilder<E> add(Class<E> clazz, Function<E, ?> function, Supplier<O> valueSupplier) {
     PropertyPath path = PropertyPath.ofTypeSafe(clazz, function);
-    String name = localized.get(path.getPropertyPath());
+    String name = localized.get(path.getRoot().getSimpleName() + "." + path.getPropertyPath());
 
     TableColumnBuilder<E> builder = new TableColumnBuilder<>();
     builder.setFunction(function);
