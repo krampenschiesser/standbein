@@ -75,16 +75,16 @@ public class TableConfigurator<E> {
     Class<?> returnType = propertyPath.getReturnType();
     returnType = Primitives.wrap(returnType);
     if (Integer.class.equals(returnType) || Short.class.equals(returnType) || Byte.class.equals(returnType)) {
-      return add(clazz, (Function<E, Number>) function, SimpleIntegerProperty::new);
+      return add(clazz, function, SimpleIntegerProperty::new);
     }
     if (Long.class.equals(returnType)) {
-      return add(clazz, (Function<E, Number>) function, SimpleLongProperty::new);
+      return add(clazz, function, SimpleLongProperty::new);
     }
     if (Float.class.equals(returnType)) {
-      return add(clazz, (Function<E, Number>) function, SimpleFloatProperty::new);
+      return add(clazz, function, SimpleFloatProperty::new);
     }
     if (Double.class.equals(returnType)) {
-      return add(clazz, (Function<E, Number>) function, SimpleDoubleProperty::new);
+      return add(clazz, function, SimpleDoubleProperty::new);
     }
     throw new IllegalArgumentException("Unkown number type " + returnType);
   }
