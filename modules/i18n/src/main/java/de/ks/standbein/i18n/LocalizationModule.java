@@ -23,10 +23,14 @@ import com.google.inject.name.Names;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class LocalizationModule extends AbstractModule {
+  public static final String DATETIME_FORMAT = "dateTimeFormat";
+  public static final String DATE_FORMAT = "dateFormat";
+
   public static final String FILENAME = "ResourceBundle.filename";
   public static final String BASENAME = "ResourceBundle.baseName";
 
@@ -38,6 +42,9 @@ public class LocalizationModule extends AbstractModule {
       .setDefault().toInstance("de.ks.standbein.i18n.Translation");
 
     OptionalBinder.newOptionalBinder(binder(), Locale.class).setDefault().toInstance(Locale.getDefault());
+
+    bind(DateTimeFormatter.class).annotatedWith(Names.named(DATETIME_FORMAT)).toInstance(DateTimeFormatter.ofPattern("uuu.MM.dd HH.mm.ss"));
+    bind(DateTimeFormatter.class).annotatedWith(Names.named(DATE_FORMAT)).toInstance(DateTimeFormatter.ofPattern("uuu.MM.dd"));
   }
 
   @Provides
