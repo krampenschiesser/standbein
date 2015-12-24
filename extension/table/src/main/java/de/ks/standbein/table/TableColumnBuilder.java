@@ -63,7 +63,7 @@ public class TableColumnBuilder<TableType> {
 
   @SuppressWarnings("unchecked")
   public TableColumn<TableType, ?> build() {
-    TableColumn<TableType, ?> tableColumn = new TableColumn<>();
+    TableColumn<TableType, ?> tableColumn = new TableColumn<>(name);
     tableColumn.setCellValueFactory(param -> {
       TableType item = param.getValue();
       Object value = function.apply(item);
