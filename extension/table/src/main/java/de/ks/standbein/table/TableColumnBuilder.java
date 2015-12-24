@@ -23,52 +23,53 @@ import javafx.scene.control.TableColumn;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class TableColumnBuilder<TableType, Value, DisplayType, Observable extends ObservableValue<DisplayType> & WritableValue<DisplayType>> {
-  protected Function<TableType, Value> function;
-  protected Supplier<Observable> observableValueSupplier;
+public class TableColumnBuilder<TableType> {
+  protected Function<TableType, ?> function;
+  protected Supplier<? extends ObservableValue<?>> observableValueSupplier;
   protected Integer width;
   protected String name;
   protected Class<TableType> tableClass;
   protected PropertyPath propertyPath;
 
-  public TableColumnBuilder<TableType, Value, DisplayType, Observable> setFunction(Function<TableType, Value> function) {
+  public TableColumnBuilder<TableType> setFunction(Function<TableType, ?> function) {
     this.function = function;
     return this;
   }
 
-  public TableColumnBuilder<TableType, Value, DisplayType, Observable> setValueSupplier(Supplier<Observable> observable) {
+  public <O extends ObservableValue<?> & WritableValue<?>> TableColumnBuilder<TableType> setValueSupplier(Supplier<O> observable) {
     this.observableValueSupplier = observable;
     return this;
   }
 
-  public TableColumnBuilder<TableType, Value, DisplayType, Observable> setWidth(Integer width) {
+  public TableColumnBuilder<TableType> setWidth(Integer width) {
     this.width = width;
     return this;
   }
 
-  public TableColumnBuilder<TableType, Value, DisplayType, Observable> setName(String name) {
+  public TableColumnBuilder<TableType> setName(String name) {
     this.name = name;
     return this;
   }
 
-  public TableColumnBuilder<TableType, Value, DisplayType, Observable> setTableClass(Class<TableType> tableClass) {
+  public TableColumnBuilder<TableType> setTableClass(Class<TableType> tableClass) {
     this.tableClass = tableClass;
     return this;
   }
 
-  public TableColumnBuilder<TableType, Value, DisplayType, Observable> setPropertyPath(PropertyPath propertyPath) {
+  public TableColumnBuilder<TableType> setPropertyPath(PropertyPath propertyPath) {
     this.propertyPath = propertyPath;
     return this;
   }
 
-  public TableColumn<TableType, DisplayType> build() {
-    TableColumn<TableType, DisplayType> tableColumn = new TableColumn<>();
+  @SuppressWarnings("unchecked")
+  public TableColumn<TableType, ?> build() {
+    TableColumn<TableType, ?> tableColumn = new TableColumn<>();
     tableColumn.setCellValueFactory(param -> {
       TableType item = param.getValue();
-      Value value = function.apply(item);
-      Observable observableValue = observableValueSupplier.get();
+      Object value = function.apply(item);
+      ObservableValue observableValue = observableValueSupplier.get();
       if (value != null) {
-        observableValue.setValue((DisplayType) value);
+        ((WritableValue) observableValue).setValue(value);
       }
       return observableValue;
     });
@@ -78,12 +79,13 @@ public class TableColumnBuilder<TableType, Value, DisplayType, Observable extend
     return tableColumn;
   }
 
-  public Function<TableType, Value> getFunction() {
+  public Function<TableType, ?> getFunction() {
     return function;
   }
 
-  public Supplier<Observable> getObservableValueSupplier() {
-    return observableValueSupplier;
+  @SuppressWarnings("unchecked")
+  public <O extends ObservableValue<?> & WritableValue<?>> Supplier<O> getObservableValueSupplier() {
+    return (Supplier<O>) observableValueSupplier;
   }
 
   public Integer getWidth() {

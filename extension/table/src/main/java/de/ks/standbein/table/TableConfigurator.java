@@ -38,7 +38,7 @@ public class TableConfigurator<E> {
   private final DateTimeFormatter dateTimeFormatter;
   private final DateTimeFormatter dateFormatter;
   private final Localized localized;
-  protected List<TableColumnBuilder<E, ?, ?, ?>> builders = new ArrayList<>();
+  protected List<TableColumnBuilder<E>> builders = new ArrayList<>();
 
   @Inject
   public TableConfigurator(@Named(LocalizationModule.DATETIME_FORMAT) DateTimeFormatter dateTimeFormatter,//
@@ -49,11 +49,11 @@ public class TableConfigurator<E> {
     this.localized = localized;
   }
 
-  public TableColumnBuilder<E, String, String, SimpleStringProperty> addText(Class<E> clazz, Function<E, String> function) {
+  public TableColumnBuilder<E> addText(Class<E> clazz, Function<E, String> function) {
     return add(clazz, function, SimpleStringProperty::new);
   }
 
-  public TableColumnBuilder<E, String, String, SimpleStringProperty> addDateTime(Class<E> clazz, Function<E, LocalDateTime> function) {
+  public TableColumnBuilder<E> addDateTime(Class<E> clazz, Function<E, LocalDateTime> function) {
     Function<E, String> wrapper = e -> {
       LocalDateTime localDateTime = function.apply(e);
       return localDateTime == null ? null : dateTimeFormatter.format(localDateTime);
@@ -61,7 +61,7 @@ public class TableConfigurator<E> {
     return add(clazz, wrapper, SimpleStringProperty::new);
   }
 
-  public TableColumnBuilder<E, String, String, SimpleStringProperty> addDate(Class<E> clazz, Function<E, LocalDate> function) {
+  public TableColumnBuilder<E> addDate(Class<E> clazz, Function<E, LocalDate> function) {
     Function<E, String> wrapper = e -> {
       LocalDate localDate = function.apply(e);
       return localDate == null ? null : dateFormatter.format(localDate);
@@ -70,7 +70,7 @@ public class TableConfigurator<E> {
   }
 
   @SuppressWarnings("unchecked")
-  public TableColumnBuilder<E, Number, Number, ?> addNumber(Class<E> clazz, Function<E, ? extends Number> function) {
+  public TableColumnBuilder<E> addNumber(Class<E> clazz, Function<E, ? extends Number> function) {
     PropertyPath propertyPath = PropertyPath.ofTypeSafe(clazz, function);
     Class<?> returnType = propertyPath.getReturnType();
     returnType = Primitives.wrap(returnType);
@@ -93,7 +93,7 @@ public class TableConfigurator<E> {
     builders.clear();
   }
 
-  public List<TableColumnBuilder<E, ?, ?, ?>> getBuilders() {
+  public List<TableColumnBuilder<E>> getBuilders() {
     return builders;
   }
 
@@ -103,12 +103,11 @@ public class TableConfigurator<E> {
       .forEach(e -> tableView.getColumns().add(e));
   }
 
-  private <V, D, O extends ObservableValue<D> & WritableValue<D>> TableColumnBuilder<E, V, D, O> add(Class<E> clazz, //
-                                                                                                     Function<E, V> function, Supplier<O> valueSupplier) {
+  private <O extends ObservableValue<?> & WritableValue<?>> TableColumnBuilder<E> add(Class<E> clazz, Function<E, ?> function, Supplier<O> valueSupplier) {
     PropertyPath path = PropertyPath.ofTypeSafe(clazz, function);
     String name = localized.get(path.getPropertyPath());
 
-    TableColumnBuilder<E, V, D, O> builder = new TableColumnBuilder<>();
+    TableColumnBuilder<E> builder = new TableColumnBuilder<>();
     builder.setFunction(function);
     builder.setValueSupplier(valueSupplier);
     builder.setName(name);
