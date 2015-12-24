@@ -36,7 +36,7 @@ public class TableColumnBuilder<TableType> {
     return this;
   }
 
-  public <O extends ObservableValue<?> & WritableValue<?>> TableColumnBuilder<TableType> setValueSupplier(Supplier<O> observable) {
+  public <V, O extends ObservableValue<V> & WritableValue<V>> TableColumnBuilder<TableType> setValueSupplier(Supplier<O> observable) {
     this.observableValueSupplier = observable;
     return this;
   }
@@ -84,7 +84,7 @@ public class TableColumnBuilder<TableType> {
   }
 
   @SuppressWarnings("unchecked")
-  public <O extends ObservableValue<?> & WritableValue<?>> Supplier<O> getObservableValueSupplier() {
+  public <V, O extends ObservableValue<V> & WritableValue<V>> Supplier<O> getObservableValueSupplier() {
     return (Supplier<O>) observableValueSupplier;
   }
 
