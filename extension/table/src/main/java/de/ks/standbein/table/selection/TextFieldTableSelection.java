@@ -211,14 +211,23 @@ public class TextFieldTableSelection<E> {
   }
 
   public TextField getTextField() {
+    checkConfigured();
     return textField;
   }
 
   public GridPane getRoot() {
+    checkConfigured();
     return root;
   }
 
   public Button getBrowse() {
+    checkConfigured();
     return browse;
+  }
+
+  private void checkConfigured() {
+    if (root == null) {
+      throw new IllegalStateException("Not configured yet!");
+    }
   }
 }
