@@ -1,0 +1,19 @@
+apply plugin: 'maven-publish'
+
+dependencies {
+    compile project(":modules:application")
+
+    testCompile project(":modules:application-test-util")
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+
+            artifactId "$extensionprefix-$project.name"
+            version "$version"
+
+            from components.java
+        }
+    }
+}
