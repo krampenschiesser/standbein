@@ -19,7 +19,8 @@ include "modules:testutil", "modules:util", "modules:reflection"
 include "modules:launch"
 include "modules:eventsystem", "modules:i18n", "modules:validation"
 include "modules:executor"
-include "modules:images", "modules:application"
+include "modules:images"
+include "modules:application"
 include "modules:application-test-util"
 
 //extensions
