@@ -20,6 +20,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WritableValue;
 import javafx.scene.control.TableColumn;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -30,6 +31,7 @@ public class TableColumnBuilder<TableType> {
   protected String name;
   protected Class<TableType> tableClass;
   protected PropertyPath propertyPath;
+  protected Consumer<TableColumn<TableType, ?>> postProcessor;
 
   public TableColumnBuilder<TableType> setFunction(Function<TableType, ?> function) {
     this.function = function;
@@ -61,6 +63,11 @@ public class TableColumnBuilder<TableType> {
     return this;
   }
 
+  public TableColumnBuilder<TableType> setPostProcessor(Consumer<TableColumn<TableType, ?>> postProcessor) {
+    this.postProcessor = postProcessor;
+    return this;
+  }
+
   @SuppressWarnings("unchecked")
   public TableColumn<TableType, ?> build() {
     TableColumn<TableType, ?> tableColumn = new TableColumn<>(name);
@@ -75,6 +82,9 @@ public class TableColumnBuilder<TableType> {
     });
     if (width != null) {
       tableColumn.setPrefWidth(width);
+    }
+    if (postProcessor != null) {
+      postProcessor.accept(tableColumn);
     }
     return tableColumn;
   }
@@ -102,5 +112,9 @@ public class TableColumnBuilder<TableType> {
 
   public PropertyPath getPropertyPath() {
     return propertyPath;
+  }
+
+  public Consumer<TableColumn<TableType, ?>> getPostProcessor() {
+    return postProcessor;
   }
 }
