@@ -19,7 +19,10 @@ import de.ks.executor.group.LastTextChange;
 import de.ks.standbein.activity.executor.ActivityExecutor;
 import de.ks.standbein.activity.executor.ActivityJavaFXExecutor;
 import de.ks.standbein.i18n.Localized;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -30,6 +33,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.PopupWindow;
+import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +61,9 @@ public class TextFieldTableSelection<E> {
   private PopupWindow tablePopup;
   private Pane tablePopupContent;
 
+  private SimpleObjectProperty<EventHandler<ActionEvent>> onAction = new SimpleObjectProperty<>();
+  private SimpleObjectProperty<E> item = new SimpleObjectProperty<>();
+
   @Inject
   public TextFieldTableSelection(Localized localized, ActivityExecutor executor, ActivityJavaFXExecutor javaFXExecutor) {
     this.localized = localized;
@@ -64,7 +71,7 @@ public class TextFieldTableSelection<E> {
     this.javaFXExecutor = javaFXExecutor;
   }
 
-  public void configure(TableView<E> table, Function<String, List<String>> comboValueSupplier, Function<String, List<E>> tableItemSupplier, Function<E, String> tableItemConverter) {
+  public void configure(TableView<E> table, Function<String, List<String>> comboValueSupplier, Function<String, List<E>> tableItemSupplier, StringConverter<E> tableItemConverter) {
     this.table = table;
     this.comboValueSupplier = comboValueSupplier;
     this.tableItemSupplier = tableItemSupplier;
@@ -106,11 +113,7 @@ public class TextFieldTableSelection<E> {
     listView.fixedCellSizeProperty().bind(textField.heightProperty());
     listView.setEffect(new DropShadow());
     listView.setOnMouseClicked(e -> {
-      String item = listView.getSelectionModel().getSelectedItem();
-      if (item != null) {
-        textField.setText(item);
-        listPopup.hide();
-      }
+      selectListItem(listView.getSelectionModel(), tableItemConverter);
     });
     listPopup.getScene().setRoot(listView);
 
@@ -140,9 +143,13 @@ public class TextFieldTableSelection<E> {
         selectionModel.select(idx);
         listView.scrollTo(Math.max(idx - 2, 0));
       } else if (e.getCode() == KeyCode.ENTER) {
-        String selectedItem = selectionModel.getSelectedItem();
-        textField.setText(selectedItem);
-        listPopup.hide();
+        if (listPopup.isShowing()) {
+          selectListItem(selectionModel, tableItemConverter);
+        } else {
+          if (onAction.get() != null) {
+            onAction.get().handle(new ActionEvent());
+          }
+        }
       } else if (e.getCode() == KeyCode.ESCAPE) {
         listPopup.hide();
       } else if (e.getCode() == KeyCode.SPACE && e.isControlDown()) {
@@ -169,17 +176,27 @@ public class TextFieldTableSelection<E> {
       .thenAcceptAsync(this::setListItems, javaFXExecutor);
   }
 
+  private void selectListItem(MultipleSelectionModel<String> selectionModel, StringConverter<E> tableItemConverter) {
+    String selectedItem = selectionModel.getSelectedItem();
+    if (selectedItem != null) {
+      textField.setText(selectedItem);
+      item.set(tableItemConverter.fromString(selectedItem));
+      listPopup.hide();
+    }
+  }
+
   private void showTablePopup() {
     Bounds bounds = browse.localToScreen(browse.getLayoutBounds());
     double width = tablePopupContent.getWidth();
     tablePopup.show(browse, bounds.getMaxX() - width, bounds.getMinY());
   }
 
-  private void applyTableItem(TableView<E> table, Function<E, String> tableItemConverter) {
+  private void applyTableItem(TableView<E> table, StringConverter<E> tableItemConverter) {
     E selectedItem = table.getSelectionModel().getSelectedItem();
     if (selectedItem != null) {
-      String textValue = tableItemConverter.apply(selectedItem);
+      String textValue = tableItemConverter.toString(selectedItem);
       textField.setText(textValue);
+      this.item.set(selectedItem);
     }
   }
 
@@ -229,5 +246,29 @@ public class TextFieldTableSelection<E> {
     if (root == null) {
       throw new IllegalStateException("Not configured yet!");
     }
+  }
+
+  public EventHandler<ActionEvent> getOnAction() {
+    return onAction.get();
+  }
+
+  public SimpleObjectProperty<EventHandler<ActionEvent>> onActionProperty() {
+    return onAction;
+  }
+
+  public void setOnAction(EventHandler<ActionEvent> onAction) {
+    this.onAction.set(onAction);
+  }
+
+  public E getItem() {
+    return item.get();
+  }
+
+  public SimpleObjectProperty<E> itemProperty() {
+    return item;
+  }
+
+  public void setItem(E item) {
+    this.item.set(item);
   }
 }

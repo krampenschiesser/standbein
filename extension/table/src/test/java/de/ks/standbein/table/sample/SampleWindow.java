@@ -21,14 +21,19 @@ import de.ks.standbein.table.TableConfigurator;
 import de.ks.standbein.table.selection.TextFieldTableSelection;
 import javafx.scene.Parent;
 import javafx.scene.control.TableView;
+import javafx.util.StringConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SampleWindow extends MainWindow {
+  private static final Logger log = LoggerFactory.getLogger(SampleWindow.class);
   @Inject
   TextFieldTableSelection<MyTableItem> selection;
   @Inject
@@ -43,8 +48,23 @@ public class SampleWindow extends MainWindow {
     configurator.addNumber(MyTableItem.class, MyTableItem::getCount).setName("Count");
     configurator.configureTable(tableView);
 
-    selection.configure(tableView, this::getComboValue, this::getTableItems, MyTableItem::getName);
+    Function<String, List<MyTableItem>> tableItemSupplier = this::getTableItems;
+    StringConverter<MyTableItem> tableItemConverter = new StringConverter<MyTableItem>() {
+      @Override
+      public String toString(MyTableItem object) {
+        return object.getName();
+      }
+
+      @Override
+      public MyTableItem fromString(String string) {
+        return tableItemSupplier.apply(string).get(0);
+      }
+    };
+    selection.configure(tableView, this::getComboValue, tableItemSupplier, tableItemConverter);
     selection.getBrowse().setText("Browse");
+    selection.itemProperty().addListener((p, o, n) -> {
+      log.info("Got new item {}", n);
+    });
     return selection.getRoot();
   }
 
