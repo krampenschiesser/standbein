@@ -53,6 +53,10 @@ public class TableConfigurator<E> {
     return add(clazz, function, SimpleStringProperty::new);
   }
 
+  public TableColumnBuilder<E> addBoolean(Class<E> clazz, Function<E, Boolean> function) {
+    return add(clazz, function, SimpleBooleanProperty::new);
+  }
+
   public TableColumnBuilder<E> addDateTime(Class<E> clazz, Function<E, LocalDateTime> function) {
     Function<E, String> wrapper = e -> {
       LocalDateTime localDateTime = function.apply(e);
