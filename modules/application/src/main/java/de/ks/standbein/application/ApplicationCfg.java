@@ -20,7 +20,7 @@ public class ApplicationCfg {
   private String icon;
   private double width;
   private double height;
-  private boolean localized;
+  private boolean localized = true;
 
   public ApplicationCfg(String title, double width, double height) {
     this.title = title;

@@ -54,7 +54,7 @@ public class ApplicationTestModule extends AbstractModule {
   protected void configure() {
     bind(boolean.class).annotatedWith(Names.named(ApplicationServiceModule.PREVENT_PLATFORMEXIT)).toInstance(true);
 
-    ApplicationCfg applicationCfg = new ApplicationCfg("apptitle", APP_SIZE, APP_SIZE).setIcon("keymap.jpg").setLocalized(true);
+    ApplicationCfg applicationCfg = new ApplicationCfg("apptitle", APP_SIZE, APP_SIZE).setIcon("keymap.jpg");
     bind(ApplicationCfg.class).toInstance(applicationCfg);
 
     if (useInitialActivity) {
