@@ -15,6 +15,8 @@
 
 package de.ks.standbein.imagecache;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import javafx.scene.image.Image;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ForkJoinPool;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -33,7 +35,10 @@ public class ImagesTest {
   private static final Logger log = LoggerFactory.getLogger(ImagesTest.class);
   private String packageImage = "packageimage.png";
   private String imageFolderImage = "imageFolderImage.png";
+  private String fullyQualified = "/de/ks/standbein/other/otherImage.png";
   private String fileImage;
+  private Injector injector;
+  private Images images;
 
   @Before
   public void setUp() throws Exception {
@@ -45,18 +50,28 @@ public class ImagesTest {
       fileImage = "pc/modules/images/fileimage.jpg";
     }
 
+    injector = Guice.createInjector(new ImageModule());
+    images = injector.getInstance(Images.class);
+  }
+
+  @Test
+  public void testSameInstanceInSingleton() throws Exception {
+    Images instance1 = injector.getInstance(Images.class);
+    Images instance2 = injector.getInstance(Images.class);
+    assertSame(instance1, instance2);
   }
 
   @Test
   public void testFindImages() throws Exception {
-    assertNotNull(Images.get(fileImage));
-    assertNotNull(Images.get(packageImage));
-    assertNotNull(Images.get(imageFolderImage));
+    assertNotNull(images.get(fileImage));
+    assertNotNull(images.get(packageImage));
+    assertNotNull(images.get(imageFolderImage));
+    assertNotNull(images.get(fullyQualified));
   }
 
   @Test
   public void testAsyncImage() throws Exception {
-    Image image = Images.later(fileImage, ForkJoinPool.commonPool()).get();
+    Image image = images.later(fileImage, ForkJoinPool.commonPool()).get();
     assertNotNull(image);
   }
 }

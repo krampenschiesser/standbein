@@ -23,37 +23,29 @@ import javafx.scene.image.Image;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
-/**
- *
- */
+
 public class Images {
   private static final Logger log = LoggerFactory.getLogger(Images.class);
-  private static final Images instance = new Images();
 
   private final LoadingCache<String, Image> cache;
   private final CacheLoader<? super String, Image> loader;
 
-  private Images() {
-    loader = new ImageLoader();
+  @Inject
+  public Images(@Named(ImageModule.IMG_DEFAULT_PACKAGE) String defaultImagePath) {
+    loader = new ImageLoader(defaultImagePath);
     cache = CacheBuilder.newBuilder()//
       .initialCapacity(300)//
       .softValues()//
       .build(loader);
   }
 
-  public static Image get(String imagePath) {
-    return instance.getImage(imagePath);
-  }
-
-  public static CompletableFuture<Image> later(String imagePath, ExecutorService executorService) {
-    return instance.loadAsync(imagePath, executorService);
-  }
-
-  protected Image getImage(String imagePath) {
+  public Image get(String imagePath) {
     try {
       return cache.get(imagePath);
     } catch (ExecutionException | UncheckedExecutionException e) {
@@ -62,7 +54,7 @@ public class Images {
     }
   }
 
-  public CompletableFuture<Image> loadAsync(String imagePath, ExecutorService executorService) {
-    return CompletableFuture.supplyAsync(() -> getImage(imagePath), executorService);
+  public CompletableFuture<Image> later(String imagePath, ExecutorService executorService) {
+    return CompletableFuture.supplyAsync(() -> get(imagePath), executorService);
   }
 }

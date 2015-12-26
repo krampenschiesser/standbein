@@ -20,6 +20,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import de.ks.eventsystem.EventBusModule;
 import de.ks.standbein.i18n.LocalizationModule;
+import de.ks.standbein.imagecache.ImageModule;
 
 import javax.inject.Singleton;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +33,7 @@ public class ApplicationModule extends AbstractModule {
     install(new ApplicationServiceModule());
     install(new LocalizationModule());
     install(new EventBusModule());
+    install(new ImageModule());
   }
 
   @Provides

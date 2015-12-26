@@ -35,6 +35,7 @@ public class Navigator {
   private Set<String> styleSheets = new HashSet<>();
   private ApplicationCfg applicationCfg = new ApplicationCfg("Unknown", 800, 600);
   private final Localized localized;
+  private final Images images;
 
   Stage stage;
   Pane rootContainer;
@@ -42,8 +43,9 @@ public class Navigator {
   Node currentNode;
 
   @Inject
-  public Navigator(Localized localized) {
+  public Navigator(Localized localized, Images images) {
     this.localized = localized;
+    this.images = images;
   }
 
   @com.google.inject.Inject(optional = true)
@@ -87,7 +89,7 @@ public class Navigator {
     stage.setTitle(title);
 
     if (applicationCfg.getIcon() != null) {
-      Image icon = Images.get(applicationCfg.getIcon());
+      Image icon = images.get(applicationCfg.getIcon());
       if (icon != null) {
         stage.getIcons().add(icon);
       }

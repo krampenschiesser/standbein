@@ -33,13 +33,15 @@ public class MenuBarCreator extends AbstractMenuCreator<MenuBar, MenuBarCreator>
   private final Localized localized;
   private final ExecutorService executorService;
   private final Injector injector;
+  private final Images images;
 
   @Inject
-  public MenuBarCreator(Set<MenuEntry> items, Localized localized, ExecutorService executorService, Injector injector) {
+  public MenuBarCreator(Set<MenuEntry> items, Localized localized, ExecutorService executorService, Injector injector, Images images) {
     super(items);
     this.localized = localized;
     this.executorService = executorService;
     this.injector = injector;
+    this.images = images;
   }
 
   @Override
@@ -86,7 +88,7 @@ public class MenuBarCreator extends AbstractMenuCreator<MenuBar, MenuBarCreator>
   private MenuItem createMenuItem(MenuEntry entry) {
     MenuItem menuItem = new MenuItem();
     if (entry.getIconPath() != null && !entry.getIconPath().isEmpty()) {
-      Images.later(entry.getIconPath(), executorService)//
+      images.later(entry.getIconPath(), executorService)//
         .thenAccept(img -> menuItem.setGraphic(new ImageView(img)));
     }
     menuItem.setId(entry.getIconPath());

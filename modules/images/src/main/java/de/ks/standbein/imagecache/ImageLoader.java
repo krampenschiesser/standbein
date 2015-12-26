@@ -28,9 +28,13 @@ import java.net.URL;
  *
  */
 public class ImageLoader extends CacheLoader<String, Image> {
-  public static final String DEFAULT_IMAGE_PACKAGE = "/de/ks/standbein/images/";
-
   private static final Logger log = LoggerFactory.getLogger(ImageLoader.class);
+
+  private final String defaultImagePath;
+
+  public ImageLoader(String defaultImagePath) {
+    this.defaultImagePath = defaultImagePath;
+  }
 
   @Override
   public Image load(String key) throws Exception {
@@ -42,18 +46,17 @@ public class ImageLoader extends CacheLoader<String, Image> {
       log.info("Loaded image {} from classpath", key);
       return image;
     }
-    resource = getClass().getResource(DEFAULT_IMAGE_PACKAGE + key);
+    resource = getClass().getResource(defaultImagePath + key);
     if (resource == null) {
-      log.debug("Could not load image {} from default image package {}", key, DEFAULT_IMAGE_PACKAGE);
+      log.debug("Could not load image {} from default image package {}", key, defaultImagePath);
     } else {
       Image image = loadFromUrl(resource);
-      log.info("Loaded image {} from default image package {}", key, DEFAULT_IMAGE_PACKAGE);
+      log.info("Loaded image {} from default image package {}", key, defaultImagePath);
       return image;
     }
 
     File file = new File(key);
     if (file.exists()) {
-
       Image image = loadFromFile(file);
       log.info("Loaded image {} from file {}", key, file);
       return image;
