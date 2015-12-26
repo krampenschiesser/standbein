@@ -68,6 +68,10 @@ public class MenuEntry implements Comparable<MenuEntry> {
     return localized;
   }
 
+  public int getOrder() {
+    return order;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

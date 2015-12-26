@@ -68,6 +68,17 @@ public class MenuTest {
   }
 
   @Test
+  public void testOrderOfMenus() throws Exception {
+    MenuBar menu = this.menu.createMenu("/main");
+    ObservableList<Menu> menus = menu.getMenus();
+    assertEquals(2, menus.size());
+    Menu first = menus.get(0);
+    Menu second = menus.get(1);
+    assertEquals(3, first.getItems().size());
+    assertEquals(1, second.getItems().size());
+  }
+
+  @Test
   public void testStartActivity() throws Exception {
     MenuEntry entry = this.menu.items.stream().filter(i -> i.getName().equals(TestMenuModule.BLA_ITEM_1)).findFirst().get();
     FXPlatform.invokeLater(() -> entry.getAction().accept(injector));

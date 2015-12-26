@@ -31,6 +31,7 @@ public class TestMenuModule extends AbstractModule {
   @Override
   protected void configure() {
     Multibinder<MenuEntry> itemBinder = Multibinder.newSetBinder(binder(), MenuEntry.class);
+    itemBinder.addBinding().toInstance(new MenuEntry("/main/ava", "other", new StartActivityAction(DummyActivity.class)).setLocalized(false).setOrder(100));
     itemBinder.addBinding().toInstance(new MenuEntry("/main/bla", BLA_ITEM_1, new StartActivityAction(DummyActivity.class)).setLocalized(false));
     itemBinder.addBinding().toInstance(new MenuEntry("/main/bla", BLA_ITEM_2, new StartActivityAction(DummyActivity.class)).setLocalized(false));
     itemBinder.addBinding().toInstance(new MenuEntry("/main/bla/blubb", BLUBB_ITEM_1, new StartActivityAction(DummyActivity.class)).setLocalized(false).setOrder(2));

@@ -18,6 +18,7 @@ package de.ks.standbein.menu;
 import com.google.inject.Injector;
 import de.ks.standbein.i18n.Localized;
 import de.ks.standbein.imagecache.Images;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -45,19 +46,37 @@ public class MenuBarCreator extends AbstractMenuCreator<MenuBar, MenuBarCreator>
   protected MenuBar createMenu(TreeSet<MenuEntry> menuEntries) {
     final Map<String, Menu> menus = new TreeMap<>();
     final List<String> menuNames = new ArrayList<>();
+    final Map<MenuItem, MenuEntry> item2Entry = new HashMap<>();
 
-    for (MenuEntry item : menuEntries) {
-      String currentItemMenuPath = item.getPath();
+    for (MenuEntry entry : menuEntries) {
+      String currentItemMenuPath = entry.getPath();
       if (!menuNames.contains(currentItemMenuPath)) {
         menuNames.add(currentItemMenuPath);
       }
       Menu menu = getOrCreateMenu(currentItemMenuPath, menus);
 
-      MenuItem menuItem = createMenuItem(item);
+      MenuItem menuItem = createMenuItem(entry);
       menu.getItems().add(menuItem);
+      item2Entry.put(menuItem, entry);
     }
 
     List<Menu> rootMenus = createMenuTreeStructure(menuNames, menus);
+    Map<Menu, Integer> menuOrder = new HashMap<>();
+
+    for (Menu menu : rootMenus) {
+      int minOrder = Integer.MAX_VALUE;
+      ObservableList<MenuItem> items = menu.getItems();
+      for (MenuItem item : items) {
+        MenuEntry entry = item2Entry.get(item);
+        if (entry != null) {
+          int order = entry.getOrder();
+          minOrder = Math.min(order, minOrder);
+        }
+      }
+      menuOrder.put(menu, minOrder);
+    }
+
+    Collections.sort(rootMenus, Comparator.comparing(menuOrder::get));
 
     MenuBar menuBar = new MenuBar();
     menuBar.getMenus().addAll(rootMenus);
