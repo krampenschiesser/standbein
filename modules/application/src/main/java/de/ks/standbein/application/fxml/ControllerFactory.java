@@ -56,6 +56,7 @@ public class ControllerFactory implements Callback<Class<?>, Object> {
       registerLoadedController(instance);
       return instance;
     } catch (ConfigurationException e) {
+      log.error("Could not load {}: ", clazz, e);
       return constructUnjectable(clazz);
     }
   }
