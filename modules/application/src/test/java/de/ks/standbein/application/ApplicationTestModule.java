@@ -23,6 +23,7 @@ import de.ks.eventsystem.EventBusModule;
 import de.ks.standbein.activity.InitialActivity;
 import de.ks.standbein.activity.resource.ResourceActivity;
 import de.ks.standbein.i18n.LocalizationModule;
+import de.ks.standbein.imagecache.ImageModule;
 import de.ks.standbein.module.ActivityContextModule;
 import de.ks.standbein.module.ApplicationServiceModule;
 
@@ -67,6 +68,7 @@ public class ApplicationTestModule extends AbstractModule {
     install(new ApplicationServiceModule());
     install(new LocalizationModule());
     install(new EventBusModule());
+    install(new ImageModule());
   }
 
   @Provides
