@@ -20,8 +20,10 @@ import org.junit.internal.AssumptionViolatedException;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 public class LoggingGuiceTestSupport extends GuiceTestSupport {
+  public static final String MDC_KEY = "testMethodMdc";
   private final Logger log;
 
   public LoggingGuiceTestSupport(Object test, Module... modules) {
@@ -45,6 +47,13 @@ public class LoggingGuiceTestSupport extends GuiceTestSupport {
   protected void starting(Description description) {
     super.starting(description);
     log.info("###Starting {}.{}", description.getTestClass().getSimpleName(), description.getMethodName());
+    MDC.put(MDC_KEY, description.getTestClass().getSimpleName() + "_" + description.getMethodName());
+  }
+
+  @Override
+  protected void finished(Description description) {
+    super.finished(description);
+    MDC.put(MDC_KEY, null);
   }
 
   @Override
