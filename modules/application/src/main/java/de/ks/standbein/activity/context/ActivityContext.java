@@ -28,7 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -279,6 +281,14 @@ public class ActivityContext implements Scope {
       proxies.putIfAbsent(key, retval);
       return (T) retval;
     }
+  }
+
+  public Set<String> getActivities() {
+    return Collections.unmodifiableSet(activities.keySet());
+  }
+
+  public boolean isMainActivity(String activity) {
+    return activities.keySet().size() == 2 && activities.containsKey(activity) && activities.containsKey(INITIAL_ACTIVITY);
   }
 
   public void setInjector(Injector injector) {
