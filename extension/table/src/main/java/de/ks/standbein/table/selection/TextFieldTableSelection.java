@@ -145,10 +145,12 @@ public class TextFieldTableSelection<E> {
       } else if (e.getCode() == KeyCode.ENTER) {
         if (listPopup.isShowing()) {
           selectListItem(selectionModel, tableItemConverter);
+          e.consume();
         } else {
           if (onAction.get() != null) {
             onAction.get().handle(new ActionEvent());
           }
+          e.consume();
         }
       } else if (e.getCode() == KeyCode.ESCAPE) {
         listPopup.hide();
@@ -182,6 +184,10 @@ public class TextFieldTableSelection<E> {
       textField.setText(selectedItem);
       item.set(tableItemConverter.fromString(selectedItem));
       listPopup.hide();
+      EventHandler<ActionEvent> handler = onAction.get();
+      if (handler != null) {
+        handler.handle(new ActionEvent());
+      }
     }
   }
 
