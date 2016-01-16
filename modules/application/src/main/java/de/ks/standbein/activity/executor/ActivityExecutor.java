@@ -47,6 +47,9 @@ public class ActivityExecutor implements ScheduledExecutorService {
         int id = threadCount.incrementAndGet();
         thread.setName(context.get().getCurrentActivity() + "-" + String.format("%02d", id));
         thread.setDaemon(true);
+        thread.setUncaughtExceptionHandler((t, e) -> {
+          log.error("Error during running thread ", e);
+        });
         return thread;
       }
     });
