@@ -49,7 +49,7 @@ public interface Validator<C extends Control, V> extends BiFunction<C, V, Valida
 
     @Override
     public ValidationResult apply(C control, V value) {
-      return validators.stream().map(v -> v.apply(control, value)).reduce(new ValidationResult(), ValidationResult::combine);
+      return new ArrayList<>(validators).stream().map(v -> v.apply(control, value)).reduce(new ValidationResult(), ValidationResult::combine);
     }
   }
 }
