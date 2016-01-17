@@ -45,21 +45,21 @@ import java.util.function.Function;
 public class TextFieldTableSelection<E> {
   private static final Logger log = LoggerFactory.getLogger(TextFieldTableSelection.class);
 
-  private final Localized localized;
-  private final ActivityExecutor executor;
-  private final ActivityJavaFXExecutor javaFXExecutor;
-  protected GridPane root;
-  protected Button browse;
-  protected TextField textField;
-  private TableView<E> table;
-  private Function<String, List<String>> comboValueSupplier;
-  private Function<String, List<E>> tableItemSupplier;
-  private Function<TableView<E>, Pane> popupContentProvider = this::createPopupContent;
-  private LastTextChange lastTextChange;
-  private ListView<String> listView;
-  private PopupControl listPopup;
-  private PopupWindow tablePopup;
-  private Pane tablePopupContent;
+  final Localized localized;
+  final ActivityExecutor executor;
+  final ActivityJavaFXExecutor javaFXExecutor;
+  GridPane root;
+  Button browse;
+  TextField textField;
+  TableView<E> table;
+  Function<String, List<String>> comboValueSupplier;
+  Function<String, List<E>> tableItemSupplier;
+  Function<TableView<E>, Pane> popupContentProvider = this::createPopupContent;
+  LastTextChange lastTextChange;
+  ListView<String> listView;
+  PopupControl listPopup;
+  PopupWindow tablePopup;
+  Pane tablePopupContent;
 
   private SimpleObjectProperty<EventHandler<ActionEvent>> onAction = new SimpleObjectProperty<>();
   private SimpleObjectProperty<E> item = new SimpleObjectProperty<>();
@@ -102,6 +102,9 @@ public class TextFieldTableSelection<E> {
       if (e.getClickCount() > 1) {
         applyTableItem(table, tableItemConverter);
         tablePopup.hide();
+        if (getOnAction() != null) {
+          getOnAction().handle(new ActionEvent());
+        }
       }
     });
     tablePopup.setAutoHide(true);
@@ -178,7 +181,7 @@ public class TextFieldTableSelection<E> {
       .thenAcceptAsync(this::setListItems, javaFXExecutor);
   }
 
-  private void selectListItem(MultipleSelectionModel<String> selectionModel, StringConverter<E> tableItemConverter) {
+  void selectListItem(MultipleSelectionModel<String> selectionModel, StringConverter<E> tableItemConverter) {
     String selectedItem = selectionModel.getSelectedItem();
     if (selectedItem != null) {
       textField.setText(selectedItem);
@@ -191,13 +194,13 @@ public class TextFieldTableSelection<E> {
     }
   }
 
-  private void showTablePopup() {
+  void showTablePopup() {
     Bounds bounds = browse.localToScreen(browse.getLayoutBounds());
     double width = tablePopupContent.getWidth();
     tablePopup.show(browse, bounds.getMaxX() - width, bounds.getMinY());
   }
 
-  private void applyTableItem(TableView<E> table, StringConverter<E> tableItemConverter) {
+  void applyTableItem(TableView<E> table, StringConverter<E> tableItemConverter) {
     E selectedItem = table.getSelectionModel().getSelectedItem();
     if (selectedItem != null) {
       String textValue = tableItemConverter.toString(selectedItem);
@@ -206,7 +209,7 @@ public class TextFieldTableSelection<E> {
     }
   }
 
-  private void showListPopup() {
+  void showListPopup() {
     Bounds bounds = textField.localToScreen(textField.getLayoutBounds());
     listPopup.show(textField, bounds.getMinX(), bounds.getMaxY());
     int selectedIndex = listView.getSelectionModel().getSelectedIndex();
@@ -215,7 +218,7 @@ public class TextFieldTableSelection<E> {
     }
   }
 
-  private void setListItems(List<String> values) {
+  void setListItems(List<String> values) {
     listView.setItems(FXCollections.observableArrayList(values));
     double fixedCellSize = listView.getFixedCellSize();
     fixedCellSize = fixedCellSize <= 0 ? 25 : fixedCellSize;
