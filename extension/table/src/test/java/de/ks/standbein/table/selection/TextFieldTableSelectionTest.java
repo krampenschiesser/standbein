@@ -74,6 +74,7 @@ public class TextFieldTableSelectionTest {
       KeyEvent event = new KeyEvent(null, "\n", "\n", KeyCode.ENTER, false, false, false, false);
       selection.getTextField().getOnKeyPressed().handle(event);
     });
+    FXPlatform.waitForFX();
     assertEquals(1, onActionCounter.get());
   }
 
