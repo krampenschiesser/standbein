@@ -14,12 +14,12 @@
  */
 package de.ks.standbein.activity.initialization;
 
+import de.ks.eventsystem.bus.EventBus;
+import de.ks.executor.JavaFXExecutorService;
 import de.ks.standbein.activity.ActivityCfg;
 import de.ks.standbein.activity.ActivityController;
 import de.ks.standbein.activity.context.ActivityScoped;
 import de.ks.standbein.application.fxml.DefaultLoader;
-import de.ks.eventsystem.bus.EventBus;
-import de.ks.executor.JavaFXExecutorService;
 import javafx.fxml.LoadException;
 import javafx.scene.Node;
 import org.apache.commons.lang3.tuple.Pair;
@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -66,6 +67,12 @@ public class ActivityInitialization {
 
   private boolean shouldLoadInFXThread(Class<?> clazz) {
     return clazz.isAnnotationPresent(LoadInFXThread.class);
+  }
+
+  public <T> void loadAdditionalController(Class<T> controllerClass, Consumer<Node> viewConsumer, Consumer<T> controllerConsumer) {
+    DefaultLoader<Node, T> loader = loadAdditionalController(controllerClass);
+    viewConsumer.accept(loader.getView());
+    controllerConsumer.accept(loader.getController());
   }
 
   @SuppressWarnings("unchecked")
