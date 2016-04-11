@@ -70,9 +70,13 @@ public class TextFieldTableSelectionTest {
   @Test
   public void testSimpleTextEnter() throws Exception {
     FXPlatform.invokeLater(() -> selection.getTextField().setText("Item01"));
+    if (selection.listPopup.isShowing()) {
+      FXPlatform.invokeLater(() -> selection.listPopup.hide());
+    }
     FXPlatform.invokeLater(() -> {
       KeyEvent event = new KeyEvent(null, "\n", "\n", KeyCode.ENTER, false, false, false, false);
       selection.getTextField().getOnKeyPressed().handle(event);
+      log.info("Pressed ENTER");
     });
     FXPlatform.waitForFX();
     assertEquals(1, onActionCounter.get());
