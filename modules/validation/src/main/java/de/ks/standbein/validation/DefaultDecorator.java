@@ -48,18 +48,22 @@ public class DefaultDecorator implements ControlDecorator {
 
   @Override
   public void decorate(Control c, ValidationResult result) {
-    if (c.getScene() == null) {
-      ChangeListener<Scene> listener = new ChangeListener<Scene>() {
-        @Override
-        public void changed(ObservableValue<? extends Scene> observable, Scene oldValue, Scene newValue) {
-          if (newValue != null) {
-            Platform.runLater(() -> decorate(c, result));
-            c.sceneProperty().removeListener(this);
+    ChangeListener<Scene> listener = new ChangeListener<Scene>() {
+      @Override
+      public void changed(ObservableValue<? extends Scene> observable, Scene oldValue, Scene newValue) {
+        if (newValue != null) {
+          Platform.runLater(() -> decorate(c, result));
+        } else {
+          ValidationPopup validationPopup = toolTips.get(c);
+          if (validationPopup != null) {
+            validationPopup.hide();
           }
+          c.sceneProperty().removeListener(this);
         }
-      };
-      c.sceneProperty().addListener(listener);
-    } else {
+      }
+    };
+    c.sceneProperty().addListener(listener);
+    if (c.getScene() != null) {
       decorateInternal(c, result);
     }
   }
@@ -80,6 +84,13 @@ public class DefaultDecorator implements ControlDecorator {
       tooltip.setAnchorLocation(PopupWindow.AnchorLocation.CONTENT_BOTTOM_LEFT);
       existing = tooltip;
       toolTips.put(c, tooltip);
+      c.focusedProperty().addListener((p, o, n) -> {
+        if (n) {
+          Bounds bounds = c.localToScreen(c.getLayoutBounds());
+          double minY = bounds.getMinY();
+          tooltip.show(c, bounds.getMinX(), minY);
+        }
+      });
     }
     //FIXME let tooltip stick to position of owner
     existing.setText(highestMessage.getText());
@@ -117,6 +128,7 @@ public class DefaultDecorator implements ControlDecorator {
         }
       };
       window.showingProperty().addListener(listener);
+      window.focusedProperty().addListener(listener);
 
 //      DropShadow dropShadow = new DropShadow(10, Color.BLACK);
 //      pane.setEffect(dropShadow);
