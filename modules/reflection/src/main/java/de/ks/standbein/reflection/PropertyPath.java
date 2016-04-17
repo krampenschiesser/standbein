@@ -370,8 +370,14 @@ public class PropertyPath {
   public String toLocalizationPath() {
     StringBuilder builder = new StringBuilder();
     builder.append(root.getSimpleName()).append(".");
-    for (String fieldName : fieldPath) {
-      builder.append(fieldName).append(".");
+    if (stringPath.size() > fieldPath.size()) {
+      for (String fieldName : stringPath) {
+        builder.append(fieldName).append(".");
+      }
+    } else {
+      for (String fieldName : fieldPath) {
+        builder.append(fieldName).append(".");
+      }
     }
     String path = builder.toString();
     return path.substring(0, path.length() - 1);
