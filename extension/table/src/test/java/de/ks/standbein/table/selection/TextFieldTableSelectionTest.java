@@ -88,6 +88,7 @@ public class TextFieldTableSelectionTest {
     FXPlatform.invokeLater(() -> selection.getTextField().setText("Item"));
     FXPlatform.invokeLater(() -> selection.lastTextChange.trigger());
     FXPlatform.waitForFX();
+    Condition.waitFor5s("Popup not showing yet", () -> selection.listPopup.isShowing());
 
     assertTrue(selection.listPopup.isShowing());
     assertEquals(20, selection.listView.getItems().size());
