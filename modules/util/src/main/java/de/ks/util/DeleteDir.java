@@ -23,10 +23,24 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 public class DeleteDir {
-  private final File dir;
+  private final Path dir;
+  boolean deleteFolder = true;
+
+  public DeleteDir(Path dir) {
+    this.dir = dir;
+  }
 
   public DeleteDir(File dir) {
-    this.dir = dir;
+    this.dir = dir.toPath();
+  }
+
+  public boolean isDeleteFolder() {
+    return deleteFolder;
+  }
+
+  public DeleteDir setDeleteFolder(boolean deleteFolder) {
+    this.deleteFolder = deleteFolder;
+    return this;
   }
 
   public void delete() {
@@ -37,8 +51,8 @@ public class DeleteDir {
     }
   }
 
-  protected void deleteDir(File file) throws IOException {
-    Files.walkFileTree(file.toPath(), new SimpleFileVisitor<Path>() {
+  protected void deleteDir(Path root) throws IOException {
+    Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         Files.delete(file);
@@ -47,7 +61,9 @@ public class DeleteDir {
 
       @Override
       public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-        Files.delete(dir);
+        if (deleteFolder || !root.equals(dir)) {
+          Files.delete(dir);
+        }
         return FileVisitResult.CONTINUE;
       }
     });
