@@ -19,19 +19,24 @@ import de.ks.standbein.reflection.PropertyPath;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WritableValue;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TreeTableColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class TableColumnBuilder<TableType> {
+  private static final Logger log = LoggerFactory.getLogger(TableColumnBuilder.class);
   protected Function<TableType, ?> function;
   protected Supplier<? extends ObservableValue<?>> observableValueSupplier;
   protected Integer width;
   protected String name;
   protected Class<TableType> tableClass;
   protected PropertyPath propertyPath;
-  protected Consumer<TableColumn<TableType, ?>> postProcessor;
+  protected Consumer<TableColumn<TableType, ?>> tablePostProcessor;
+  protected Consumer<TreeTableColumn<TableType, ?>> treePostProcessor;
 
   public TableColumnBuilder<TableType> setFunction(Function<TableType, ?> function) {
     this.function = function;
@@ -63,17 +68,27 @@ public class TableColumnBuilder<TableType> {
     return this;
   }
 
-  public TableColumnBuilder<TableType> setPostProcessor(Consumer<TableColumn<TableType, ?>> postProcessor) {
-    this.postProcessor = postProcessor;
+  public TableColumnBuilder<TableType> setTablePostProcessor(Consumer<TableColumn<TableType, ?>> tablePostProcessor) {
+    this.tablePostProcessor = tablePostProcessor;
+    return this;
+  }
+
+  public TableColumnBuilder<TableType> setTewwPostProcessor(Consumer<TreeTableColumn<TableType, ?>> treePostProcessor) {
+    this.treePostProcessor = treePostProcessor;
     return this;
   }
 
   @SuppressWarnings("unchecked")
-  public TableColumn<TableType, ?> build() {
+  public TableColumn<TableType, ?> buildTableColumn() {
     TableColumn<TableType, ?> tableColumn = new TableColumn<>(name);
     tableColumn.setCellValueFactory(param -> {
       TableType item = param.getValue();
-      Object value = function.apply(item);
+      Object value = null;
+      try {
+        value = function.apply(item);
+      } catch (NullPointerException e) {
+        log.debug("Could not get value from {}", item, e);
+      }
       ObservableValue observableValue = observableValueSupplier.get();
       if (value != null) {
         ((WritableValue) observableValue).setValue(value);
@@ -83,8 +98,34 @@ public class TableColumnBuilder<TableType> {
     if (width != null) {
       tableColumn.setPrefWidth(width);
     }
-    if (postProcessor != null) {
-      postProcessor.accept(tableColumn);
+    if (tablePostProcessor != null) {
+      tablePostProcessor.accept(tableColumn);
+    }
+    return tableColumn;
+  }
+
+  @SuppressWarnings("unchecked")
+  public TreeTableColumn<TableType, ?> buildTreeTableColumn() {
+    TreeTableColumn<TableType, ?> tableColumn = new TreeTableColumn<>(name);
+    tableColumn.setCellValueFactory(param -> {
+      TableType item = param.getValue().getValue();
+      Object value = null;
+      try {
+        value = function.apply(item);
+      } catch (NullPointerException e) {
+        log.debug("Could not get value from {}", item, e);
+      }
+      ObservableValue observableValue = observableValueSupplier.get();
+      if (value != null) {
+        ((WritableValue) observableValue).setValue(value);
+      }
+      return observableValue;
+    });
+    if (width != null) {
+      tableColumn.setPrefWidth(width);
+    }
+    if (treePostProcessor != null) {
+      treePostProcessor.accept(tableColumn);
     }
     return tableColumn;
   }
@@ -114,7 +155,11 @@ public class TableColumnBuilder<TableType> {
     return propertyPath;
   }
 
-  public Consumer<TableColumn<TableType, ?>> getPostProcessor() {
-    return postProcessor;
+  public Consumer<TableColumn<TableType, ?>> getTablePostProcessor() {
+    return tablePostProcessor;
+  }
+
+  public Consumer<TreeTableColumn<TableType, ?>> getTreePostProcessor() {
+    return treePostProcessor;
   }
 }

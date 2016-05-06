@@ -23,6 +23,7 @@ import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WritableValue;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TreeTableView;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -103,9 +104,17 @@ public class TableConfigurator<E> {
 
   public void configureTable(TableView<E> tableView) {
     builders.stream().sequential()//
-      .map(TableColumnBuilder::build)//
+      .map(TableColumnBuilder::buildTableColumn)//
       .forEach(e -> tableView.getColumns().add(e));
   }
+
+  public void configureTreeTable(TreeTableView<E> tableView) {
+    builders.stream().sequential()//
+      .map(TableColumnBuilder::buildTreeTableColumn)//
+      .forEach(e -> tableView.getColumns().add(e));
+  }
+
+
 
   private <V, O extends ObservableValue<V> & WritableValue<V>> TableColumnBuilder<E> add(Class<E> clazz, Function<E, ?> function, Supplier<O> valueSupplier) {
     PropertyPath path = PropertyPath.ofTypeSafe(clazz, function);
