@@ -17,6 +17,7 @@ package de.ks.standbein.autocomp;
 
 import de.ks.standbein.application.MainWindow;
 import javafx.scene.Parent;
+import javafx.scene.layout.VBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,16 +31,23 @@ public class SampleWindow extends MainWindow {
   private static final Logger log = LoggerFactory.getLogger(SampleWindow.class);
   @Inject
   AutoCompletionTextField selection;
+  @Inject
+  AutoCompletionTextField editable;
 
   @Override
   public Parent getNode() {
-
+    VBox vBox = new VBox();
+    vBox.setSpacing(10);
     Function<String, List<String>> tableItemSupplier = this::getTableItems;
     selection.configure(tableItemSupplier);
-    selection.itemProperty().addListener((p, o, n) -> {
-      log.info("Got new item {}", n);
-    });
-    return selection.getTextField();
+    editable.configure(tableItemSupplier);
+    editable.setEditable(true);
+
+    selection.itemProperty().addListener((p, o, n) -> log.info("Got item {}", n));
+    editable.itemProperty().addListener((p, o, n) -> log.info("Got item {}", n));
+    vBox.getChildren().add(selection.getTextField());
+    vBox.getChildren().add(editable.getTextField());
+    return vBox;
   }
 
   private List<String> getTableItems(String value) {

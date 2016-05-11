@@ -18,6 +18,7 @@ package de.ks.standbein.autocomp;
 import de.ks.executor.group.LastTextChange;
 import de.ks.standbein.activity.executor.ActivityExecutor;
 import de.ks.standbein.activity.executor.ActivityJavaFXExecutor;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -43,6 +44,7 @@ public class AutoCompletionTextField {
 
   private SimpleObjectProperty<EventHandler<ActionEvent>> onAction = new SimpleObjectProperty<>();
   private SimpleObjectProperty<String> item = new SimpleObjectProperty<>();
+  private SimpleBooleanProperty editable = new SimpleBooleanProperty();
 
   @Inject
   public AutoCompletionTextField(ActivityExecutor executor, ActivityJavaFXExecutor javaFXExecutor) {
@@ -64,6 +66,7 @@ public class AutoCompletionTextField {
     }
     listView = new ListView<>();
     listPopup = new PopupControl();
+    listPopup.setAutoFix(true);
     lastTextChange = new LastTextChange(textField, 75, executor);
 
     listView.setFocusTraversable(false);
@@ -94,10 +97,13 @@ public class AutoCompletionTextField {
         selectionModel.select(idx);
         listView.scrollTo(Math.max(idx - 2, 0));
       } else if (e.getCode() == KeyCode.ENTER) {
-        if (listPopup.isShowing()) {
+        if (listView.getHeight() > 1 && listPopup.isShowing()) {
           selectListItem(selectionModel);
           e.consume();
         } else {
+          if (editable.get()) {
+            item.set(textField.textProperty().getValueSafe());
+          }
           if (onAction.get() != null) {
             onAction.get().handle(new ActionEvent());
           }
@@ -178,5 +184,17 @@ public class AutoCompletionTextField {
 
   public TextField getTextField() {
     return textField;
+  }
+
+  public boolean getEditable() {
+    return editable.get();
+  }
+
+  public SimpleBooleanProperty editableProperty() {
+    return editable;
+  }
+
+  public void setEditable(boolean editable) {
+    this.editable.set(editable);
   }
 }
