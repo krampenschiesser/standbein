@@ -146,7 +146,7 @@ public class TextFieldTableSelection<E> {
         selectionModel.select(idx);
         listView.scrollTo(Math.max(idx - 2, 0));
       } else if (e.getCode() == KeyCode.ENTER) {
-        if (listPopup.isShowing()) {
+        if (listPopup.isShowing() && listView.getHeight() > 1) {
           selectListItem(selectionModel, tableItemConverter);
           e.consume();
         } else {
