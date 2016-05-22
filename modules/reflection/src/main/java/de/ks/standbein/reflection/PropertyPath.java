@@ -238,6 +238,8 @@ public class PropertyPath {
           Method method = methodOptional.get();
           method.setAccessible(true);
           method.invoke(instance, value);
+        } else {
+          log.warn("Could not find any setter for getter {}", lastMethod);
         }
       } else {
         lastMethod.setAccessible(true);
