@@ -123,6 +123,10 @@ public class AutoCompletionTextField {
       }
     });
 
+    reload();
+  }
+
+  public void reload() {
     CompletableFuture.supplyAsync(() -> comboValueSupplier.apply(textField.textProperty().getValueSafe()), executor)//
       .thenAcceptAsync(this::setListItems, javaFXExecutor);
   }
