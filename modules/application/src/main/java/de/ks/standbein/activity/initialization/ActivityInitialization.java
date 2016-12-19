@@ -90,6 +90,7 @@ public class ActivityInitialization {
     return loader;
   }
 
+  @SuppressWarnings("unchecked")
   public <T> CompletableFuture<DefaultLoader<Node, T>> loadAdditionalControllerWithFuture(Class<T> controllerClass) {
     @SuppressWarnings("unchecked")
     DefaultLoader<Node, T> loader = loadAdditionalController(controllerClass);

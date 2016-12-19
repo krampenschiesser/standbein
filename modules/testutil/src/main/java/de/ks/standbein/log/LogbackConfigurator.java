@@ -44,7 +44,7 @@ public class LogbackConfigurator extends ContextAwareBase implements Configurato
       StatusPrinter.printInCaseOfErrorsOrWarnings(context);
     } else {
       System.err.println("Could not find any cfg/logback.xml");
-      BasicConfigurator.configure((LoggerContext) context);
+      new BasicConfigurator().configure((LoggerContext) context);
     }
   }
 
