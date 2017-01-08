@@ -30,6 +30,7 @@ import java.util.ResourceBundle;
 public class LocalizationModule extends AbstractModule {
   public static final String DATETIME_FORMAT = "dateTimeFormat";
   public static final String DATE_FORMAT = "dateFormat";
+  public static final String TIME_FORMAT = "timeFormat";
 
   public static final String FILENAME = "ResourceBundle.filename";
   public static final String BASENAME = "ResourceBundle.baseName";
@@ -45,6 +46,7 @@ public class LocalizationModule extends AbstractModule {
 
     bind(DateTimeFormatter.class).annotatedWith(Names.named(DATETIME_FORMAT)).toInstance(DateTimeFormatter.ofPattern("uuu.MM.dd HH.mm.ss"));
     bind(DateTimeFormatter.class).annotatedWith(Names.named(DATE_FORMAT)).toInstance(DateTimeFormatter.ofPattern("uuu.MM.dd"));
+    bind(DateTimeFormatter.class).annotatedWith(Names.named(TIME_FORMAT)).toInstance(DateTimeFormatter.ofPattern("HH.mm.ss"));
   }
 
   @Provides
