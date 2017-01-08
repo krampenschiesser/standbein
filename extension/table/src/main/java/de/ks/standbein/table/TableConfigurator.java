@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,15 +39,17 @@ import java.util.function.Supplier;
 public class TableConfigurator<E> {
   private final DateTimeFormatter dateTimeFormatter;
   private final DateTimeFormatter dateFormatter;
+  private final DateTimeFormatter timeFormatter;
   private final Localized localized;
   protected List<TableColumnBuilder<E>> builders = new ArrayList<>();
 
   @Inject
   public TableConfigurator(@Named(LocalizationModule.DATETIME_FORMAT) DateTimeFormatter dateTimeFormatter,//
                            @Named(LocalizationModule.DATE_FORMAT) DateTimeFormatter dateFormatter,//
-                           Localized localized) {
+                           @Named(LocalizationModule.DATE_FORMAT) DateTimeFormatter timeFormatter, Localized localized) {
     this.dateTimeFormatter = dateTimeFormatter;
     this.dateFormatter = dateFormatter;
+    this.timeFormatter = timeFormatter;
     this.localized = localized;
   }
 
@@ -70,6 +73,14 @@ public class TableConfigurator<E> {
     Function<E, String> wrapper = e -> {
       LocalDate localDate = function.apply(e);
       return localDate == null ? null : dateFormatter.format(localDate);
+    };
+    return add(clazz, wrapper, SimpleStringProperty::new);
+  }
+
+  public TableColumnBuilder<E> addTime(Class<E> clazz, Function<E, LocalTime> function) {
+    Function<E, String> wrapper = e -> {
+      LocalTime localTime = function.apply(e);
+      return localTime == null ? null : timeFormatter.format(localTime);
     };
     return add(clazz, wrapper, SimpleStringProperty::new);
   }
